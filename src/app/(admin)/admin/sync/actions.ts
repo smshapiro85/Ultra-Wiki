@@ -160,27 +160,60 @@ export async function getSyncStatus(
   };
 }
 
-export async function getRecentSyncLogs(): Promise<
-  {
-    id: string;
-    status: string;
-    triggerType: string;
-    filesProcessed: number;
-    startedAt: Date | null;
-    completedAt: Date | null;
-    errorMessage: string | null;
-    createdAt: Date;
-  }[]
-> {
+export async function getActiveSyncStatus(): Promise<{
+  isRunning: boolean;
+  syncLogId?: string;
+  startedAt?: Date;
+} | null> {
   await requireAdmin();
   const db = getDb();
 
-  return db
+  const [row] = await db
+    .select({
+      id: syncLogs.id,
+      startedAt: syncLogs.startedAt,
+    })
+    .from(syncLogs)
+    .where(eq(syncLogs.status, "running"))
+    .limit(1);
+
+  if (!row) {
+    return { isRunning: false };
+  }
+
+  return {
+    isRunning: true,
+    syncLogId: row.id,
+    startedAt: row.startedAt ?? undefined,
+  };
+}
+
+export interface SyncLogEntry {
+  id: string;
+  status: string;
+  triggerType: string;
+  filesProcessed: number;
+  articlesCreated: number;
+  articlesUpdated: number;
+  startedAt: Date | null;
+  completedAt: Date | null;
+  errorMessage: string | null;
+  createdAt: Date;
+  durationMs: number | null;
+}
+
+export async function getRecentSyncLogs(): Promise<SyncLogEntry[]> {
+  await requireAdmin();
+  const db = getDb();
+
+  const rows = await db
     .select({
       id: syncLogs.id,
       status: syncLogs.status,
       triggerType: syncLogs.triggerType,
       filesProcessed: syncLogs.filesProcessed,
+      articlesCreated: syncLogs.articlesCreated,
+      articlesUpdated: syncLogs.articlesUpdated,
       startedAt: syncLogs.startedAt,
       completedAt: syncLogs.completedAt,
       errorMessage: syncLogs.errorMessage,
@@ -188,5 +221,14 @@ export async function getRecentSyncLogs(): Promise<
     })
     .from(syncLogs)
     .orderBy(desc(syncLogs.createdAt))
-    .limit(10);
+    .limit(20);
+
+  return rows.map((row) => ({
+    ...row,
+    durationMs:
+      row.startedAt && row.completedAt
+        ? new Date(row.completedAt).getTime() -
+          new Date(row.startedAt).getTime()
+        : null,
+  }));
 }

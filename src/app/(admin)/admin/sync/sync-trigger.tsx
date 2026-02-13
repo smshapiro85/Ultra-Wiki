@@ -15,7 +15,11 @@ type SyncState =
     }
   | { phase: "error"; message: string };
 
-export function SyncTrigger() {
+interface SyncTriggerProps {
+  disabled?: boolean;
+}
+
+export function SyncTrigger({ disabled }: SyncTriggerProps) {
   const [state, setState] = useState<SyncState>({ phase: "idle" });
   const pollRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -109,7 +113,7 @@ export function SyncTrigger() {
     }
   }, []);
 
-  const isDisabled = state.phase === "starting" || state.phase === "running";
+  const isDisabled = disabled || state.phase === "starting" || state.phase === "running";
 
   return (
     <div className="space-y-4">
