@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 2 complete -- ready for Phase 3
+**Current focus:** Phase 3 -- AI Processing Pipeline (merge engine complete, pipeline orchestration next)
 
 ## Current Position
 
-Phase: 2 of 7 (Admin Settings & GitHub Sync) -- COMPLETE
-Plan: 3 of 3 in current phase (all done)
-Status: Phase 2 complete -- all 3 plans executed
-Last activity: 2026-02-13 -- Completed 02-03-PLAN.md (cron sync & history dashboard)
+Phase: 3 of 7 (AI Processing Pipeline)
+Plan: 2 of 3 in current phase
+Status: Executing Phase 3 -- plans 01 and 02 complete
+Last activity: 2026-02-13 -- Completed 03-02-PLAN.md (merge engine, conflict resolution, version tracking)
 
-Progress: [████░░░░░░] 29%
+Progress: [█████░░░░░] 38%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 8
 - Average duration: 4min
-- Total execution time: 0.42 hours
+- Total execution time: 0.55 hours
 
 **By Phase:**
 
@@ -29,10 +29,11 @@ Progress: [████░░░░░░] 29%
 |-------|-------|-------|----------|
 | 01 | 3 | 15min | 5min |
 | 02 | 3 | 11min | 4min |
+| 03 | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 6min, 4min, 4min, 4min, 3min
-- Trend: Stable/Improving
+- Last 5 plans: 4min, 4min, 3min, 3min, 5min
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -74,6 +75,9 @@ Recent decisions affecting current work:
 - [02-03]: Bearer token auth (CRON_SECRET env var) for machine-to-machine cron endpoint
 - [02-03]: Schedule checking: cron-parser prev() vs last completed sync's completedAt
 - [02-03]: Invalid cron expressions treated as "not configured" (graceful degradation)
+- [03-02]: Conflict markers never stored in article content -- human version kept on conflict, AI proposal stored in version history
+- [03-02]: node-diff3 merge() conflict counting via startsWith('<<<<<<<') marker detection
+- [03-02]: ServerBlockNoteEditor as lazy singleton (synchronous create, reused across requests)
 
 ### Pending Todos
 
@@ -88,5 +92,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 02-03-PLAN.md -- Phase 2 complete
-Resume file: .planning/phases/02-admin-settings-and-github-sync/02-03-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md -- merge engine, conflict resolution, version tracking
+Resume file: .planning/phases/03-ai-processing-pipeline/03-02-SUMMARY.md
