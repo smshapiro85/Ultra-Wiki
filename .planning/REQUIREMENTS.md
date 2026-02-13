@@ -174,13 +174,89 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (To be populated by roadmapper) | | |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| INFR-01 | Phase 1 | Pending |
+| INFR-02 | Phase 1 | Pending |
+| INFR-03 | Phase 1 | Pending |
+| ADMIN-01 | Phase 2 | Pending |
+| ADMIN-02 | Phase 2 | Pending |
+| ADMIN-03 | Phase 2 | Pending |
+| ADMIN-04 | Phase 2 | Pending |
+| ADMIN-05 | Phase 2 | Pending |
+| ADMIN-06 | Phase 2 | Pending |
+| ADMIN-07 | Phase 2 | Pending |
+| GHUB-01 | Phase 2 | Pending |
+| GHUB-02 | Phase 2 | Pending |
+| GHUB-03 | Phase 2 | Pending |
+| GHUB-04 | Phase 2 | Pending |
+| GHUB-05 | Phase 2 | Pending |
+| GHUB-06 | Phase 2 | Pending |
+| GHUB-07 | Phase 2 | Pending |
+| GHUB-08 | Phase 2 | Pending |
+| GHUB-09 | Phase 2 | Pending |
+| AIPL-01 | Phase 3 | Pending |
+| AIPL-02 | Phase 3 | Pending |
+| AIPL-03 | Phase 3 | Pending |
+| AIPL-04 | Phase 3 | Pending |
+| AIPL-05 | Phase 3 | Pending |
+| AIPL-06 | Phase 3 | Pending |
+| AIPL-07 | Phase 3 | Pending |
+| AIPL-08 | Phase 3 | Pending |
+| VIEW-01 | Phase 4 | Pending |
+| VIEW-02 | Phase 4 | Pending |
+| VIEW-03 | Phase 4 | Pending |
+| VIEW-04 | Phase 4 | Pending |
+| VIEW-05 | Phase 4 | Pending |
+| VIEW-06 | Phase 4 | Pending |
+| VIEW-07 | Phase 4 | Pending |
+| VIEW-08 | Phase 4 | Pending |
+| VIEW-09 | Phase 4 | Pending |
+| VIEW-10 | Phase 4 | Pending |
+| EDIT-01 | Phase 5 | Pending |
+| EDIT-02 | Phase 5 | Pending |
+| EDIT-03 | Phase 5 | Pending |
+| EDIT-04 | Phase 5 | Pending |
+| EDIT-05 | Phase 5 | Pending |
+| EDIT-06 | Phase 5 | Pending |
+| EDIT-07 | Phase 5 | Pending |
+| VERS-01 | Phase 5 | Pending |
+| VERS-02 | Phase 5 | Pending |
+| VERS-03 | Phase 5 | Pending |
+| VERS-04 | Phase 5 | Pending |
+| VERS-05 | Phase 5 | Pending |
+| TECH-01 | Phase 6 | Pending |
+| TECH-02 | Phase 6 | Pending |
+| TECH-03 | Phase 6 | Pending |
+| TECH-04 | Phase 6 | Pending |
+| CMNT-01 | Phase 6 | Pending |
+| CMNT-02 | Phase 6 | Pending |
+| CMNT-03 | Phase 6 | Pending |
+| CMNT-04 | Phase 6 | Pending |
+| CMNT-05 | Phase 6 | Pending |
+| CMNT-06 | Phase 6 | Pending |
+| ASKI-01 | Phase 7 | Pending |
+| ASKI-02 | Phase 7 | Pending |
+| ASKI-03 | Phase 7 | Pending |
+| ASKI-04 | Phase 7 | Pending |
+| ASKI-05 | Phase 7 | Pending |
+| ASKI-06 | Phase 7 | Pending |
+| ASKI-07 | Phase 7 | Pending |
+| NOTF-01 | Phase 7 | Pending |
+| NOTF-02 | Phase 7 | Pending |
+| NOTF-03 | Phase 7 | Pending |
+| NOTF-04 | Phase 7 | Pending |
+| NOTF-05 | Phase 7 | Pending |
+| NOTF-06 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 59 total
-- Mapped to phases: 0
-- Unmapped: 59
+- v1 requirements: 77 total
+- Mapped to phases: 77
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-13*
-*Last updated: 2026-02-13 after initial definition*
+*Last updated: 2026-02-13 after roadmap creation*
