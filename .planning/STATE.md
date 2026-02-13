@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 1 - Foundation & Authentication
+**Current focus:** Phase 2 - Admin Settings & GitHub Sync
 
 ## Current Position
 
-Phase: 1 of 7 (Foundation & Authentication) -- COMPLETE
-Plan: 3 of 3 in current phase (all done)
-Status: Phase complete -- ready for Phase 2
-Last activity: 2026-02-13 -- Completed 01-03-PLAN.md (user profile & notifications)
+Phase: 2 of 7 (Admin Settings & GitHub Sync)
+Plan: 1 of 3 in current phase
+Status: Executing Phase 2 -- completed 02-01-PLAN.md
+Last activity: 2026-02-13 -- Completed 02-01-PLAN.md (admin settings dashboard)
 
-Progress: [██░░░░░░░░] 14%
+Progress: [███░░░░░░░] 19%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 4
 - Average duration: 5min
-- Total execution time: 0.25 hours
+- Total execution time: 0.32 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 3 | 15min | 5min |
+| 02 | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 6min, 4min
+- Last 5 plans: 5min, 6min, 4min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -52,6 +53,8 @@ Recent decisions affecting current work:
 - [01-01]: node:22-alpine Docker base
 - [Decision]: BlockNote JSON as native storage format -- no Markdown round-trip, no Milkdown fallback needed
 - [Decision]: Replaced pgboss with cron-triggered API route -- weekly sync doesn't need a persistent job queue
+- [Decision]: AI must receive full category tree + article index during generation -- always prefer existing categories over creating new ones. Wiki organization is a first-class concern.
+- [Decision]: New repo files/folders surface in a dedicated "New Files Review" admin section (not auto-included). Admin includes or ignores each, then "Apply Updates" triggers AI import + re-index.
 - [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
 - [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
 - [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
@@ -60,6 +63,10 @@ Recent decisions affecting current work:
 - [01-03]: useActionState (React 19) for form state management in profile forms
 - [01-03]: Client-side signOut in UserMenu via next-auth/react instead of server action
 - [01-03]: Sonner toast added to root layout for global form feedback
+- [02-01]: cron-parser v5 API (CronExpressionParser.parse) for server-side cron validation
+- [02-01]: cronstrue for client-side human-readable cron previews
+- [02-01]: github_branch added as 13th setting key (default "main")
+- [02-01]: Secret masking pattern: MASK_VALUE skip-save prevents overwriting real secrets
 
 ### Pending Todos
 
@@ -74,5 +81,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 01-03-PLAN.md (user profile & notifications) -- Phase 1 complete
-Resume file: .planning/phases/01-foundation-and-authentication/01-03-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md (admin settings dashboard)
+Resume file: .planning/phases/02-admin-settings-and-github-sync/02-01-SUMMARY.md
