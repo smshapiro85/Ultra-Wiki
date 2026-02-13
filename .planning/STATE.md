@@ -5,34 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 2 - Admin Settings & GitHub Sync
+**Current focus:** Phase 2 complete -- ready for Phase 3
 
 ## Current Position
 
-Phase: 2 of 7 (Admin Settings & GitHub Sync)
-Plan: 2 of 3 in current phase
-Status: Executing Phase 2 -- completed 02-02-PLAN.md
-Last activity: 2026-02-13 -- Completed 02-02-PLAN.md (GitHub sync engine & dashboard)
+Phase: 2 of 7 (Admin Settings & GitHub Sync) -- COMPLETE
+Plan: 3 of 3 in current phase (all done)
+Status: Phase 2 complete -- all 3 plans executed
+Last activity: 2026-02-13 -- Completed 02-03-PLAN.md (cron sync & history dashboard)
 
-Progress: [████░░░░░░] 24%
+Progress: [████░░░░░░] 29%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 5min
-- Total execution time: 0.38 hours
+- Total plans completed: 6
+- Average duration: 4min
+- Total execution time: 0.42 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 3 | 15min | 5min |
-| 02 | 2 | 8min | 4min |
+| 02 | 3 | 11min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 6min, 4min, 4min, 4min
-- Trend: Stable
+- Last 5 plans: 6min, 4min, 4min, 4min, 3min
+- Trend: Stable/Improving
 
 *Updated after each plan completion*
 
@@ -71,6 +71,9 @@ Recent decisions affecting current work:
 - [02-02]: Sync stores metadata only (path, SHA) -- file content deferred to Phase 3
 - [02-02]: Retry [1s, 4s, 16s] for transient errors; 401/404 fail immediately
 - [02-02]: Atomic sync lock via INSERT NOT EXISTS on sync_logs (Neon HTTP compatible)
+- [02-03]: Bearer token auth (CRON_SECRET env var) for machine-to-machine cron endpoint
+- [02-03]: Schedule checking: cron-parser prev() vs last completed sync's completedAt
+- [02-03]: Invalid cron expressions treated as "not configured" (graceful degradation)
 
 ### Pending Todos
 
@@ -85,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 02-02-PLAN.md (GitHub sync engine & dashboard)
-Resume file: .planning/phases/02-admin-settings-and-github-sync/02-02-SUMMARY.md
+Stopped at: Completed 02-03-PLAN.md -- Phase 2 complete
+Resume file: .planning/phases/02-admin-settings-and-github-sync/02-03-SUMMARY.md
