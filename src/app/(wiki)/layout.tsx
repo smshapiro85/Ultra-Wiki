@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { getDb } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { UserMenu } from "@/components/common/user-menu";
 
 export default async function WikiLayout({
@@ -10,7 +13,24 @@ export default async function WikiLayout({
 }) {
   const session = await auth();
 
-  if (!session?.user) {
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
+  const db = getDb();
+  const [user] = await db
+    .select({
+      name: users.name,
+      email: users.email,
+      image: users.image,
+      avatarUrl: users.avatarUrl,
+      role: users.role,
+    })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  if (!user) {
     redirect("/login");
   }
 
@@ -23,19 +43,11 @@ export default async function WikiLayout({
               href="/"
               className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
             >
-              CodeWiki
+              UltraWiki
             </Link>
           </div>
 
-          <UserMenu
-            user={{
-              name: session.user.name ?? null,
-              email: session.user.email ?? null,
-              image: session.user.image ?? null,
-              avatarUrl: null,
-              role: session.user.role ?? "user",
-            }}
-          />
+          <UserMenu user={user} />
         </div>
       </nav>
 

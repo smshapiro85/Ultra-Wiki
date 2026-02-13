@@ -18,7 +18,7 @@ export default async function LoginPage({
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold">CodeWiki</CardTitle>
+        <CardTitle className="text-2xl font-bold">UltraWiki</CardTitle>
         <CardDescription>
           AI-powered documentation that stays in sync
         </CardDescription>

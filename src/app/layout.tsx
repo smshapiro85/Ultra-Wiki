@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CodeWiki",
+  title: "UltraWiki",
   description: "AI-powered documentation that stays in sync with your codebase",
 };
 

@@ -37,7 +37,7 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-2 rounded-md px-2 py-1 outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={avatarSrc} alt={user.name ?? "User"} />
+            <AvatarImage src={avatarSrc} alt={user.name ?? "User"} referrerPolicy="no-referrer" />
             <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
           <span className="hidden text-sm text-zinc-700 dark:text-zinc-300 sm:inline">

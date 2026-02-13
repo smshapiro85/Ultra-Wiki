@@ -42,8 +42,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
       <div className="flex items-center gap-4">
         <Avatar className="h-16 w-16">
           <AvatarImage
-            src={user.image ?? undefined}
+            src={user.avatarUrl ?? user.image ?? undefined}
             alt={user.name ?? "User"}
+            referrerPolicy="no-referrer"
           />
           <AvatarFallback className="text-lg">{initials}</AvatarFallback>
         </Avatar>

@@ -36,7 +36,7 @@ export default async function AdminLayout({
               href="/"
               className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
             >
-              CodeWiki
+              UltraWiki
             </Link>
             <div className="flex items-center gap-1 rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
               Admin
