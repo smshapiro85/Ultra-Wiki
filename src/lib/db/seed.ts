@@ -4,6 +4,7 @@ import { siteSettings } from "./schema";
 
 const requiredSettings = [
   { key: "github_repo_url", description: "Full GitHub repository URL", isSecret: false },
+  { key: "github_branch", description: "GitHub branch to sync", value: "main", isSecret: false },
   { key: "github_api_key", description: "GitHub Personal Access Token", isSecret: true },
   { key: "openrouter_api_key", description: "OpenRouter API key", isSecret: true },
   {
