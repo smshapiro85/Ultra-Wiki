@@ -42,6 +42,18 @@ export default async function AdminLayout({
               Admin
             </div>
             <Link
+              href="/admin/settings"
+              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              Settings
+            </Link>
+            <Link
+              href="/admin/sync"
+              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              Sync
+            </Link>
+            <Link
               href="/admin/users"
               className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             >
