@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 1 of 7 (Foundation & Authentication)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-02-13 -- Roadmap created with 7 phases covering 77 requirements
+Plan: 1 of 3 in current phase
+Status: Executing phase
+Last activity: 2026-02-13 -- Completed 01-01-PLAN.md (project scaffold + Drizzle schema)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 5%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 5min
+- Total execution time: 0.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01 | 1 | 5min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 5min
+- Trend: Starting
 
 *Updated after each plan completion*
 
@@ -46,6 +46,10 @@ Recent decisions affecting current work:
 - [Roadmap]: Phase 3 (AI Pipeline) kept standalone due to complexity and risk -- this is the core differentiator
 - [Roadmap]: Technical View + Comments combined into one phase (both are article tab sub-features)
 - [Roadmap]: Ask AI + Notifications combined (both are interaction layers depending on all prior phases)
+- [01-01]: All 18 tables defined upfront in single schema.ts for clean initial migration
+- [01-01]: contentJson (jsonb) added to articles/articleVersions now (nullable) to avoid Phase 5 migration
+- [01-01]: isSecret boolean defers encryption to Phase 2; marks fields for UI masking
+- [01-01]: node:22-alpine Docker base for pg-boss Node 22.12+ requirement
 
 ### Pending Todos
 
@@ -60,5 +64,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Roadmap created, ready for Phase 1 planning
-Resume file: None
+Stopped at: Completed 01-01-PLAN.md (project scaffold + database schema)
+Resume file: .planning/phases/01-foundation-and-authentication/01-01-SUMMARY.md
