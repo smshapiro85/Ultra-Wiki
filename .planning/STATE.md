@@ -75,6 +75,10 @@ Recent decisions affecting current work:
 - [02-03]: Bearer token auth (CRON_SECRET env var) for machine-to-machine cron endpoint
 - [02-03]: Schedule checking: cron-parser prev() vs last completed sync's completedAt
 - [02-03]: Invalid cron expressions treated as "not configured" (graceful degradation)
+- [03-01]: Zod v4 works directly with AI SDK v6 Output.object -- no zodSchema wrapper needed
+- [03-01]: Extracted withRetry to shared src/lib/github/retry.ts for reuse across sync and AI pipeline
+- [03-01]: z.record in Zod v4 requires two args (keyType, valueType) unlike Zod v3
+- [03-01]: generateText with experimental_output property for structured output (not deprecated generateObject)
 - [03-02]: Conflict markers never stored in article content -- human version kept on conflict, AI proposal stored in version history
 - [03-02]: node-diff3 merge() conflict counting via startsWith('<<<<<<<') marker detection
 - [03-02]: ServerBlockNoteEditor as lazy singleton (synchronous create, reused across requests)
@@ -92,5 +96,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 03-02-PLAN.md -- merge engine, conflict resolution, version tracking
-Resume file: .planning/phases/03-ai-processing-pipeline/03-02-SUMMARY.md
+Stopped at: Re-executed 03-01-PLAN.md -- AI foundation layer (client, schemas, prompts, analysis, generation)
+Resume file: .planning/phases/03-ai-processing-pipeline/03-01-SUMMARY.md
