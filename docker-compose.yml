@@ -1,0 +1,14 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - image_data:/data/images
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+  image_data:
+    driver: local
