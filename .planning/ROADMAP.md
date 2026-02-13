@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Authentication** - Database schema, Docker deployment, Google OIDC login, role system
 - [x] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with cron-triggered scheduling
-- [ ] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
+- [x] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
 - [ ] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
 - [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
@@ -73,9 +73,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- AI client (Vercel AI SDK + OpenRouter), Zod schemas, prompt builders, file content fetching, code analysis and article generation
-- [ ] 03-02-PLAN.md -- Three-way merge (node-diff3), conflict resolution, BlockNote conversion, version tracking, review banner dismissal API
-- [ ] 03-03-PLAN.md -- Pipeline orchestrator wiring analysis + merge + storage, sync integration (auto-trigger after sync)
+- [x] 03-01-PLAN.md -- AI client (Vercel AI SDK + OpenRouter), Zod schemas, prompt builders, file content fetching, code analysis and article generation
+- [x] 03-02-PLAN.md -- Three-way merge (node-diff3), conflict resolution, BlockNote conversion, version tracking, review banner dismissal API
+- [x] 03-03-PLAN.md -- Pipeline orchestrator wiring analysis + merge + storage, sync integration (auto-trigger after sync)
 
 ### Phase 4: Wiki Viewer
 **Goal**: Users can browse, navigate, and search the wiki to find and read articles
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|---------------|--------|-----------|
 | 1. Foundation & Authentication | 3/3 | ✓ Complete | 2026-02-13 |
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
-| 3. AI Processing Pipeline | 0/3 | Planned | - |
+| 3. AI Processing Pipeline | 3/3 | ✓ Complete | 2026-02-13 |
 | 4. Wiki Viewer | 0/3 | Not started | - |
 | 5. Article Editing & Version History | 0/3 | Not started | - |
 | 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
