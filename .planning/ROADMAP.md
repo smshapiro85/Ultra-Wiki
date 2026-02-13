@@ -45,27 +45,29 @@ Plans:
 **Requirements**: ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05, ADMIN-06, ADMIN-07, GHUB-01, GHUB-02, GHUB-03, GHUB-04, GHUB-05, GHUB-06, GHUB-07, GHUB-08, GHUB-09
 **Success Criteria** (what must be TRUE):
   1. Admin can configure GitHub repo URL, API keys (OpenRouter, SendGrid, Slack), and AI prompts from a settings dashboard -- secret values are never exposed in the frontend
-  2. Admin can browse the repo file tree and exclude files/folders from sync, with exclusions persisting across syncs
-  3. Admin can trigger a manual sync that fetches changed files incrementally (SHA comparison), with a progress indicator
-  4. Scheduled sync runs automatically via cron-triggered API route using admin-configured schedule, with concurrency locking
-  5. Admin can view sync history and job status (pending, running, completed, failed) in the admin UI
-**Plans**: TBD
+  2. Admin can browse the repo file tree with all files/folders excluded by default, and selectively include what to sync -- inclusions persist across syncs
+  3. When included files/folders change, an AI re-index runs to determine if the wiki structure (categories, article groupings) needs updating
+  4. Admin can trigger a manual sync that fetches changed files incrementally (SHA comparison), with a progress indicator
+  5. Scheduled sync runs automatically via cron-triggered API route using admin-configured schedule, with concurrency locking
+  6. Admin can view sync history and job status (pending, running, completed, failed) in the admin UI
+**Plans:** 3 plans
 
 Plans:
-- [ ] 02-01: Admin settings dashboard and site_settings key-value store
-- [ ] 02-02: GitHub integration (Octokit file tree, exclusion rules, incremental sync)
-- [ ] 02-03: Cron-triggered sync scheduling and sync history dashboard
+- [ ] 02-01-PLAN.md -- Admin settings dashboard with tabbed UI (General, API Keys, AI Prompts), settings library, test connection
+- [ ] 02-02-PLAN.md -- GitHub integration: Octokit client, file tree UI with inclusion checkboxes, incremental sync engine with concurrency lock
+- [ ] 02-03-PLAN.md -- Cron-triggered sync scheduling with schedule checker, enhanced sync history dashboard
 
 ### Phase 3: AI Processing Pipeline
 **Goal**: The system automatically generates and updates wiki articles from code changes, merging AI content with human edits without destroying them
 **Depends on**: Phase 2
 **Requirements**: AIPL-01, AIPL-02, AIPL-03, AIPL-04, AIPL-05, AIPL-06, AIPL-07, AIPL-08
 **Success Criteria** (what must be TRUE):
-  1. After a sync completes, the system analyzes changed files and creates or updates articles with AI-generated Markdown content, technical view content, file links, and DB table mappings
-  2. AI-generated articles follow the admin-configured article style prompt and receive AI-suggested categories
-  3. When an article with human edits is updated by AI, human contributions are preserved through the merge strategy -- the resulting article contains both the new AI content and the original human edits
-  4. When a merge produces a conflict between human edits and code changes, a visible review banner appears on the article
-  5. User can dismiss the review banner after reviewing the changes
+  1. After a sync completes, the system analyzes changed files and creates or updates articles with AI-generated content, technical view content, file links, and DB table mappings
+  2. AI receives the full existing category tree and article index as context -- it must place articles into existing categories/groupings whenever possible, only proposing new categories when no existing one fits. Category coherence is critical to wiki organization.
+  3. AI-generated articles follow the admin-configured article style prompt
+  4. When an article with human edits is updated by AI, human contributions are preserved through the merge strategy -- the resulting article contains both the new AI content and the original human edits
+  5. When a merge produces a conflict between human edits and code changes, a visible review banner appears on the article
+  6. User can dismiss the review banner after reviewing the changes
 **Plans**: TBD
 
 Plans:
