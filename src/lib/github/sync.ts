@@ -28,6 +28,8 @@ export interface SyncResult {
     added: number;
     modified: number;
     removed: number;
+    articlesCreated: number;
+    articlesUpdated: number;
   };
 }
 
@@ -67,6 +69,8 @@ export async function releaseSyncLock(
   status: "completed" | "failed",
   stats: {
     filesProcessed?: number;
+    articlesCreated?: number;
+    articlesUpdated?: number;
     error?: string;
   }
 ): Promise<void> {
@@ -77,6 +81,8 @@ export async function releaseSyncLock(
       status,
       completedAt: new Date(),
       filesProcessed: stats.filesProcessed ?? 0,
+      articlesCreated: stats.articlesCreated ?? 0,
+      articlesUpdated: stats.articlesUpdated ?? 0,
       errorMessage: stats.error ?? null,
     })
     .where(eq(syncLogs.id, syncLogId));
@@ -215,7 +221,11 @@ export async function applyChanges(
  *   4. Fetch remote tree
  *   5. Detect changes via SHA comparison
  *   6. Apply changes to github_files
- *   7. Release lock with stats
+ *   6.5. Run AI pipeline on changed files
+ *   7. Release lock with stats (including article counts)
+ *
+ * The sync lock is held until AFTER the AI pipeline completes,
+ * preventing race conditions between sync and AI processing.
  *
  * Returns sync result with stats or error information.
  */
@@ -256,16 +266,38 @@ export async function runSync(
     // 6. Apply changes
     const { filesProcessed } = await applyChanges(changeSet);
 
+    // 6.5. Run AI pipeline on changed files (while lock is still held)
+    // Dynamic import to avoid pulling BlockNote/JSDOM into the module graph
+    // at build time (causes createContext error during static page collection).
+    const changedFilePaths = [
+      ...changeSet.added.map((f) => f.path),
+      ...changeSet.modified.map((f) => f.path),
+    ];
+    let aiStats = { articlesCreated: 0, articlesUpdated: 0 };
+    if (changedFilePaths.length > 0) {
+      try {
+        const { runAIPipeline } = await import("@/lib/ai/pipeline");
+        aiStats = await runAIPipeline(syncLogId, changedFilePaths);
+      } catch (error) {
+        // AI pipeline failure should NOT fail the sync -- log and continue
+        console.error("[sync] AI pipeline error:", error);
+      }
+    }
+
     const stats = {
       filesProcessed,
       added: changeSet.added.length,
       modified: changeSet.modified.length,
       removed: changeSet.removed.length,
+      articlesCreated: aiStats.articlesCreated,
+      articlesUpdated: aiStats.articlesUpdated,
     };
 
-    // 7. Release lock with success
+    // 7. Release lock with success (including article counts)
     await releaseSyncLock(syncLogId, "completed", {
       filesProcessed,
+      articlesCreated: aiStats.articlesCreated,
+      articlesUpdated: aiStats.articlesUpdated,
     });
 
     return { success: true, syncLogId, stats };
