@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
   if (type === "openrouter") {
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/models", {
+      const response = await fetch("https://openrouter.ai/api/v1/key", {
         headers: { Authorization: `Bearer ${apiKey}` },
       });
       if (!response.ok) {
