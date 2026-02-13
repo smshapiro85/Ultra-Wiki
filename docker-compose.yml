@@ -9,6 +9,10 @@ services:
       - .env
     restart: unless-stopped
 
+# Scheduled sync: set up a host cron job to trigger syncs:
+# */5 * * * * curl -s -X POST -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/admin/sync/cron
+# The route checks the admin-configured schedule internally, so the cron can run frequently (e.g., every 5 min).
+
 volumes:
   image_data:
     driver: local
