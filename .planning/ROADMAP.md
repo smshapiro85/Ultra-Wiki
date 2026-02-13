@@ -32,12 +32,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Admin can promote a regular user to admin and demote an admin to user
   4. User can edit their display name and avatar from a profile page
   5. The application starts in Docker with persistent image storage and connects to Neon Postgres (pooled and unpooled)
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 01-01: Docker setup, database schema, and Drizzle migrations
-- [ ] 01-02: NextAuth v5 Google OIDC authentication and role system
-- [ ] 01-03: User profile and notification preferences UI
+- [ ] 01-01-PLAN.md -- Scaffold Next.js 15 project, complete Drizzle schema (18 tables), Docker infrastructure
+- [ ] 01-02-PLAN.md -- NextAuth v5 Google OIDC with split config, JWT roles, login page, admin user management
+- [ ] 01-03-PLAN.md -- User profile editing (name, avatar) and notification preferences UI
 
 ### Phase 2: Admin Settings & GitHub Sync
 **Goal**: Admin can configure the system and sync source code from GitHub on a schedule or manually
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Foundation & Authentication | 0/3 | Not started | - |
+| 1. Foundation & Authentication | 0/3 | Planned | - |
 | 2. Admin Settings & GitHub Sync | 0/3 | Not started | - |
 | 3. AI Processing Pipeline | 0/3 | Not started | - |
 | 4. Wiki Viewer | 0/3 | Not started | - |
