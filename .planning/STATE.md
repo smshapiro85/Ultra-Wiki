@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 1 of 7 (Foundation & Authentication)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: Executing phase
-Last activity: 2026-02-13 -- Completed 01-01-PLAN.md (project scaffold + Drizzle schema)
+Last activity: 2026-02-13 -- Completed 01-02-PLAN.md (authentication & authorization)
 
-Progress: [█░░░░░░░░░] 5%
+Progress: [██░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 5min
-- Total execution time: 0.1 hours
+- Total plans completed: 2
+- Average duration: 5.5min
+- Total execution time: 0.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01 | 1 | 5min | 5min |
+| 01 | 2 | 11min | 5.5min |
 
 **Recent Trend:**
-- Last 5 plans: 5min
-- Trend: Starting
+- Last 5 plans: 5min, 6min
+- Trend: Stable
 
 *Updated after each plan completion*
 
@@ -50,6 +50,10 @@ Recent decisions affecting current work:
 - [01-01]: contentJson (jsonb) added to articles/articleVersions now (nullable) to avoid Phase 5 migration
 - [01-01]: isSecret boolean defers encryption to Phase 2; marks fields for UI masking
 - [01-01]: node:22-alpine Docker base for pg-boss Node 22.12+ requirement
+- [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
+- [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
+- [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
+- [01-02]: Server action pattern for signIn/signOut instead of client-side auth calls
 
 ### Pending Todos
 
@@ -64,5 +68,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 01-01-PLAN.md (project scaffold + database schema)
-Resume file: .planning/phases/01-foundation-and-authentication/01-01-SUMMARY.md
+Stopped at: Completed 01-02-PLAN.md (authentication & authorization)
+Resume file: .planning/phases/01-foundation-and-authentication/01-02-SUMMARY.md
