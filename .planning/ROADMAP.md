@@ -13,7 +13,7 @@ CodeWiki delivers an AI-augmented internal wiki that auto-generates documentatio
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation & Authentication** - Database schema, Docker deployment, Google OIDC login, role system
-- [ ] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with cron-triggered scheduling
+- [x] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with cron-triggered scheduling
 - [ ] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
 - [ ] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
@@ -46,16 +46,18 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Admin can configure GitHub repo URL, API keys (OpenRouter, SendGrid, Slack), and AI prompts from a settings dashboard -- secret values are never exposed in the frontend
   2. Admin can browse the repo file tree with all files/folders excluded by default, and selectively include what to sync -- inclusions persist across syncs
-  3. When included files/folders change, an AI re-index runs to determine if the wiki structure (categories, article groupings) needs updating
-  4. Admin can trigger a manual sync that fetches changed files incrementally (SHA comparison), with a progress indicator
-  5. Scheduled sync runs automatically via cron-triggered API route using admin-configured schedule, with concurrency locking
-  6. Admin can view sync history and job status (pending, running, completed, failed) in the admin UI
+  3. When a sync detects new files/folders in the repo (not previously seen), they appear in a "New Files Review" admin section -- unselected by default, separate from the main file tree
+  4. Admin can review new files/folders and either include them (add to sync) or ignore them (permanently dismissed in DB, won't resurface). An "Apply Updates" action commits selections and triggers an AI import and re-index of wiki structure.
+  5. When included files/folders change (via new file review or manual file tree edits), an AI re-index runs to determine if the wiki structure (categories, article groupings) needs updating
+  6. Admin can trigger a manual sync that fetches changed files incrementally (SHA comparison), with a progress indicator
+  7. Scheduled sync runs automatically via cron-triggered API route using admin-configured schedule, with concurrency locking
+  8. Admin can view sync history and job status (pending, running, completed, failed) in the admin UI
 **Plans:** 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- Admin settings dashboard with tabbed UI (General, API Keys, AI Prompts), settings library, test connection
-- [ ] 02-02-PLAN.md -- GitHub integration: Octokit client, file tree UI with inclusion checkboxes, incremental sync engine with concurrency lock
-- [ ] 02-03-PLAN.md -- Cron-triggered sync scheduling with schedule checker, enhanced sync history dashboard
+- [x] 02-01-PLAN.md -- Admin settings dashboard with tabbed UI (General, API Keys, AI Prompts), settings library, test connection
+- [x] 02-02-PLAN.md -- GitHub integration: Octokit client, file tree UI with inclusion checkboxes, new files review section with include/ignore + "Apply Updates", incremental sync engine with concurrency lock
+- [x] 02-03-PLAN.md -- Cron-triggered sync scheduling with schedule checker, enhanced sync history dashboard
 
 ### Phase 3: AI Processing Pipeline
 **Goal**: The system automatically generates and updates wiki articles from code changes, merging AI content with human edits without destroying them
@@ -149,7 +151,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Foundation & Authentication | 3/3 | ✓ Complete | 2026-02-13 |
-| 2. Admin Settings & GitHub Sync | 0/3 | Not started | - |
+| 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
 | 3. AI Processing Pipeline | 0/3 | Not started | - |
 | 4. Wiki Viewer | 0/3 | Not started | - |
 | 5. Article Editing & Version History | 0/3 | Not started | - |
