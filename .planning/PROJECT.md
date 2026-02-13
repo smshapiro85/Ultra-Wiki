@@ -17,11 +17,11 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 ### Active
 
 - [ ] Google OIDC authentication with role-based access (admin/user)
-- [ ] GitHub integration with file sync, exclusion rules, and scheduled/manual sync via pgboss
+- [ ] GitHub integration with file sync, exclusion rules, and scheduled/manual sync via cron-triggered API route
 - [ ] AI processing pipeline: code analysis → article generation/update via OpenRouter
 - [ ] AI + human content coexistence with merge strategy and conflict detection
 - [ ] Wiki viewer with category navigation, full-text search, and Markdown rendering
-- [ ] WYSIWYG Markdown editor (BlockNote, fallback Milkdown) with image paste/upload
+- [ ] WYSIWYG editor (BlockNote) with native JSON storage and image paste/upload
 - [ ] Version history with diff viewer and rollback
 - [ ] Technical view linking articles to source files and database tables
 - [ ] Threaded comments with @mentions
@@ -44,15 +44,15 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 - **Approach:** AI reads code changes, generates/updates wiki articles in Markdown, humans annotate and edit on top. The merge strategy (section 7 of spec) is the critical differentiator.
 - **Target users:** Developers, QA Engineers, Product Managers at a single company.
 - **Deployment:** Self-hosted on a private server via Docker. Neon Postgres is remote (DATABASE_URL env var). Local filesystem for image storage.
-- **Content format:** All content stored as raw Markdown — no proprietary formats.
+- **Content format:** Editor content stored as BlockNote JSON (native format, human-readable). Markdown generated on-demand for rendering, AI consumption, and diffs.
 - **Spec document:** Full spec at `docs/ultrawiki-spec.md` (v0.2.2-draft, 2026-02-13). Includes complete database schema, AI prompts, and implementation checklist.
 
 ## Constraints
 
-- **Tech stack:** Next.js 14+ (App Router), shadcn/ui + Tailwind, Drizzle ORM, Neon Postgres, NextAuth.js v5, OpenRouter, pgboss, BlockNote (fallback Milkdown), sharp — all specified in spec
+- **Tech stack:** Next.js 14+ (App Router), shadcn/ui + Tailwind, Drizzle ORM, Neon Postgres, NextAuth.js v5, OpenRouter, BlockNote, sharp
 - **Single-tenant:** One company on a private server, not a commercial product
 - **Open-source first:** Highly-adopted, well-starred libraries preferred
-- **Markdown-native:** All content as raw Markdown, no proprietary formats
+- **BlockNote-native:** Editor content stored as BlockNote JSON; Markdown generated on-demand for rendering and AI
 - **No external storage:** Images stored on local filesystem, served via API route
 - **Database:** Neon Postgres (remote), connection via DATABASE_URL env var — not stored in site_settings
 
@@ -60,8 +60,8 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| BlockNote as primary editor (Milkdown fallback) | Modern WYSIWYG, active development, high GitHub stars. Milkdown if Markdown round-trip is insufficient | — Pending |
-| pgboss for job scheduling | Postgres-backed, no additional infrastructure, cron + retries + concurrency built in | — Pending |
+| BlockNote as editor with native JSON storage | Modern WYSIWYG, active development. Store BlockNote JSON natively — no lossy Markdown round-trip. Milkdown fallback dropped. | Decided |
+| Cron-triggered API route for sync (replaced pgboss) | Sync runs once a week — no need for a persistent job queue supervisor. Simple cron hits an API route, sync runs to completion. | Decided |
 | OpenRouter as AI gateway | Model-agnostic, single API key, configurable model | — Pending |
 | Local filesystem for images | Simple, no external service, Docker volume mount | — Pending |
 | site_settings key-value table for config | Flexible, admin-editable, secrets masked in UI | — Pending |

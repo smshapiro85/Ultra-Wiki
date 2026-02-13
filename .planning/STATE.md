@@ -49,7 +49,9 @@ Recent decisions affecting current work:
 - [01-01]: All 18 tables defined upfront in single schema.ts for clean initial migration
 - [01-01]: contentJson (jsonb) added to articles/articleVersions now (nullable) to avoid Phase 5 migration
 - [01-01]: isSecret boolean defers encryption to Phase 2; marks fields for UI masking
-- [01-01]: node:22-alpine Docker base for pg-boss Node 22.12+ requirement
+- [01-01]: node:22-alpine Docker base
+- [Decision]: BlockNote JSON as native storage format -- no Markdown round-trip, no Milkdown fallback needed
+- [Decision]: Replaced pgboss with cron-triggered API route -- weekly sync doesn't need a persistent job queue
 - [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
 - [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
 - [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
@@ -65,8 +67,8 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Research]: BlockNote Markdown round-trip is lossy by design -- needs early fidelity validation in Phase 5 with possible Milkdown fallback
-- [Research]: pgboss requires direct (unpooled) Neon connection -- must use DATABASE_URL_UNPOOLED, handle connection drops
+- ~~[Research]: BlockNote Markdown round-trip is lossy by design~~ -- RESOLVED: storing BlockNote JSON natively, no round-trip needed
+- ~~[Research]: pgboss requires direct (unpooled) Neon connection~~ -- RESOLVED: replaced pgboss with cron-triggered API route (sync is a weekly job, not a persistent queue)
 - [Research]: AI merge quality is the highest-risk feature -- no competitor does this well, needs extensive testing in Phase 3
 
 ## Session Continuity

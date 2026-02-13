@@ -12,8 +12,8 @@ CodeWiki delivers an AI-augmented internal wiki that auto-generates documentatio
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation & Authentication** - Database schema, Docker deployment, Google OIDC login, role system
-- [ ] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with pgboss scheduling
+- [x] **Phase 1: Foundation & Authentication** - Database schema, Docker deployment, Google OIDC login, role system
+- [ ] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with cron-triggered scheduling
 - [ ] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
 - [ ] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
@@ -35,9 +35,9 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
-- [ ] 01-01-PLAN.md -- Scaffold Next.js 15 project, complete Drizzle schema (18 tables), Docker infrastructure
-- [ ] 01-02-PLAN.md -- NextAuth v5 Google OIDC with split config, JWT roles, login page, admin user management
-- [ ] 01-03-PLAN.md -- User profile editing (name, avatar) and notification preferences UI
+- [x] 01-01-PLAN.md -- Scaffold Next.js 15 project, complete Drizzle schema (18 tables), Docker infrastructure
+- [x] 01-02-PLAN.md -- NextAuth v5 Google OIDC with split config, JWT roles, login page, admin user management
+- [x] 01-03-PLAN.md -- User profile editing (name, avatar) and notification preferences UI
 
 ### Phase 2: Admin Settings & GitHub Sync
 **Goal**: Admin can configure the system and sync source code from GitHub on a schedule or manually
@@ -47,14 +47,14 @@ Plans:
   1. Admin can configure GitHub repo URL, API keys (OpenRouter, SendGrid, Slack), and AI prompts from a settings dashboard -- secret values are never exposed in the frontend
   2. Admin can browse the repo file tree and exclude files/folders from sync, with exclusions persisting across syncs
   3. Admin can trigger a manual sync that fetches changed files incrementally (SHA comparison), with a progress indicator
-  4. Scheduled sync runs automatically via pgboss cron using admin-configured schedule, with concurrency locking and retry
-  5. Admin can view sync history and pgboss job status (pending, active, completed, failed) in the admin UI
+  4. Scheduled sync runs automatically via cron-triggered API route using admin-configured schedule, with concurrency locking
+  5. Admin can view sync history and job status (pending, running, completed, failed) in the admin UI
 **Plans**: TBD
 
 Plans:
 - [ ] 02-01: Admin settings dashboard and site_settings key-value store
 - [ ] 02-02: GitHub integration (Octokit file tree, exclusion rules, incremental sync)
-- [ ] 02-03: pgboss worker setup, scheduled sync, job dashboard
+- [ ] 02-03: Cron-triggered sync scheduling and sync history dashboard
 
 ### Phase 3: AI Processing Pipeline
 **Goal**: The system automatically generates and updates wiki articles from code changes, merging AI content with human edits without destroying them
@@ -95,7 +95,7 @@ Plans:
 **Depends on**: Phase 4
 **Requirements**: EDIT-01, EDIT-02, EDIT-03, EDIT-04, EDIT-05, EDIT-06, EDIT-07, VERS-01, VERS-02, VERS-03, VERS-04, VERS-05
 **Success Criteria** (what must be TRUE):
-  1. User can edit any article in a WYSIWYG Markdown editor (BlockNote) with toolbar support for headings, bold, italic, code, links, tables, lists, and images -- editor exports raw Markdown
+  1. User can edit any article in a WYSIWYG editor (BlockNote) with toolbar support for headings, bold, italic, code, links, tables, lists, and images -- editor stores native BlockNote JSON
   2. User can paste or upload images that are auto-compressed (max 1200x1200, JPEG quality 80, EXIF stripped) and stored on local filesystem, served via API route
   3. Editor auto-saves drafts to localStorage; explicit Save creates a version record, sets the human-edited flag, and prompts for an optional change summary
   4. User can view full version history for any article, filter by change source (AI, human, merged), and compare any two versions with side-by-side or inline diff
@@ -103,7 +103,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: BlockNote editor integration with Markdown round-trip
+- [ ] 05-01: BlockNote editor integration with native JSON storage
 - [ ] 05-02: Image upload/paste, compression (sharp), and serving API
 - [ ] 05-03: Version history, diff viewer, and rollback
 
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
-| 1. Foundation & Authentication | 0/3 | Planned | - |
+| 1. Foundation & Authentication | 3/3 | ✓ Complete | 2026-02-13 |
 | 2. Admin Settings & GitHub Sync | 0/3 | Not started | - |
 | 3. AI Processing Pipeline | 0/3 | Not started | - |
 | 4. Wiki Viewer | 0/3 | Not started | - |
