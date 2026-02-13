@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 2 of 7 (Admin Settings & GitHub Sync)
-Plan: 1 of 3 in current phase
-Status: Executing Phase 2 -- completed 02-01-PLAN.md
-Last activity: 2026-02-13 -- Completed 02-01-PLAN.md (admin settings dashboard)
+Plan: 2 of 3 in current phase
+Status: Executing Phase 2 -- completed 02-02-PLAN.md
+Last activity: 2026-02-13 -- Completed 02-02-PLAN.md (GitHub sync engine & dashboard)
 
-Progress: [███░░░░░░░] 19%
+Progress: [████░░░░░░] 24%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 5min
-- Total execution time: 0.32 hours
+- Total execution time: 0.38 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01 | 3 | 15min | 5min |
-| 02 | 1 | 4min | 4min |
+| 02 | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 6min, 4min, 4min
+- Last 5 plans: 5min, 6min, 4min, 4min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -67,6 +67,10 @@ Recent decisions affecting current work:
 - [02-01]: cronstrue for client-side human-readable cron previews
 - [02-01]: github_branch added as 13th setting key (default "main")
 - [02-01]: Secret masking pattern: MASK_VALUE skip-save prevents overwriting real secrets
+- [02-02]: excludedPaths table repurposed as included-paths storage (pattern column = INCLUDE, not exclude)
+- [02-02]: Sync stores metadata only (path, SHA) -- file content deferred to Phase 3
+- [02-02]: Retry [1s, 4s, 16s] for transient errors; 401/404 fail immediately
+- [02-02]: Atomic sync lock via INSERT NOT EXISTS on sync_logs (Neon HTTP compatible)
 
 ### Pending Todos
 
@@ -81,5 +85,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-13
-Stopped at: Completed 02-01-PLAN.md (admin settings dashboard)
-Resume file: .planning/phases/02-admin-settings-and-github-sync/02-01-SUMMARY.md
+Stopped at: Completed 02-02-PLAN.md (GitHub sync engine & dashboard)
+Resume file: .planning/phases/02-admin-settings-and-github-sync/02-02-SUMMARY.md
