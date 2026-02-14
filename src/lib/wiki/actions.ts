@@ -155,6 +155,7 @@ export async function regenerateArticle(
         related_files: filePaths,
         related_db_tables: [],
         category_suggestion: "",
+        conflicts_with_human_edits: [],
       },
       stylePrompt
     );
