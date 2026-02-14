@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
-import { useEffect } from "react";
+import { useActionState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
-import { updateProfile } from "./actions";
+import { updateProfile, updateThemePreference } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,11 +15,20 @@ interface ProfileFormProps {
     email: string | null;
     image: string | null;
     avatarUrl: string | null;
+    themePreference: string;
   };
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const [state, formAction, isPending] = useActionState(updateProfile, null);
+  const { setTheme, theme } = useTheme();
+
+  // Sync persisted theme preference from DB on mount
+  useEffect(() => {
+    if (user.themePreference) {
+      setTheme(user.themePreference);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (state?.success) {
@@ -82,6 +91,31 @@ export function ProfileForm({ user }: ProfileFormProps) {
         />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
           Leave empty to use your Google profile picture
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Theme</Label>
+        <div className="flex gap-2">
+          {(["system", "light", "dark"] as const).map((t) => (
+            <Button
+              key={t}
+              type="button"
+              variant={theme === t ? "default" : "outline"}
+              size="sm"
+              onClick={async () => {
+                setTheme(t);
+                await updateThemePreference(t);
+              }}
+            >
+              {t === "system"
+                ? "Auto"
+                : t.charAt(0).toUpperCase() + t.slice(1)}
+            </Button>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Auto follows your operating system preference.
         </p>
       </div>
 

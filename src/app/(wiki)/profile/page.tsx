@@ -40,6 +40,7 @@ export default async function ProfilePage() {
               email: user.email,
               image: user.image,
               avatarUrl: user.avatarUrl,
+              themePreference: user.themePreference,
             }}
           />
         </CardContent>

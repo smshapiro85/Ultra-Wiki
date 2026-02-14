@@ -93,6 +93,23 @@ export async function updateNotificationPreferences(
   }
 }
 
+export async function updateThemePreference(theme: string) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated");
+  }
+
+  if (!["system", "light", "dark"].includes(theme)) {
+    throw new Error("Invalid theme");
+  }
+
+  const db = getDb();
+  await db
+    .update(users)
+    .set({ themePreference: theme, updatedAt: new Date() })
+    .where(eq(users.id, session.user.id));
+}
+
 export async function getUserProfile() {
   const session = await auth();
   if (!session?.user?.id) {

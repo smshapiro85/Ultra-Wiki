@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import "@blocknote/core/fonts/inter.css";
@@ -52,6 +53,7 @@ export function ArticleEditor({
   onSaveSuccess,
 }: ArticleEditorProps) {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [isReady, setIsReady] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
@@ -275,7 +277,7 @@ export function ArticleEditor({
           <BlockNoteView
             editor={editor}
             onChange={handleChange}
-            theme="light"
+            theme={resolvedTheme === "dark" ? "dark" : "light"}
           />
         </div>
       )}
