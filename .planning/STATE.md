@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 8 (AI Prompt Refinement). Plan 2 of 4 complete.
+**Current focus:** Phase 8 (AI Prompt Refinement). Plans 1-2 of 4 complete.
 
 ## Current Position
 
 Phase: 8 of 8 (AI Prompt Refinement)
 Plan: 2 of 4 in current phase
-Status: Executing Phase 8 plans. 08-02 complete (heading sizes).
-Last activity: 2026-02-14 -- Completed 08-02-PLAN.md (Heading Size Hierarchy)
+Status: Executing Phase 8 plans. 08-01 (prompt hardening) and 08-02 (heading sizes) complete.
+Last activity: 2026-02-14 -- Completed 08-01-PLAN.md (Prompt Hardening)
 
 Progress: [████████████████████] 100% (phases 1-7) + Phase 8 in progress
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
+- Total plans completed: 31
 - Average duration: 3min
 - Total execution time: 1.6 hours
 
@@ -34,7 +34,7 @@ Progress: [████████████████████] 100% (p
 | 05 | 8 | 23min | 3min |
 | 06 | 3 | 11min | 4min |
 | 07 | 3 | 12min | 4min |
-| 08 | 1 | 1min | 1min |
+| 08 | 2 | 4min | 2min |
 
 **Recent Trend:**
 - Last 5 plans: 3min, 4min, 6min, 2min, 1min
@@ -157,6 +157,9 @@ Recent decisions affecting current work:
 - [07-03]: Notification triggers are fire-and-forget via Promise.catch() -- never block primary actions
 - [07-02]: Context info passed as props from server-rendered article page (not fetched separately) -- avoids extra API call
 - [07-02]: Context truncation at 32000 chars with 70/30 split between article content and technical view
+- [08-01]: 6 explicit category rules in DEFAULT_ANALYSIS_PROMPT (reuse, folder mapping, naming, hierarchy, generic parents, stability)
+- [08-01]: H1 for top-level article sections, enforced no-title-duplication in both style prompt and generation prompt
+- [08-01]: Dual-location prompt reinforcement -- critical rules stated in both DEFAULT_ARTICLE_STYLE_PROMPT and buildGenerationPrompt for full coverage
 - [08-02]: Prose H1 reduced to 1.5em (from 2.25em), H2 to 1.25em, H3 to 1.1em -- all subordinate to article title (text-3xl = 1.875rem)
 - [08-02]: Side menu heights recalculated from formula: font-size * 16px * 1.75 line-height + 6px padding
 
@@ -173,5 +176,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 08-02-PLAN.md (Heading Size Hierarchy)
-Resume file: .planning/phases/08-ai-prompt-refinement/08-02-SUMMARY.md
+Stopped at: Completed 08-01-PLAN.md (Prompt Hardening). 08-01 and 08-02 complete, 08-03 and 08-04 remaining.
+Resume file: .planning/phases/08-ai-prompt-refinement/08-01-SUMMARY.md
