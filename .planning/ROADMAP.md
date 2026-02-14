@@ -70,12 +70,13 @@ Plans:
   4. When an article with human edits is updated by AI, human contributions are preserved through the merge strategy -- the resulting article contains both the new AI content and the original human edits
   5. When a merge produces a conflict between human edits and code changes, a visible review banner appears on the article
   6. User can dismiss the review banner after reviewing the changes
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
 - [x] 03-01-PLAN.md -- AI client (Vercel AI SDK + OpenRouter), Zod schemas, prompt builders, file content fetching, code analysis and article generation
 - [x] 03-02-PLAN.md -- Three-way merge (node-diff3), conflict resolution, BlockNote conversion, version tracking, review banner dismissal API
 - [x] 03-03-PLAN.md -- Pipeline orchestrator wiring analysis + merge + storage, sync integration (auto-trigger after sync)
+- [ ] 03-04-PLAN.md -- Gap closure: dynamic import for markdown.ts in pipeline.ts to fix createContext crash
 
 ### Phase 4: Wiki Viewer
 **Goal**: Users can browse, navigate, and search the wiki to find and read articles
@@ -152,7 +153,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|---------------|--------|-----------|
 | 1. Foundation & Authentication | 3/3 | ✓ Complete | 2026-02-13 |
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
-| 3. AI Processing Pipeline | 3/3 | ✓ Complete | 2026-02-13 |
+| 3. AI Processing Pipeline | 3/4 | Gap closure | - |
 | 4. Wiki Viewer | 0/3 | Not started | - |
 | 5. Article Editing & Version History | 0/3 | Not started | - |
 | 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
