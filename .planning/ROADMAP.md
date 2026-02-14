@@ -19,6 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
 - [x] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [ ] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
+- [ ] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
 
 ## Phase Details
 
@@ -160,10 +161,26 @@ Plans:
 - [ ] 07-02: Page-level Ask AI with article context assembly
 - [ ] 07-03: Notification service (Slack DM, SendGrid email) with preference-based routing
 
+### Phase 8: AI Prompt Refinement & Category Strategy
+**Goal**: The AI pipeline produces consistent, predictable category structures and well-formatted article content across every run — no drift in how categories are created or how articles are structured
+**Depends on**: Phase 3 (AI pipeline must exist), Phase 5 (article rendering must exist for CSS fixes)
+**Requirements**: Derived from production observations — not original spec requirements but critical to real-world quality
+**Success Criteria** (what must be TRUE):
+  1. The AI analysis prompt includes an explicit, deterministic category strategy: clear rules for when to reuse an existing category vs. create a new one, how to name categories, when a code folder maps to one category vs. multiple articles in one category, and how to handle subcategories. The strategy is informed by analysis of existing data.
+  2. The AI article style prompt explicitly instructs the LLM to never start article content with the article title (since the title is rendered separately above the content). The first line of generated markdown should be the first content section heading or introductory text, not a duplicate of the title.
+  3. Article content always uses H1 (`#`) as the top-level section heading within articles. The CSS sizing for H1 in prose/article content is reduced so it is visually smaller than the article title (`text-3xl font-bold`), creating a clear hierarchy: article title > H1 section heading > H2 sub-heading.
+  4. The prompts include explicit structural rules: articles start with H1 section headings (not H2), each major section uses H1, sub-sections use H2, and no heading level is skipped.
+  5. Run-to-run consistency: given the same set of source files and the same existing category tree, the AI produces the same category assignments and article groupings. The prompt includes anchoring instructions (prefer existing patterns, match naming conventions already in use) to minimize non-deterministic drift.
+**Plans:** 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md -- Category strategy: analyze existing data, define deterministic category rules, update analysis prompt with explicit category creation/reuse strategy
+- [ ] 08-02-PLAN.md -- Article content formatting: no title duplication rule, heading hierarchy (H1 sections), CSS size reduction for prose H1/H2, structural heading rules in style prompt
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
@@ -174,3 +191,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 5. Article Editing & Version History | 8/8 | ✓ Complete | 2026-02-14 |
 | 6. Technical View, Comments & Mentions | 2/2 | ✓ Complete | 2026-02-14 |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
+| 8. AI Prompt Refinement & Category Strategy | 0/2 | Not started | - |

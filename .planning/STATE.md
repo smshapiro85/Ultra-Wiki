@@ -141,6 +141,7 @@ Recent decisions affecting current work:
 - [05-07]: ChangeSourceBadge extracted to shared file to avoid circular imports between version-history and version-preview
 - [05-08]: Text column for themePreference (not enum) -- three values (system/light/dark) don't warrant Postgres enum, avoids migration complexity
 - [05-08]: useTheme for immediate client-side switching + server action for DB persistence -- dual strategy for responsiveness
+- [Phase 08]: New phase for AI prompt refinement -- category strategy (deterministic rules for reuse vs. creation) and article formatting (no title duplication, H1 as top-level section headings, reduced prose heading CSS sizes)
 
 ### Pending Todos
 
