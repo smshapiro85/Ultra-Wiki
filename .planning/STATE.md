@@ -56,6 +56,7 @@ Recent decisions affecting current work:
 - [Decision]: Replaced pgboss with cron-triggered API route -- weekly sync doesn't need a persistent job queue
 - [Decision]: AI must receive full category tree + article index during generation -- always prefer existing categories over creating new ones. Wiki organization is a first-class concern.
 - [Decision]: New repo files/folders surface in a dedicated "New Files Review" admin section (not auto-included). Admin includes or ignores each, then "Apply Updates" triggers AI import + re-index.
+- [Decision]: Admin-only "Regenerate Article" button on article page (Phase 4). Re-fetches linked source files, re-runs generation with current prompt. Respects merge strategy for human-edited articles.
 - [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
 - [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
 - [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
@@ -86,6 +87,12 @@ Recent decisions affecting current work:
 - [03-03]: Delete-and-reinsert pattern for article_file_links/article_db_tables (simpler than diff)
 - [03-03]: AI pipeline failure does not abort sync -- errors logged, partial results preserved
 - [03-04]: Dynamic import() at each call site in pipeline.ts for markdown.ts -- prevents @blocknote/server-util from entering module graph at evaluation time
+- [03-UAT]: Deferred BlockNote conversion -- pipeline stores contentMarkdown only (contentJson=null). @blocknote/server-util crashes in RSC/Turbopack even with dynamic imports. Conversion to BlockNote JSON deferred to editor (client-side). When AI re-updates, it merges on markdown and resets contentJson to null.
+- [03-UAT]: Category cache -- resolveOrCreateCategory now pushes new categories onto in-memory categoryTree array + uses onConflictDoNothing to handle races
+- [03-UAT]: Zod v4 z.record() generates propertyNames in JSON schema, rejected by OpenAI-compatible structured output providers. Changed columns field to z.array(z.object({name, description}))
+- [03-UAT]: Both AI calls (analyze + generate) now use structured output via Output.object() with Zod schemas
+- [03-UAT]: temperature: 0.2 for both AI calls (low creativity, more consistent)
+- [03-UAT]: Reasoning effort configurable via admin settings dropdown (none/minimal/low/medium/high/xhigh), passed as reasoning.effort to OpenRouter
 
 ### Pending Todos
 
@@ -93,7 +100,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- ~~[Research]: BlockNote Markdown round-trip is lossy by design~~ -- RESOLVED: storing BlockNote JSON natively, no round-trip needed
+- ~~[Research]: BlockNote Markdown round-trip is lossy by design~~ -- RESOLVED: pipeline stores markdown only, BlockNote JSON conversion deferred to editor (client-side). No server-side round-trip.
 - ~~[Research]: pgboss requires direct (unpooled) Neon connection~~ -- RESOLVED: replaced pgboss with cron-triggered API route (sync is a weekly job, not a persistent queue)
 - [Research]: AI merge quality is the highest-risk feature -- no competitor does this well, needs extensive testing in Phase 3
 

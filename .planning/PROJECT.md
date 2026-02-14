@@ -17,7 +17,7 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 ### Active
 
 - [ ] Google OIDC authentication with role-based access (admin/user)
-- [ ] GitHub integration with file sync, exclusion rules, and scheduled/manual sync via cron-triggered API route
+- [ ] GitHub integration with file tree (exclude-by-default, opt-in inclusion), AI re-index on inclusion changes, and scheduled/manual sync via cron-triggered API route
 - [ ] AI processing pipeline: code analysis → article generation/update via OpenRouter
 - [ ] AI + human content coexistence with merge strategy and conflict detection
 - [ ] Wiki viewer with category navigation, full-text search, and Markdown rendering
@@ -44,7 +44,7 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 - **Approach:** AI reads code changes, generates/updates wiki articles in Markdown, humans annotate and edit on top. The merge strategy (section 7 of spec) is the critical differentiator.
 - **Target users:** Developers, QA Engineers, Product Managers at a single company.
 - **Deployment:** Self-hosted on a private server via Docker. Neon Postgres is remote (DATABASE_URL env var). Local filesystem for image storage.
-- **Content format:** Editor content stored as BlockNote JSON (native format, human-readable). Markdown generated on-demand for rendering, AI consumption, and diffs.
+- **Content format:** Dual-format storage. AI pipeline stores `contentMarkdown` (source of truth for AI operations). `contentJson` (BlockNote JSON) is populated when the user first opens the editor — it becomes the source of truth for editing. See "Content Storage Lifecycle" in Key Decisions.
 - **Spec document:** Full spec at `docs/ultrawiki-spec.md` (v0.2.2-draft, 2026-02-13). Includes complete database schema, AI prompts, and implementation checklist.
 
 ## Constraints
@@ -52,7 +52,7 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 - **Tech stack:** Next.js 14+ (App Router), shadcn/ui + Tailwind, Drizzle ORM, Neon Postgres, NextAuth.js v5, OpenRouter, BlockNote, sharp
 - **Single-tenant:** One company on a private server, not a commercial product
 - **Open-source first:** Highly-adopted, well-starred libraries preferred
-- **BlockNote-native:** Editor content stored as BlockNote JSON; Markdown generated on-demand for rendering and AI
+- **BlockNote-native editing:** Editor uses BlockNote JSON; AI pipeline uses Markdown. Both stored, each authoritative in its domain
 - **No external storage:** Images stored on local filesystem, served via API route
 - **Database:** Neon Postgres (remote), connection via DATABASE_URL env var — not stored in site_settings
 
@@ -60,12 +60,14 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
+| Content Storage Lifecycle (dual-format) | AI pipeline stores `contentMarkdown` only (`contentJson = null`). `@blocknote/server-util` cannot run in RSC/Turbopack (createContext crash). Conversion to BlockNote JSON is deferred to the editor (client-side). Once user edits, `contentJson` becomes authoritative for editing; `contentMarkdown` is regenerated on save for AI merge operations. When AI re-updates an article, it merges on markdown and resets `contentJson` to null. | Decided |
 | BlockNote as editor with native JSON storage | Modern WYSIWYG, active development. Store BlockNote JSON natively — no lossy Markdown round-trip. Milkdown fallback dropped. | Decided |
 | Cron-triggered API route for sync (replaced pgboss) | Sync runs once a week — no need for a persistent job queue supervisor. Simple cron hits an API route, sync runs to completion. | Decided |
 | OpenRouter as AI gateway | Model-agnostic, single API key, configurable model | — Pending |
 | Local filesystem for images | Simple, no external service, Docker volume mount | — Pending |
 | site_settings key-value table for config | Flexible, admin-editable, secrets masked in UI | — Pending |
 | Four admin-editable AI prompts | Analysis, article style, global Ask AI, page-level Ask AI — all customizable | — Pending |
+| Category-aware article generation | AI receives full category tree + article index as context. Must prefer existing categories over creating new ones — wiki organization coherence is critical. | Decided |
 
 ---
 *Last updated: 2026-02-13 after initialization*
