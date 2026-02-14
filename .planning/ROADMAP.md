@@ -111,17 +111,19 @@ Plans:
   6. User can restore (rollback) any article to a previous version
   7. After AI merges a human-edited article, an LLM review pass analyzes the merged content against the code changes for semantic issues (contradictions, stale info). It never modifies content — it creates annotations in an `ai_review_annotations` table referencing section headings, with severity and timestamp.
   8. Article page shows a collapsible "AI Review: N items need attention" banner when active annotations exist. Each annotation card shows the concern, referenced section, timestamp, and a Dismiss button. Referenced section headings get a yellow left-border highlight. Clicking an annotation scrolls to that section.
-  9. Admin has a centralized "Review Queue" page listing all articles needing attention — merge conflicts (needsReview) and active AI review annotations. Each item links to the article. Filterable by category and searchable by article title/text. Sorted by most recent first, with configurable sort order.
-**Plans:** 4 plans
+  9. User can toggle between auto (system default), light, and dark mode from their profile page. Preference persists in the users table. Theme applies app-wide via next-themes ThemeProvider.
+  10. Admin has a centralized "Review Queue" page listing all articles needing attention — merge conflicts (needsReview) and active AI review annotations. Each item links to the article. Filterable by category and searchable by article title/text. Sorted by most recent first, with configurable sort order.
+**Plans:** 8 plans
 
 Plans:
 - [x] 05-01-PLAN.md -- BlockNote editor integration with native JSON storage, localStorage drafts, save with version tracking
 - [x] 05-02-PLAN.md -- Image upload/paste with sharp compression, filesystem storage, and serving API
 - [x] 05-03-PLAN.md -- Version history UI with source filtering, diff viewer (inline + side-by-side), and rollback
 - [x] 05-04-PLAN.md -- AI review annotations: ai_review_annotations table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
-- [ ] 05-05: Admin Review Queue — centralized list of merge conflicts + AI review annotations, with category filter, search, and sort
-- [ ] 05-06: Draft-as-version — replace localStorage drafts with `changeSource: "draft"` version records (one per user per article, upsert), add "draft" to changeSourceEnum, update history UI with draft styling
-- [ ] 05-07: Version preview slide-out — click any version history record to view rendered formatted text in a slide-out panel without restoring
+- [ ] 05-05-PLAN.md -- Admin Review Queue: centralized list of merge conflicts + AI review annotations, with category filter, search, and sort
+- [ ] 05-06-PLAN.md -- Draft-as-version: replace localStorage drafts with `changeSource: "draft"` version records (one per user per article, upsert), add "draft" to changeSourceEnum, update history UI with draft styling
+- [ ] 05-07-PLAN.md -- Version preview slide-out: click any version history record to view rendered formatted text in a slide-out panel without restoring
+- [ ] 05-08-PLAN.md -- Light/dark mode: next-themes ThemeProvider in root layout, theme toggle in user profile (auto/light/dark), persist preference in users table
 
 ### Phase 6: Technical View, Comments & Mentions
 **Goal**: Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
@@ -133,11 +135,13 @@ Plans:
   3. Technical view content is editable using the same Markdown editor as articles
   4. User can post threaded comments on any article, with Markdown rendering, avatars, display names, and timestamps
   5. User can resolve and unresolve comments; @mention autocomplete triggers when typing @ and creates mention records that trigger notifications
+  6. Admin can configure a separate OpenRouter "summary model" (efficient, fast model for short outputs) and a file summary prompt in settings. Each source file in `github_files` has an `aiSummary` column with a 1-2 sentence AI-generated description of what the file does. Summaries are generated/updated automatically during sync whenever a file is new or changed. Technical View file cards display the file's `aiSummary` instead of generic text. The summary model is reusable for other short-summary needs across the app.
 **Plans:** 2 plans
 
 Plans:
 - [x] 06-01-PLAN.md -- Technical view tab with structured file links, inline code viewer, DB tables, GitHub deep links, and technical view editing
 - [x] 06-02-PLAN.md -- Threaded comments with Markdown rendering, resolve/unresolve, @mention autocomplete via react-mentions-ts
+- [ ] 06-03: AI file summaries — summary model setting, file_summary_prompt, `github_files.aiSummary` column, sync pipeline integration (generate on new/changed files), Technical View card update
 
 ### Phase 7: Ask AI & Notifications
 **Goal**: Users can ask AI questions about the wiki and codebase, and receive notifications about activity that matters to them
