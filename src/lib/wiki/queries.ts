@@ -5,8 +5,9 @@ import {
   articleVersions,
   userBookmarks,
   aiReviewAnnotations,
+  users,
 } from "@/lib/db/schema";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql, and, inArray } from "drizzle-orm";
 
 // =============================================================================
 // Types
@@ -422,4 +423,53 @@ export async function getActiveAnnotationCount(
     );
 
   return Number(result[0].count);
+}
+
+// =============================================================================
+// getArticleVersions
+// =============================================================================
+
+export interface ArticleVersionSummary {
+  id: string;
+  changeSource: string;
+  changeSummary: string | null;
+  creatorName: string | null;
+  createdAt: Date;
+  contentMarkdown: string;
+}
+
+/**
+ * Get all versions for an article with optional change source filtering.
+ * Joins users table to get creator name. Returns newest first.
+ */
+export async function getArticleVersions(
+  articleId: string,
+  sourceFilter?: string[]
+): Promise<ArticleVersionSummary[]> {
+  const db = getDb();
+
+  const conditions = [eq(articleVersions.articleId, articleId)];
+
+  if (sourceFilter && sourceFilter.length > 0) {
+    const validSources = sourceFilter as Array<
+      "ai_generated" | "ai_updated" | "human_edited" | "ai_merged"
+    >;
+    conditions.push(inArray(articleVersions.changeSource, validSources));
+  }
+
+  const rows = await db
+    .select({
+      id: articleVersions.id,
+      changeSource: articleVersions.changeSource,
+      changeSummary: articleVersions.changeSummary,
+      creatorName: users.name,
+      createdAt: articleVersions.createdAt,
+      contentMarkdown: articleVersions.contentMarkdown,
+    })
+    .from(articleVersions)
+    .leftJoin(users, eq(articleVersions.createdBy, users.id))
+    .where(and(...conditions))
+    .orderBy(desc(articleVersions.createdAt));
+
+  return rows;
 }
