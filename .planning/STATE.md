@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 7 COMPLETE (Ask AI & Notifications). All 3 plans complete.
+**Current focus:** Phase 8 (AI Prompt Refinement). Plan 2 of 4 complete.
 
 ## Current Position
 
-Phase: 7 of 7 (Ask AI & Notifications)
-Plan: 3 of 3 in current phase (all complete)
-Status: ALL PHASES COMPLETE. All 29 plans across 7 phases executed.
-Last activity: 2026-02-14 -- Completed 07-02-PLAN.md (Page-level Ask AI)
+Phase: 8 of 8 (AI Prompt Refinement)
+Plan: 2 of 4 in current phase
+Status: Executing Phase 8 plans. 08-02 complete (heading sizes).
+Last activity: 2026-02-14 -- Completed 08-02-PLAN.md (Heading Size Hierarchy)
 
-Progress: [████████████████████] 100%
+Progress: [████████████████████] 100% (phases 1-7) + Phase 8 in progress
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 30
 - Average duration: 3min
 - Total execution time: 1.6 hours
 
@@ -34,9 +34,10 @@ Progress: [████████████████████] 100%
 | 05 | 8 | 23min | 3min |
 | 06 | 3 | 11min | 4min |
 | 07 | 3 | 12min | 4min |
+| 08 | 1 | 1min | 1min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 3min, 4min, 6min, 2min
+- Last 5 plans: 3min, 4min, 6min, 2min, 1min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -156,6 +157,8 @@ Recent decisions affecting current work:
 - [07-03]: Notification triggers are fire-and-forget via Promise.catch() -- never block primary actions
 - [07-02]: Context info passed as props from server-rendered article page (not fetched separately) -- avoids extra API call
 - [07-02]: Context truncation at 32000 chars with 70/30 split between article content and technical view
+- [08-02]: Prose H1 reduced to 1.5em (from 2.25em), H2 to 1.25em, H3 to 1.1em -- all subordinate to article title (text-3xl = 1.875rem)
+- [08-02]: Side menu heights recalculated from formula: font-size * 16px * 1.75 line-height + 6px padding
 
 ### Pending Todos
 
@@ -170,5 +173,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 07-02-PLAN.md (Page-level Ask AI). All 7 phases complete.
-Resume file: .planning/phases/07-ask-ai-notifications/07-02-SUMMARY.md
+Stopped at: Completed 08-02-PLAN.md (Heading Size Hierarchy)
+Resume file: .planning/phases/08-ai-prompt-refinement/08-02-SUMMARY.md
