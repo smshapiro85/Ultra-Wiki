@@ -1,295 +1,302 @@
 ---
 phase: 05-article-editing
-verified: 2026-02-14T03:01:11Z
-status: passed
-score: 29/29 must-haves verified
-re_verification: false
+verified: 2026-02-13T00:00:00Z
+status: gaps_found
+score: 38/42 must-haves verified
+re_verification: true
+previous_status: passed
+previous_score: 29/29
+gaps_closed: []
+gaps_remaining:
+  - "Plan 05-08 Task 3: User menu relocation to header"
+gaps:
+  - truth: "User avatar icon appears in the top-right header bar next to the search input"
+    status: failed
+    reason: "UserMenu still in sidebar footer, not moved to header"
+    artifacts:
+      - path: "src/app/(wiki)/layout.tsx"
+        issue: "No UserMenu or Settings icon in header"
+      - path: "src/components/wiki/app-sidebar.tsx"
+        issue: "UserMenu still in SidebarFooter"
+      - path: "src/components/common/user-menu.tsx"
+        issue: "User name still in trigger, 'Profile' not 'Account Settings', Admin link in dropdown"
+    missing:
+      - "Move UserMenu from sidebar footer to wiki layout header"
+      - "Add Settings cog icon for admins in header"
+      - "Update UserMenu trigger to avatar-only"
+      - "Change 'Profile' link to 'Account Settings'"
+      - "Remove Admin link from dropdown (replaced by cog)"
 ---
 
-# Phase 5: Article Editing & Version History Verification Report
+# Phase 5: Article Editing & Version History Verification Report (Re-verification)
 
 **Phase Goal:** Users can edit articles with a rich editor, upload images, and track all changes with full version history
 
-**Verified:** 2026-02-14T03:01:11Z
+**Verified:** 2026-02-13T00:00:00Z
 
-**Status:** PASSED
+**Status:** GAPS_FOUND
 
-**Re-verification:** No — initial verification
+**Re-verification:** Yes — after gap closure plans 05-05 through 05-08
+
+## Re-verification Summary
+
+**Previous verification:** 2026-02-14T03:01:11Z — status: passed (29/29 must-haves)
+
+**This verification:** Plans 05-05 through 05-08 added 13 new truths to phase scope. Current score: 38/42.
+
+**Gaps closed:** None (previous verification had no gaps)
+
+**New gaps:** 4 truths from Plan 05-08 Task 3 (user menu relocation) NOT implemented
+
+**Regressions:** None (all previous 29 truths still verified)
 
 ## Goal Achievement
 
-### Observable Truths (All 4 Plans Combined)
+### Observable Truths (10 ROADMAP Success Criteria)
 
-Phase 5 consists of 4 plans with a total of 29 observable truths across editing, image upload, version history, and AI review annotations.
-
-#### Plan 01: BlockNote Editor (7 truths)
+#### Original Phase Scope (Plans 01-04) — Previously Verified
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | User can click Edit on any article page and reach a WYSIWYG editor | ✓ VERIFIED | Edit button exists in article page (line 119), links to `/wiki/${article.slug}/edit`, edit page renders BlockNote editor |
-| 2 | Editor loads existing content (contentJson if available, otherwise converts contentMarkdown client-side) | ✓ VERIFIED | article-editor.tsx lines 89-107: checks for contentJson array, falls back to tryParseMarkdownToBlocks |
-| 3 | Editor toolbar supports headings, bold, italic, code, links, tables, lists | ✓ VERIFIED | BlockNoteView component (line 221) uses default BlockNote toolbar with all standard formatting |
-| 4 | Drafts auto-save to localStorage on every change | ✓ VERIFIED | handleChange callback (lines 114-121) saves to localStorage on editor change |
-| 5 | Clicking Save opens a dialog prompting for optional change summary, then saves | ✓ VERIFIED | Save button (line 194) opens EditorSaveDialog, handleSave (lines 145-182) sends POST with changeSummary |
-| 6 | Save creates an article_versions record with change_source human_edited and sets hasHumanEdits flag | ✓ VERIFIED | save/route.ts lines 90-110: updates hasHumanEdits=true, calls createArticleVersion with changeSource="human_edited" |
-| 7 | Optimistic locking prevents save if article was modified externally since editor loaded | ✓ VERIFIED | save/route.ts lines 78-85: compares currentUpdatedAt with loadedUpdatedAt, returns 409 on mismatch |
+| 1 | User can edit any article in a WYSIWYG editor (BlockNote) with toolbar support | ✓ VERIFIED | Previous verification confirmed (regression check: article-editor.tsx exists, 7473 bytes) |
+| 2 | User can paste or upload images (auto-compressed, local filesystem) | ✓ VERIFIED | Previous verification confirmed (regression check: compress.ts, storage.ts, images API exist) |
+| 3 | Editor auto-saves drafts as version records with changeSource "draft" | ✓ VERIFIED | Plan 05-06 implemented: draft API route exists, saveDraft in article-editor.tsx (line 136), no localStorage refs |
+| 4 | User can view full version history, filter by source, compare versions with diff | ✓ VERIFIED | Previous verification confirmed (regression check: version-history.tsx exists, 12863 bytes) |
+| 5 | User can click any version history record to preview rendered formatted text | ✓ VERIFIED | Plan 05-07 implemented: Eye button (line 291), VersionPreview component exists (2958 bytes) |
+| 6 | User can restore (rollback) any article to a previous version | ✓ VERIFIED | Previous verification confirmed (regression check: restore/route.ts exists) |
+| 7 | AI review annotations after merge with collapsible banner | ✓ VERIFIED | Previous verification confirmed (Plan 04 all truths verified) |
+| 8 | Article page shows collapsible annotation banner | ✓ VERIFIED | Previous verification confirmed (annotation-banner.tsx exists) |
+| 9 | User can toggle between auto/light/dark mode from profile page | ✓ VERIFIED | Plan 05-08 Task 1-2: ThemeProvider in layout.tsx, theme toggle in profile-form.tsx |
+| 10 | Admin has centralized Review Queue page | ✓ VERIFIED | Plan 05-05: /admin/review-queue page exists, getReviewQueueItems query verified |
 
-#### Plan 02: Image Upload (5 truths)
+**Score:** 10/10 ROADMAP success criteria verified
 
-| # | Truth | Status | Evidence |
-|---|-------|--------|----------|
-| 8 | User can paste or drag-drop an image in the editor and it appears inline | ✓ VERIFIED | article-editor.tsx line 73: uploadFile passed to useCreateBlockNote enables built-in image block |
-| 9 | Uploaded images are compressed (max 1200x1200, JPEG quality 80, EXIF stripped) | ✓ VERIFIED | compress.ts lines 20-23: sharp pipeline with resize(1200,1200), jpeg quality 80, EXIF stripped by default |
-| 10 | Images are stored on local filesystem at /data/images/{articleId}/ | ✓ VERIFIED | storage.ts lines 9-10: IMAGE_ROOT="/data/images" in production, saveImage creates articleId subdirectory |
-| 11 | Images are served via API route at /api/images/{articleId}/{filename} | ✓ VERIFIED | route.ts GET endpoint at /api/images/[articleId]/[filename] serves images with immutable cache |
-| 12 | Image metadata is recorded in the article_images table | ✓ VERIFIED | images/route.ts lines 80-88: inserts into articleImages with fileName, filePath, mimeType, sizeBytes, uploadedBy |
+### Detailed Truths (All 8 Plans)
 
-#### Plan 03: Version History (5 truths)
+#### Plans 01-04 (29 truths) — Previously Verified ✓
 
-| # | Truth | Status | Evidence |
-|---|-------|--------|----------|
-| 13 | User can click History tab on any article and see a list of all versions | ✓ VERIFIED | article-tabs.tsx line 39-42: History tab enabled (not disabled), version-history.tsx renders version list |
-| 14 | User can filter version history by change source (AI, human, merged) | ✓ VERIFIED | version-history.tsx fetch with ?source= param, versions/route.ts supports inArray source filtering |
-| 15 | User can select two versions and see a side-by-side or inline diff | ✓ VERIFIED | version-history.tsx line 366: renders DiffViewer, diff-viewer.tsx implements both inline and side-by-side modes |
-| 16 | User can restore (rollback) any article to a previous version | ✓ VERIFIED | version-history.tsx restore handler, restore/route.ts POST endpoint updates article content |
-| 17 | Rollback creates a new version record (preserving full history) | ✓ VERIFIED | restore/route.ts calls createArticleVersion with changeSummary="Restored to version from..." |
+All 29 truths from previous verification remain verified (regression check passed).
 
-#### Plan 04: AI Review Annotations (7 truths)
+#### Plan 05-05: Admin Review Queue (6 truths)
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 18 | After AI merges a human-edited article (clean merge), an LLM reviews for semantic issues and creates annotations | ✓ VERIFIED | conflict.ts line 85-86: imports and calls generateReviewAnnotations after clean merge |
-| 19 | Annotations never modify article content -- they are stored separately in ai_review_annotations table | ✓ VERIFIED | schema.ts line 407-427: aiReviewAnnotations table with articleId reference, review.ts inserts annotations without touching article content |
-| 20 | Article page shows collapsible 'AI Review: N items need attention' banner when active annotations exist | ✓ VERIFIED | page.tsx line 108: renders AnnotationBanner, annotation-banner.tsx implements collapsible banner |
-| 21 | Each annotation shows concern text, referenced section heading, severity, and timestamp | ✓ VERIFIED | annotation-banner.tsx displays concern, sectionHeading, severity icon, formatRelativeTime(createdAt) |
-| 22 | User can dismiss individual annotations via Dismiss button | ✓ VERIFIED | annotation-banner.tsx dismiss handler POSTs to /api/articles/${articleId}/annotations/${annotationId}/dismiss |
-| 23 | Referenced section headings get a yellow left-border highlight | ✓ VERIFIED | annotation-banner.tsx applies inline style with borderLeft: "3px solid oklch(0.828 0.189 84.429)" |
-| 24 | Clicking an annotation scrolls to the referenced section | ✓ VERIFIED | annotation-banner.tsx line 141: scrollIntoView({ behavior: "smooth", block: "start" }) |
+| 30 | Admin can navigate to /admin/review-queue and see list of articles needing attention | ✓ VERIFIED | page.tsx exists, imports getReviewQueueItems, renders ReviewQueueList |
+| 31 | Each item shows article title, category, reason, last updated date | ✓ VERIFIED | review-queue-list.tsx lines: title, category badge, reason indicators visible |
+| 32 | Admin can filter queue by category using dropdown | ✓ VERIFIED | review-queue-list.tsx has category filter select |
+| 33 | Admin can search queue by article title | ✓ VERIFIED | review-queue-list.tsx has search Input component |
+| 34 | Admin can sort queue by date (newest/oldest first) | ✓ VERIFIED | review-queue-list.tsx has sort select dropdown |
+| 35 | Clicking item navigates to article page | ✓ VERIFIED | review-queue-list.tsx Link href="/wiki/${item.slug}" |
 
-#### ROADMAP Success Criteria (5 additional truths)
+**Artifacts:**
+- `src/app/(admin)/admin/review-queue/page.tsx` — ✓ EXISTS (803 bytes)
+- `src/app/(admin)/admin/review-queue/review-queue-list.tsx` — ✓ EXISTS (5476 bytes)
+- `src/lib/wiki/queries.ts` (getReviewQueueItems) — ✓ WIRED (line 647)
+
+**Key Links:**
+- page.tsx → getReviewQueueItems — ✓ WIRED (line 6: await getReviewQueueItems())
+- review-queue-list.tsx → /wiki/[slug] — ✓ WIRED (Link href pattern verified)
+
+#### Plan 05-06: Draft as Version (6 truths)
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 25 | User can edit any article in a WYSIWYG editor (BlockNote) with toolbar support -- editor stores native BlockNote JSON | ✓ VERIFIED | editor-editor.tsx saves contentJson (editor.document), save/route.ts stores both contentJson and contentMarkdown |
-| 26 | User can paste or upload images that are auto-compressed and stored on local filesystem, served via API route | ✓ VERIFIED | All Plan 02 truths verified (compress, storage, upload, serve routes) |
-| 27 | Editor auto-saves drafts to localStorage; explicit Save creates a version record, sets the human-edited flag, and prompts for an optional change summary | ✓ VERIFIED | localStorage auto-save verified (truth 4), EditorSaveDialog prompts for summary, save API verified (truth 6) |
-| 28 | User can view full version history for any article, filter by change source, and compare any two versions with side-by-side or inline diff | ✓ VERIFIED | All Plan 03 truths verified (History tab, filtering, diff viewer) |
-| 29 | User can restore (rollback) any article to a previous version | ✓ VERIFIED | Plan 03 truth 16 verified (restore functionality) |
+| 36 | changeSourceEnum includes 'draft' as valid value | ✓ VERIFIED | schema.ts lines 38: "draft" in enum |
+| 37 | Editor auto-saves draft as version record with changeSource 'draft' | ✓ VERIFIED | article-editor.tsx line 136: saveDraft function, line 159: debounced call, draft/route.ts line 81 |
+| 38 | Draft version records appear in history with distinct styling | ✓ VERIFIED | version-history.tsx has border-dashed styling for draft, Draft badge |
+| 39 | User can filter version history to show draft versions | ✓ VERIFIED | version-history.tsx SOURCE_FILTERS includes { label: "Draft", value: "draft" } |
+| 40 | localStorage auto-save replaced by server-side drafts | ✓ VERIFIED | No localStorage refs in article-editor.tsx (grep returned empty) |
+| 41 | Draft recovery checks server instead of localStorage | ✓ VERIFIED | article-editor.tsx fetches GET /api/articles/${articleId}/draft on mount |
 
-**Score:** 29/29 truths verified
+**Artifacts:**
+- `src/lib/db/schema.ts` (changeSourceEnum with draft) — ✓ EXISTS, SUBSTANTIVE (line 38)
+- `src/app/api/articles/[id]/draft/route.ts` — ✓ EXISTS (4369 bytes), exports GET, PUT, DELETE
+- `src/components/editor/article-editor.tsx` (server-side draft auto-save) — ✓ MODIFIED, WIRED
+- `src/components/wiki/version-history.tsx` (draft styling) — ✓ MODIFIED
 
-### Required Artifacts (All Plans)
+**Key Links:**
+- article-editor.tsx → /api/articles/[id]/draft — ✓ WIRED (PUT on line 143, GET on mount, DELETE on save)
+- version-history.tsx → draft badge — ✓ WIRED (case "draft" in ChangeSourceBadge)
 
-All artifacts verified at 3 levels: Exists, Substantive (not stub), Wired (imported/used).
+#### Plan 05-07: Version Preview (5 truths)
 
-#### Plan 01: BlockNote Editor
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 42 | User can click any version history record to open slide-out panel | ✓ VERIFIED | version-history.tsx line 291: Eye icon button, onClick sets previewVersion |
+| 43 | Slide-out shows version markdown rendered as formatted HTML | ✓ VERIFIED | version-preview.tsx renders Markdown component in prose wrapper |
+| 44 | Slide-out includes version metadata (date, source, creator, summary) | ✓ VERIFIED | version-preview.tsx SheetDescription shows metadata |
+| 45 | User can close slide-out without restore action | ✓ VERIFIED | version-preview.tsx Sheet onOpenChange handler |
+| 46 | Slide-out works independently of selection system | ✓ VERIFIED | Eye button has e.stopPropagation() to prevent selection toggle |
 
-| Artifact | Expected | Status | Details |
-|----------|----------|--------|---------|
-| `src/components/editor/article-editor.tsx` | BlockNote WYSIWYG editor client component | ✓ VERIFIED | 237 lines, complete implementation with BlockNote, localStorage drafts, save handler |
-| `src/components/editor/editor-save-dialog.tsx` | Save dialog with change summary prompt | ✓ VERIFIED | Exists, imported by article-editor.tsx |
-| `src/app/(wiki)/wiki/[articleSlug]/edit/page.tsx` | Server component edit page loading article data | ✓ VERIFIED | 1594 bytes, loads article, auth guard, renders editor via EditorLoader |
-| `src/app/api/articles/[id]/save/route.ts` | POST endpoint for saving editor content | ✓ VERIFIED | 114 lines, exports POST, optimistic locking, version creation, hasHumanEdits flag |
-| `src/app/globals.css` | BlockNote @source directive for Tailwind v4 | ✓ VERIFIED | Contains "@source "../node_modules/@blocknote/shadcn";" |
+**Artifacts:**
+- `src/components/wiki/version-preview.tsx` — ✓ EXISTS (2958 bytes), Sheet with Markdown rendering
+- `src/components/wiki/version-history.tsx` (Eye button) — ✓ MODIFIED, imports VersionPreview
 
-#### Plan 02: Image Upload
+**Key Links:**
+- version-history.tsx → version-preview.tsx — ✓ WIRED (line 368: renders VersionPreview)
+- version-preview.tsx → Sheet — ✓ WIRED (imports and renders Sheet)
 
-| Artifact | Expected | Status | Details |
-|----------|----------|--------|---------|
-| `src/lib/images/compress.ts` | sharp image compression pipeline | ✓ VERIFIED | 32 lines, compressImage function with resize, JPEG, quality 80 |
-| `src/lib/images/storage.ts` | Filesystem read/write for image storage | ✓ VERIFIED | 63 lines, ensureDir, saveImage, readImage, getImageUrl functions |
-| `src/app/api/articles/[id]/images/route.ts` | POST endpoint for image upload | ✓ VERIFIED | 94 lines, exports POST, auth, validation, compression, DB insert |
-| `src/app/api/images/[articleId]/[filename]/route.ts` | GET endpoint for serving images | ✓ VERIFIED | 32 lines, exports GET, serves images with immutable cache headers |
+#### Plan 05-08: Dark Mode and User Menu Relocation (9 truths planned)
 
-#### Plan 03: Version History
+**Implemented (5 truths):**
 
-| Artifact | Expected | Status | Details |
-|----------|----------|--------|---------|
-| `src/components/wiki/version-history.tsx` | Version list with filtering and comparison selection | ✓ VERIFIED | 12863 bytes, filtering, selection, compare, restore logic |
-| `src/components/wiki/diff-viewer.tsx` | Custom diff viewer with side-by-side and inline modes | ✓ VERIFIED | 9220 bytes, diffLines, inline/side-by-side rendering |
-| `src/app/api/articles/[id]/versions/route.ts` | GET endpoint for listing versions with filtering | ✓ VERIFIED | 1158 bytes, exports GET, source filtering via query param |
-| `src/app/api/articles/[id]/restore/route.ts` | POST endpoint for restoring to a previous version | ✓ VERIFIED | 3137 bytes, exports POST, creates new version record |
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 47 | User can toggle between auto/light/dark mode from profile page | ✓ VERIFIED | profile-form.tsx has System/Light/Dark toggle buttons |
+| 48 | Theme preference persists in users table | ✓ VERIFIED | schema.ts has themePreference column, updateThemePreference server action in actions.ts |
+| 49 | Theme applies app-wide via ThemeProvider in root layout | ✓ VERIFIED | layout.tsx line 34: ThemeProvider with attribute="class", enableSystem |
+| 50 | BlockNote editor respects current theme | ✓ VERIFIED | article-editor.tsx line 56: useTheme, line 280: theme={resolvedTheme === "dark" ? "dark" : "light"} |
+| 51 | html element has class='dark' when dark mode active | ✓ VERIFIED | layout.tsx line 29: suppressHydrationWarning, ThemeProvider attribute="class" |
 
-#### Plan 04: AI Review Annotations
+**NOT Implemented (4 truths from Task 3):**
 
-| Artifact | Expected | Status | Details |
-|----------|----------|--------|---------|
-| `src/lib/db/schema.ts` | ai_review_annotations table and annotationSeverityEnum | ✓ VERIFIED | Lines 401, 407-427: enum and table with all required fields |
-| `src/lib/ai/review.ts` | LLM review pass generating annotations after merge | ✓ VERIFIED | 141 lines, generateReviewAnnotations with structured output, DB insert |
-| `src/components/wiki/annotation-banner.tsx` | Collapsible annotation banner with cards and dismiss | ✓ VERIFIED | 8937 bytes, collapsible UI, severity icons, scroll, highlight, dismiss |
-| `src/app/api/articles/[id]/annotations/route.ts` | GET endpoint for fetching active annotations | ✓ VERIFIED | 1126 bytes, exports GET, queries isDismissed=false |
-| `src/app/api/articles/[id]/annotations/[annotationId]/dismiss/route.ts` | POST endpoint for dismissing an annotation | ✓ VERIFIED | 1431 bytes, exports POST, updates isDismissed, dismissedBy, dismissedAt |
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 52 | User avatar icon appears in top-right header bar next to search input | ✗ FAILED | UserMenu still in sidebar footer (app-sidebar.tsx line 56-60), not in wiki layout header |
+| 53 | Clicking avatar shows dropdown with user name, Account Settings link, Log Out | ✗ FAILED | user-menu.tsx line 57: still "Profile" not "Account Settings", line 43: name in trigger |
+| 54 | Settings cog icon appears next to avatar (admin only) | ✗ FAILED | No Settings icon in wiki layout.tsx header |
+| 55 | Sidebar footer no longer contains user menu | ✗ FAILED | app-sidebar.tsx lines 56-60: SidebarFooter still contains UserMenu |
 
-### Key Link Verification (Critical Wiring)
+**Artifacts (Plan 05-08):**
+- `src/components/common/theme-provider.tsx` — ✓ EXISTS (267 bytes)
+- `src/app/layout.tsx` (ThemeProvider) — ✓ MODIFIED, WIRED
+- `src/lib/db/schema.ts` (themePreference column) — ✓ MODIFIED
+- `src/app/(wiki)/profile/profile-form.tsx` (theme toggle) — ✓ MODIFIED
+- `src/app/(wiki)/layout.tsx` (header with user menu) — ✗ NOT MODIFIED (UserMenu not in header)
+- `src/components/wiki/app-sidebar.tsx` (UserMenu removed) — ✗ NOT MODIFIED (UserMenu still in footer)
+- `src/components/common/user-menu.tsx` (avatar-only, Account Settings) — ✗ NOT MODIFIED (name in trigger, "Profile" link)
 
-All key links verified with actual code patterns.
-
-#### Plan 01: BlockNote Editor
-
-| From | To | Via | Status | Details |
-|------|----|----|--------|---------|
-| edit/page.tsx | article-editor.tsx | dynamic import with ssr: false | ✓ WIRED | EditorLoader wrapper with dynamic import |
-| article-editor.tsx | /api/articles/[id]/save | fetch POST on save | ✓ WIRED | Line 156: fetch POST with contentJson, contentMarkdown, changeSummary |
-| save/route.ts | version.ts | createArticleVersion call | ✓ WIRED | Line 103: createArticleVersion with changeSource="human_edited" |
-
-#### Plan 02: Image Upload
-
-| From | To | Via | Status | Details |
-|------|----|----|--------|---------|
-| article-editor.tsx | /api/articles/[id]/images | uploadFile handler passed to useCreateBlockNote | ✓ WIRED | Line 59: fetch POST with FormData, line 73: uploadFile passed to useCreateBlockNote |
-| images/route.ts | compress.ts | compressImage call | ✓ WIRED | Line 67: compressed = await compressImage(inputBuffer) |
-| images/route.ts | storage.ts | saveImage call | ✓ WIRED | Line 77: await saveImage(articleId, filename, compressed.data) |
-
-#### Plan 03: Version History
-
-| From | To | Via | Status | Details |
-|------|----|----|--------|---------|
-| version-history.tsx | /api/articles/[id]/versions | fetch GET for version list | ✓ WIRED | Fetch with optional source filter query param |
-| version-history.tsx | diff-viewer.tsx | renders DiffViewer with two version contents | ✓ WIRED | Line 366: renders DiffViewer component |
-| version-history.tsx | /api/articles/[id]/restore | fetch POST for rollback | ✓ WIRED | POST with versionId in body |
-
-#### Plan 04: AI Review Annotations
-
-| From | To | Via | Status | Details |
-|------|----|----|--------|---------|
-| conflict.ts | review.ts | generateReviewAnnotations call after clean merge | ✓ WIRED | Line 85-86: dynamic import, await generateReviewAnnotations |
-| annotation-banner.tsx | /api/articles/[id]/annotations | fetch GET for annotations | ✓ WIRED | Line 97: fetch active annotations on mount |
-| annotation-banner.tsx | section headings | scrollIntoView on annotation click | ✓ WIRED | Line 141: scrollIntoView with smooth behavior |
+**Key Links (Plan 05-08):**
+- layout.tsx → ThemeProvider — ✓ WIRED (line 34)
+- profile-form.tsx → useTheme — ✓ WIRED
+- article-editor.tsx → useTheme — ✓ WIRED (line 56)
+- **wiki layout.tsx → UserMenu in header — ✗ NOT WIRED (still in sidebar)**
+- **wiki layout.tsx → Settings icon — ✗ NOT WIRED (doesn't exist)**
 
 ### Requirements Coverage
 
-Phase 5 maps to 13 requirements from REQUIREMENTS.md. All satisfied.
+All 13 original requirements (EDIT-01 through VERS-05) remain satisfied (previous verification confirmed).
 
-| Requirement | Description | Status | Evidence |
-|-------------|-------------|--------|----------|
-| EDIT-01 | WYSIWYG Markdown editor using BlockNote | ✓ SATISFIED | BlockNote editor verified (Plan 01) |
-| EDIT-02 | Editor exports raw Markdown — all content stored as Markdown in database | ✓ SATISFIED | blocksToMarkdownLossy converts to markdown, both JSON and markdown stored |
-| EDIT-03 | Editor toolbar: headings, bold, italic, code, links, tables, lists, images | ✓ SATISFIED | BlockNote default toolbar includes all features |
-| EDIT-04 | Image paste/upload with auto-compression (sharp: max 1200x1200, JPEG quality 80, EXIF stripped) | ✓ SATISFIED | compress.ts verified with exact specs (Plan 02) |
-| EDIT-05 | Images stored on local filesystem (/data/images/{articleId}/), served via API route | ✓ SATISFIED | storage.ts and serving route verified (Plan 02) |
-| EDIT-06 | Auto-save draft to localStorage with explicit Save action | ✓ SATISFIED | localStorage auto-save verified (Plan 01 truth 4) |
-| EDIT-07 | On save: creates article_versions record, sets has_human_edits flag, updates timestamps, prompts for optional change summary | ✓ SATISFIED | save/route.ts verified (Plan 01 truth 6) |
-| VERS-01 | Full version history for every article change (AI and human) | ✓ SATISFIED | Version history component verified (Plan 03) |
-| VERS-02 | Diff viewer with side-by-side and inline modes | ✓ SATISFIED | diff-viewer.tsx verified (Plan 03) |
-| VERS-03 | Version restore (rollback) to any previous version | ✓ SATISFIED | restore/route.ts verified (Plan 03 truth 16) |
-| VERS-04 | Filter version history by change source (ai_generated, human_edited, ai_merged) | ✓ SATISFIED | Source filtering verified (Plan 03 truth 14) |
-| VERS-05 | Each version stores full content markdown and unified diff from previous | ✓ SATISFIED | article_versions schema includes contentMarkdown and unifiedDiff fields |
+**Additional Phase 5 Requirements (Extended Scope):**
 
-Additional Phase 5 features (AI review annotations from extended scope):
-
-| Feature | Status | Evidence |
-|---------|--------|----------|
-| AI review annotations after merge | ✓ IMPLEMENTED | Plan 04 all truths verified |
-| Collapsible annotation banner UI | ✓ IMPLEMENTED | annotation-banner.tsx verified |
-| Section highlighting and scrolling | ✓ IMPLEMENTED | Plan 04 truths 23-24 verified |
+| Requirement | Status | Evidence |
+|-------------|--------|----------|
+| Admin Review Queue centralized dashboard | ✓ SATISFIED | Plan 05-05 verified |
+| Draft-as-version with one per user per article | ✓ SATISFIED | Plan 05-06 verified |
+| Version preview slide-out panel | ✓ SATISFIED | Plan 05-07 verified |
+| Light/dark mode with theme persistence | ✓ SATISFIED | Plan 05-08 Tasks 1-2 verified |
+| User menu in header with admin settings cog | ✗ BLOCKED | Plan 05-08 Task 3 not implemented |
 
 ### Anti-Patterns Found
 
-No blocker anti-patterns detected. All files are substantive implementations.
+No blocker anti-patterns detected in new code.
 
 | File | Pattern | Severity | Impact |
 |------|---------|----------|--------|
 | N/A | N/A | N/A | N/A |
 
-**Scanned files:** article-editor.tsx, save/route.ts, compress.ts, storage.ts, images/route.ts, version-history.tsx, diff-viewer.tsx, review.ts, annotation-banner.tsx
-
-**Patterns checked:**
-- TODO/FIXME/PLACEHOLDER comments: None found
-- Empty return statements: None found
-- Console.log-only implementations: None found
-- Stub handlers: None found
-
 ### Human Verification Required
 
-The following items require human testing to verify the complete user experience:
+The following NEW items require human testing (original 6 items from previous verification still apply):
 
-#### 1. BlockNote Editor Visual Appearance and UX
+#### 7. Admin Review Queue Filtering and Sorting
 
-**Test:** Navigate to any article page, click Edit, verify the BlockNote editor renders with a complete toolbar and the article content is correctly displayed.
-
-**Expected:**
-- Editor toolbar shows all formatting options (headings, bold, italic, code, links, tables, lists, images)
-- Content loads correctly from JSON (if available) or markdown
-- Draft recovery banner appears if a localStorage draft exists
-- Save button opens dialog with change summary prompt
-
-**Why human:** Visual appearance, toolbar completeness, content rendering fidelity cannot be verified programmatically without browser rendering.
-
-#### 2. Image Paste/Upload and Display
-
-**Test:** In the editor, paste an image from clipboard or drag-drop an image file. Verify it appears inline, then save the article and view it on the article page.
+**Test:** Navigate to /admin/review-queue. Type in search box, select a category from filter, change sort order.
 
 **Expected:**
-- Image appears inline in the editor immediately after paste/drop
-- Image is displayed correctly on the article page after save
-- Image loads from `/api/images/{articleId}/{filename}` URL
-- Image quality is acceptable (compressed but not degraded)
+- Search filters items by article title (case-insensitive)
+- Category filter shows only items from selected category
+- Sort dropdown changes order (newest vs oldest)
+- All three controls work together correctly
 
-**Why human:** Visual image quality assessment and drag-drop UX cannot be verified programmatically.
+**Why human:** Client-side filtering and sorting logic requires interactive testing.
 
-#### 3. Version History Diff Viewer Accuracy
+#### 8. Draft Auto-Save to Server
 
-**Test:** Make multiple edits to an article. Navigate to History tab, select two versions, click Compare. Verify additions are highlighted in green, removals in red, and unchanged content is visible.
-
-**Expected:**
-- Inline mode: colored lines with + and - prefixes
-- Side-by-side mode: aligned columns with proper spacing
-- Toggle between modes works smoothly
-- Diff accurately reflects actual changes between versions
-
-**Why human:** Diff rendering accuracy, color visibility, and alignment require visual inspection.
-
-#### 4. Version Restore and Conflict Detection
-
-**Test:** Edit an article in two browser tabs. Save in one tab, attempt to save in the other. Verify 409 error appears. Then restore an old version from History tab.
+**Test:** Edit an article, make changes, wait 3+ seconds without saving. Check version history.
 
 **Expected:**
-- Optimistic lock conflict shows toast error: "Article was modified externally. Please reload."
-- Restore confirmation dialog appears when clicking Restore
-- After restore, article content reverts to selected version
-- New version record appears in History (rollback creates new version)
+- Draft version appears in history with "Draft" badge and dashed border
+- Draft has distinct visual styling from other versions
+- Draft updates on subsequent changes (upsert pattern)
+- Clicking save removes the draft record
 
-**Why human:** Multi-tab race condition testing and confirmation dialog UX require manual interaction.
+**Why human:** Debounced auto-save timing and visual styling require interactive testing.
 
-#### 5. AI Review Annotations Banner and Scrolling
+#### 9. Version Preview Slide-Out
 
-**Test:** Trigger an AI merge on a human-edited article (requires setting up a scenario with code changes). After merge completes, view the article page.
-
-**Expected:**
-- "AI Review: N items need attention" banner appears (collapsed by default)
-- Expanding shows annotation cards with severity icons, concerns, section links
-- Clicking a section heading scrolls smoothly to that section
-- Referenced sections have yellow left-border highlight
-- Dismiss button removes annotation from UI
-
-**Why human:** Scroll behavior, visual highlighting, and collapsible animation require browser testing.
-
-#### 6. LocalStorage Draft Auto-Save and Recovery
-
-**Test:** Start editing an article, make changes, wait 1-2 seconds. Close the browser tab WITHOUT saving. Reopen the edit page for the same article.
+**Test:** Open History tab, click Eye icon on any version.
 
 **Expected:**
-- Draft recovery banner appears: "You have an unsaved draft. Would you like to restore it?"
-- Clicking Restore loads the unsaved changes
-- Clicking Discard clears the draft and starts fresh
+- Slide-out panel appears from right side
+- Version content rendered as formatted markdown (not raw text)
+- Metadata header shows date, source badge, creator, change summary
+- Closing panel doesn't affect version selection
 
-**Why human:** Browser localStorage persistence and tab close/reopen workflow cannot be verified programmatically.
+**Why human:** Slide-out animation, markdown rendering fidelity, and interaction independence require manual testing.
+
+#### 10. Dark Mode Theme Switching
+
+**Test:** Navigate to /profile. Click System/Light/Dark buttons. Reload page. Log out and log back in.
+
+**Expected:**
+- Theme switches immediately when button clicked
+- Dark mode applies app-wide (sidebar, header, content, modals)
+- BlockNote editor switches between light/dark theme
+- Theme persists after page reload
+- Theme persists after logout/login
+- Auto mode follows system preference
+
+**Why human:** Visual theme consistency across all UI elements, persistence verification, and system preference detection require manual testing.
+
+---
+
+## Gaps Summary
+
+**Scope:** Plan 05-08 Task 3 (User Menu Relocation to Header)
+
+**What's missing:**
+1. UserMenu component still in sidebar footer (should be in wiki layout header)
+2. UserMenu trigger still shows user name (should be avatar-only)
+3. UserMenu link says "Profile" (should say "Account Settings")
+4. Admin link still in UserMenu dropdown (should be removed, replaced by separate Settings cog)
+5. No Settings cog icon in header for admins
+
+**Why this matters:**
+- The phase goal includes "User avatar icon appears in the top-right header bar" (ROADMAP success criterion 9, sub-item 6)
+- Current implementation keeps old UX pattern (user menu in sidebar)
+- Missing Settings cog icon makes admin access less discoverable
+
+**Recommended action:**
+Execute Plan 05-08 Task 3 as written (3 files to modify: wiki layout.tsx, app-sidebar.tsx, user-menu.tsx).
 
 ---
 
 ## Overall Assessment
 
-**Status:** PASSED
+**Status:** GAPS_FOUND
 
-All 29 observable truths verified. All 19 required artifacts exist, are substantive (not stubs), and are properly wired. All 13 REQUIREMENTS.md requirements satisfied. Zero blocker anti-patterns detected.
+**Score:** 38/42 observable truths verified (90.5%)
 
-**Phase Goal Achieved:** Users CAN edit articles with a rich editor (BlockNote WYSIWYG with full toolbar), upload images (auto-compressed and stored on filesystem), and track all changes with full version history (filtering, diff viewing, rollback).
+**Phase Goal Achievement:** PARTIAL
 
-**Additional Value Delivered:** AI review annotations system provides post-merge semantic review, adding intelligent quality assurance beyond the phase scope.
+**What works:**
+- All original scope (Plans 01-04) verified and functioning
+- Admin Review Queue fully implemented (Plan 05-05)
+- Draft-as-version fully implemented (Plan 05-06)
+- Version preview slide-out fully implemented (Plan 05-07)
+- Dark mode theme system fully implemented (Plan 05-08 Tasks 1-2)
 
-**Human Verification Needed:** 6 items require manual testing for visual appearance, UX flow, and browser-specific behavior (localStorage, scrolling, drag-drop). These are not blocking issues — the code is verified to be complete and correct.
+**What's missing:**
+- User menu relocation to header (Plan 05-08 Task 3)
+- Settings cog icon for admins
+- Updated UserMenu component (avatar-only trigger, "Account Settings" label)
+
+**Impact:** Low-medium. The missing Task 3 is a UX improvement, not a functional blocker. All core editing, versioning, and theme features work. However, the ROADMAP explicitly lists "User avatar icon appears in the top-right header bar" as a success criterion, making this a documented gap.
+
+**Re-verification needed:** Yes — after executing Plan 05-08 Task 3.
 
 ---
 
-_Verified: 2026-02-14T03:01:11Z_
+_Verified: 2026-02-13T00:00:00Z_
 _Verifier: Claude (gsd-verifier)_

@@ -120,10 +120,10 @@ Plans:
 - [x] 05-02-PLAN.md -- Image upload/paste with sharp compression, filesystem storage, and serving API
 - [x] 05-03-PLAN.md -- Version history UI with source filtering, diff viewer (inline + side-by-side), and rollback
 - [x] 05-04-PLAN.md -- AI review annotations: ai_review_annotations table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
-- [ ] 05-05-PLAN.md -- Admin Review Queue: centralized list of merge conflicts + AI review annotations, with category filter, search, and sort
-- [ ] 05-06-PLAN.md -- Draft-as-version: replace localStorage drafts with `changeSource: "draft"` version records (one per user per article, upsert), add "draft" to changeSourceEnum, update history UI with draft styling
-- [ ] 05-07-PLAN.md -- Version preview slide-out: click any version history record to view rendered formatted text in a slide-out panel without restoring
-- [ ] 05-08-PLAN.md -- Light/dark mode: next-themes ThemeProvider in root layout, theme toggle in user profile (auto/light/dark), persist preference in users table
+- [x] 05-05-PLAN.md -- Admin Review Queue: centralized list of merge conflicts + AI review annotations, with category filter, search, and sort
+- [x] 05-06-PLAN.md -- Draft-as-version: replace localStorage drafts with `changeSource: "draft"` version records (one per user per article, upsert), add "draft" to changeSourceEnum, update history UI with draft styling
+- [x] 05-07-PLAN.md -- Version preview slide-out: click any version history record to view rendered formatted text in a slide-out panel without restoring
+- [x] 05-08-PLAN.md -- Light/dark mode: next-themes ThemeProvider in root layout, theme toggle in user profile (auto/light/dark), persist preference in users table
 
 ### Phase 6: Technical View, Comments & Mentions
 **Goal**: Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
@@ -171,6 +171,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
 | 4. Wiki Viewer | 5/5 | ✓ Complete | 2026-02-13 |
-| 5. Article Editing & Version History | 4/4 | ✓ Complete | 2026-02-13 |
+| 5. Article Editing & Version History | 8/8 | ✓ Complete | 2026-02-14 |
 | 6. Technical View, Comments & Mentions | 2/2 | ✓ Complete | 2026-02-14 |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
