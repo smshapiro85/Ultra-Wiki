@@ -9,8 +9,10 @@ import {
   articleDbTables,
   githubFiles,
   users,
+  comments,
+  mentions,
 } from "@/lib/db/schema";
-import { eq, desc, sql, and, inArray } from "drizzle-orm";
+import { eq, desc, sql, and, inArray, ilike, or } from "drizzle-orm";
 
 // =============================================================================
 // Types
@@ -543,4 +545,109 @@ export async function getArticleDbTables(
     columns: row.columns as ArticleDbTable["columns"],
     relevanceExplanation: row.relevanceExplanation,
   }));
+}
+
+// =============================================================================
+// getArticleComments
+// =============================================================================
+
+export interface CommentWithReplies {
+  id: string;
+  userId: string;
+  userName: string | null;
+  userImage: string | null;
+  userAvatarUrl: string | null;
+  contentMarkdown: string;
+  isResolved: boolean;
+  resolvedBy: string | null;
+  resolvedAt: Date | null;
+  parentCommentId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  replies: CommentWithReplies[];
+}
+
+/**
+ * Get all comments for an article as a tree.
+ * Joins users table for avatar/name. Builds tree server-side:
+ * root comments have null parentCommentId, replies nested under parents.
+ * Root comments sorted newest-first, replies sorted oldest-first within each thread.
+ */
+export async function getArticleComments(
+  articleId: string
+): Promise<CommentWithReplies[]> {
+  const db = getDb();
+
+  const allComments = await db
+    .select({
+      id: comments.id,
+      userId: comments.userId,
+      userName: users.name,
+      userImage: users.image,
+      userAvatarUrl: users.avatarUrl,
+      contentMarkdown: comments.contentMarkdown,
+      isResolved: comments.isResolved,
+      resolvedBy: comments.resolvedBy,
+      resolvedAt: comments.resolvedAt,
+      parentCommentId: comments.parentCommentId,
+      createdAt: comments.createdAt,
+      updatedAt: comments.updatedAt,
+    })
+    .from(comments)
+    .leftJoin(users, eq(comments.userId, users.id))
+    .where(eq(comments.articleId, articleId))
+    .orderBy(desc(comments.createdAt));
+
+  // Build tree using a Map
+  const commentMap = new Map<string, CommentWithReplies>();
+  for (const c of allComments) {
+    commentMap.set(c.id, { ...c, replies: [] });
+  }
+
+  const roots: CommentWithReplies[] = [];
+  for (const c of commentMap.values()) {
+    if (c.parentCommentId && commentMap.has(c.parentCommentId)) {
+      commentMap.get(c.parentCommentId)!.replies.push(c);
+    } else {
+      roots.push(c);
+    }
+  }
+
+  // Sort replies oldest-first within each thread
+  for (const c of commentMap.values()) {
+    c.replies.sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }
+
+  return roots;
+}
+
+// =============================================================================
+// searchUsers
+// =============================================================================
+
+/**
+ * Search users by name or email (case-insensitive).
+ * Returns id, name, email, image, avatarUrl. Default limit 10.
+ */
+export async function searchUsers(query: string, limit: number = 10) {
+  const db = getDb();
+
+  const results = await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      image: users.image,
+      avatarUrl: users.avatarUrl,
+    })
+    .from(users)
+    .where(
+      or(ilike(users.name, `%${query}%`), ilike(users.email, `%${query}%`))
+    )
+    .limit(limit);
+
+  return results;
 }
