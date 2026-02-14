@@ -24,6 +24,7 @@ import { RegenerateButton } from "@/components/wiki/regenerate-button";
 import { BookmarkButton } from "@/components/wiki/bookmark-button";
 import { AnnotationBanner } from "@/components/wiki/annotation-banner";
 import { VersionHistory } from "@/components/wiki/version-history";
+import { TechnicalView } from "@/components/wiki/technical-view";
 
 /**
  * Article page at /wiki/[articleSlug].
@@ -132,15 +133,16 @@ export default async function ArticlePage({
               <ArticleContent markdown={article.contentMarkdown} />
             }
             technicalView={
-              article.technicalViewMarkdown ? (
-                <ArticleContent
-                  markdown={article.technicalViewMarkdown}
-                />
-              ) : (
-                <p className="py-8 text-center text-muted-foreground">
-                  No technical view available.
-                </p>
-              )
+              <TechnicalView
+                articleId={article.id}
+                articleSlug={article.slug}
+                technicalViewMarkdown={article.technicalViewMarkdown}
+              />
+            }
+            commentsContent={
+              <p className="py-8 text-center text-muted-foreground">
+                Comments coming soon.
+              </p>
             }
             historyContent={
               <VersionHistory

@@ -20,6 +20,7 @@ interface ArticleEditorProps {
   initialContentJson: unknown | null;
   initialContentMarkdown: string;
   articleUpdatedAt: string;
+  saveMode?: "article" | "technical";
   onSaveSuccess?: () => void;
 }
 
@@ -42,6 +43,7 @@ export function ArticleEditor({
   initialContentJson,
   initialContentMarkdown,
   articleUpdatedAt,
+  saveMode = "article",
   onSaveSuccess,
 }: ArticleEditorProps) {
   const router = useRouter();
@@ -163,6 +165,7 @@ export function ArticleEditor({
         contentMarkdown,
         changeSummary: changeSummary || null,
         loadedUpdatedAt: articleUpdatedAt,
+        mode: saveMode,
       }),
     });
 

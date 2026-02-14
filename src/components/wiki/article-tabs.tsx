@@ -6,6 +6,7 @@ import { FileText, Code, MessageSquare, History } from "lucide-react";
 interface ArticleTabsProps {
   articleContent: React.ReactNode;
   technicalView: React.ReactNode;
+  commentsContent: React.ReactNode;
   historyContent: React.ReactNode;
 }
 
@@ -13,12 +14,13 @@ interface ArticleTabsProps {
  * Tab system for article page with four tabs:
  * - Article (default, active)
  * - Technical View (active, renders technicalView prop)
- * - Comments (disabled placeholder for Phase 6)
+ * - Comments (active, renders commentsContent prop)
  * - History (active, renders historyContent prop)
  */
 export function ArticleTabs({
   articleContent,
   technicalView,
+  commentsContent,
   historyContent,
 }: ArticleTabsProps) {
   return (
@@ -32,7 +34,7 @@ export function ArticleTabs({
           <Code className="size-4" />
           Technical View
         </TabsTrigger>
-        <TabsTrigger value="comments" disabled>
+        <TabsTrigger value="comments">
           <MessageSquare className="size-4" />
           Comments
         </TabsTrigger>
@@ -46,11 +48,7 @@ export function ArticleTabs({
 
       <TabsContent value="technical">{technicalView}</TabsContent>
 
-      <TabsContent value="comments">
-        <p className="py-8 text-center text-muted-foreground">
-          Comments will be available in Phase 6.
-        </p>
-      </TabsContent>
+      <TabsContent value="comments">{commentsContent}</TabsContent>
 
       <TabsContent value="history">{historyContent}</TabsContent>
     </Tabs>

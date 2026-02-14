@@ -34,6 +34,7 @@ interface EditorLoaderProps {
   initialContentJson: unknown | null;
   initialContentMarkdown: string;
   articleUpdatedAt: string;
+  saveMode?: "article" | "technical";
 }
 
 /**
