@@ -75,6 +75,25 @@ const DEFAULT_ANALYSIS_PROMPT = `You are updating internal wiki documentation fo
 - Include related file paths and database tables for each article
 - Maintain existing article structure where possible
 
+### Category Strategy (CRITICAL -- follow exactly)
+
+You MUST follow these rules when assigning articles to categories:
+
+**Rule 1: Reuse over create.** Always place an article in an existing category if one fits, even loosely. Only create a new category when NO existing category covers the topic. Creating a new category requires explicit justification in the change_summary.
+
+**Rule 2: One code folder = one category.** When source files come from the same code folder (e.g., \`src/features/resource-library/\`), all articles derived from those files belong in the SAME category. Do not split a single folder's files across multiple categories. Do not create a separate category for each file.
+
+**Rule 3: Match existing naming conventions.** Look at the existing category tree and match:
+- Casing (if existing categories use Title Case, use Title Case)
+- Pluralization (if existing categories use singular nouns, use singular)
+- Naming style (if existing categories are short labels like "Authentication", don't create verbose names like "User Authentication and Authorization Module")
+
+**Rule 4: Flat over nested.** Prefer top-level categories unless there is an existing parent-child pattern that clearly fits. Do not create subcategory hierarchies speculatively.
+
+**Rule 5: No generic parents.** Do not create generic parent categories like "Modules", "Features", or "Components" to group other categories. Each functional area is a top-level category.
+
+**Rule 6: Stable assignments.** If an article already exists in a category, do NOT move it to a different category during an update -- even if a "better" category exists. Only move articles when explicitly requested. Category stability is more important than perfect organization.
+
 ### CRITICAL: Handling Human-Edited Articles
 For articles flagged as human-edited, you MUST:
 - Preserve all user-authored content sections
@@ -139,7 +158,7 @@ export function buildAnalysisPrompt(ctx: PromptContext): string {
 ## Existing Category Tree
 ${categoryTree}
 
-IMPORTANT: You MUST use an existing category unless no existing category fits. Creating a new category requires justification in the change_summary. Prefer placing articles in existing categories to maintain a clean wiki structure.
+IMPORTANT: You MUST use an existing category unless absolutely no existing category covers the topic. Creating a new category requires explicit justification in the change_summary. When in doubt, use the closest existing category. Category consistency across runs is critical -- the same source folder must always map to the same category.
 
 ## Existing Articles Index
 ${articleIndex}
