@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 8 (AI Prompt Refinement). Plans 1-2 of 4 complete.
+**Current focus:** Phase 8 (AI Prompt Refinement). Plans 1, 2, 4 of 4 complete. Plan 3 remaining.
 
 ## Current Position
 
 Phase: 8 of 8 (AI Prompt Refinement)
-Plan: 2 of 4 in current phase
-Status: Executing Phase 8 plans. 08-01 (prompt hardening) and 08-02 (heading sizes) complete.
-Last activity: 2026-02-14 -- Completed 08-01-PLAN.md (Prompt Hardening)
+Plan: 4 of 4 in current phase (3 complete, plan 3 still pending)
+Status: Executing Phase 8 plans. 08-01 (prompt hardening), 08-02 (heading sizes), 08-04 (sync page improvements) complete. 08-03 pending.
+Last activity: 2026-02-14 -- Completed 08-04-PLAN.md (Sync Page Improvements)
 
-Progress: [████████████████████] 100% (phases 1-7) + Phase 8 in progress
+Progress: [████████████████████] 100% (phases 1-7) + Phase 8: 3/4 plans complete
 
 ## Performance Metrics
 
@@ -162,6 +162,9 @@ Recent decisions affecting current work:
 - [08-01]: Dual-location prompt reinforcement -- critical rules stated in both DEFAULT_ARTICLE_STYLE_PROMPT and buildGenerationPrompt for full coverage
 - [08-02]: Prose H1 reduced to 1.5em (from 2.25em), H2 to 1.25em, H3 to 1.1em -- all subordinate to article title (text-3xl = 1.875rem)
 - [08-02]: Side menu heights recalculated from formula: font-size * 16px * 1.75 line-height + 6px padding
+- [08-04]: SSE endpoint at /api/sync/stream parallel to existing server action -- SyncTrigger uses EventSource, cron/API callers unaffected
+- [08-04]: expandKey + key prop re-mount pattern for expand/collapse all tree controls (simpler than imperative state management)
+- [08-04]: originalNodeMap via useMemo for correct all-children folder selection during filtered search
 
 ### Pending Todos
 
@@ -176,5 +179,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 08-01-PLAN.md (Prompt Hardening). 08-01 and 08-02 complete, 08-03 and 08-04 remaining.
-Resume file: .planning/phases/08-ai-prompt-refinement/08-01-SUMMARY.md
+Stopped at: Completed 08-04-PLAN.md (Sync Page Improvements). Plans 08-01, 08-02, 08-04 complete. 08-03 remaining.
+Resume file: .planning/phases/08-ai-prompt-refinement/08-04-SUMMARY.md
