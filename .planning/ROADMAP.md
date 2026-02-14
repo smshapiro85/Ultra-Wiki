@@ -105,11 +105,13 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. User can edit any article in a WYSIWYG editor (BlockNote) with toolbar support for headings, bold, italic, code, links, tables, lists, and images -- editor stores native BlockNote JSON
   2. User can paste or upload images that are auto-compressed (max 1200x1200, JPEG quality 80, EXIF stripped) and stored on local filesystem, served via API route
-  3. Editor auto-saves drafts to localStorage; explicit Save creates a version record, sets the human-edited flag, and prompts for an optional change summary
-  4. User can view full version history for any article, filter by change source (AI, human, merged), and compare any two versions with side-by-side or inline diff
-  5. User can restore (rollback) any article to a previous version
-  6. After AI merges a human-edited article, an LLM review pass analyzes the merged content against the code changes for semantic issues (contradictions, stale info). It never modifies content — it creates annotations in an `ai_review_annotations` table referencing section headings, with severity and timestamp.
-  7. Article page shows a collapsible "AI Review: N items need attention" banner when active annotations exist. Each annotation card shows the concern, referenced section, timestamp, and a Dismiss button. Referenced section headings get a yellow left-border highlight. Clicking an annotation scrolls to that section.
+  3. Editor auto-saves drafts as version records with `changeSource: "draft"` (one draft per user per article, upsert pattern). Drafts appear in version history with a distinct visual style. No more localStorage blind-restore — user can preview the draft before deciding to continue editing or discard it.
+  4. User can view full version history for any article, filter by change source (AI, human, merged, draft), and compare any two versions with side-by-side or inline diff
+  5. User can click any version history record to preview it as rendered formatted text in a slide-out panel — view it without restoring or comparing
+  6. User can restore (rollback) any article to a previous version
+  7. After AI merges a human-edited article, an LLM review pass analyzes the merged content against the code changes for semantic issues (contradictions, stale info). It never modifies content — it creates annotations in an `ai_review_annotations` table referencing section headings, with severity and timestamp.
+  8. Article page shows a collapsible "AI Review: N items need attention" banner when active annotations exist. Each annotation card shows the concern, referenced section, timestamp, and a Dismiss button. Referenced section headings get a yellow left-border highlight. Clicking an annotation scrolls to that section.
+  9. Admin has a centralized "Review Queue" page listing all articles needing attention — merge conflicts (needsReview) and active AI review annotations. Each item links to the article. Filterable by category and searchable by article title/text. Sorted by most recent first, with configurable sort order.
 **Plans:** 4 plans
 
 Plans:
@@ -117,6 +119,9 @@ Plans:
 - [x] 05-02-PLAN.md -- Image upload/paste with sharp compression, filesystem storage, and serving API
 - [x] 05-03-PLAN.md -- Version history UI with source filtering, diff viewer (inline + side-by-side), and rollback
 - [x] 05-04-PLAN.md -- AI review annotations: ai_review_annotations table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
+- [ ] 05-05: Admin Review Queue — centralized list of merge conflicts + AI review annotations, with category filter, search, and sort
+- [ ] 05-06: Draft-as-version — replace localStorage drafts with `changeSource: "draft"` version records (one per user per article, upsert), add "draft" to changeSourceEnum, update history UI with draft styling
+- [ ] 05-07: Version preview slide-out — click any version history record to view rendered formatted text in a slide-out panel without restoring
 
 ### Phase 6: Technical View, Comments & Mentions
 **Goal**: Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
@@ -128,11 +133,11 @@ Plans:
   3. Technical view content is editable using the same Markdown editor as articles
   4. User can post threaded comments on any article, with Markdown rendering, avatars, display names, and timestamps
   5. User can resolve and unresolve comments; @mention autocomplete triggers when typing @ and creates mention records that trigger notifications
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 06-01: Technical view tab (file links with inline code viewer, DB tables, GitHub deep links)
-- [ ] 06-02: Threaded comments with Markdown, resolve/unresolve, and @mentions
+- [ ] 06-01-PLAN.md -- Technical view tab with structured file links, inline code viewer, DB tables, GitHub deep links, and technical view editing
+- [ ] 06-02-PLAN.md -- Threaded comments with Markdown rendering, resolve/unresolve, @mention autocomplete via react-mentions-ts
 
 ### Phase 7: Ask AI & Notifications
 **Goal**: Users can ask AI questions about the wiki and codebase, and receive notifications about activity that matters to them
