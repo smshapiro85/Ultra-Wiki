@@ -25,6 +25,7 @@ import { BookmarkButton } from "@/components/wiki/bookmark-button";
 import { AnnotationBanner } from "@/components/wiki/annotation-banner";
 import { VersionHistory } from "@/components/wiki/version-history";
 import { TechnicalView } from "@/components/wiki/technical-view";
+import { CommentsSection } from "@/components/wiki/comments-section";
 
 /**
  * Article page at /wiki/[articleSlug].
@@ -140,9 +141,16 @@ export default async function ArticlePage({
               />
             }
             commentsContent={
-              <p className="py-8 text-center text-muted-foreground">
-                Comments coming soon.
-              </p>
+              session?.user?.id ? (
+                <CommentsSection
+                  articleId={article.id}
+                  currentUserId={session.user.id}
+                />
+              ) : (
+                <p className="py-8 text-center text-muted-foreground">
+                  Sign in to view and post comments.
+                </p>
+              )
             }
             historyContent={
               <VersionHistory
