@@ -110,13 +110,13 @@ Plans:
   5. User can restore (rollback) any article to a previous version
   6. After AI merges a human-edited article, an LLM review pass analyzes the merged content against the code changes for semantic issues (contradictions, stale info). It never modifies content — it creates annotations in an `ai_review_annotations` table referencing section headings, with severity and timestamp.
   7. Article page shows a collapsible "AI Review: N items need attention" banner when active annotations exist. Each annotation card shows the concern, referenced section, timestamp, and a Dismiss button. Referenced section headings get a yellow left-border highlight. Clicking an annotation scrolls to that section.
-**Plans**: TBD
+**Plans:** 4 plans
 
 Plans:
-- [ ] 05-01: BlockNote editor integration with native JSON storage
-- [ ] 05-02: Image upload/paste, compression (sharp), and serving API
-- [ ] 05-03: Version history, diff viewer, and rollback
-- [ ] 05-04: AI review annotations — `ai_review_annotations` table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
+- [ ] 05-01-PLAN.md -- BlockNote editor integration with native JSON storage, localStorage drafts, save with version tracking
+- [ ] 05-02-PLAN.md -- Image upload/paste with sharp compression, filesystem storage, and serving API
+- [ ] 05-03-PLAN.md -- Version history UI with source filtering, diff viewer (inline + side-by-side), and rollback
+- [ ] 05-04-PLAN.md -- AI review annotations: ai_review_annotations table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
 
 ### Phase 6: Technical View, Comments & Mentions
 **Goal**: Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
@@ -162,6 +162,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
 | 4. Wiki Viewer | 5/5 | ✓ Complete | 2026-02-13 |
-| 5. Article Editing & Version History | 0/3 | Not started | - |
+| 5. Article Editing & Version History | 0/4 | Not started | - |
 | 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
