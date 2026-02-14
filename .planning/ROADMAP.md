@@ -86,14 +86,15 @@ Plans:
   1. User can navigate articles via a collapsible category/article tree in the left sidebar and breadcrumbs showing the article path
   2. Article content renders from Markdown with syntax-highlighted code blocks, and an auto-generated table of contents appears from article headings
   3. Each article has a tab system (Article, Technical View, Comments, History) and a metadata sidebar showing last updated, editor, AI/human badge, and category
-  4. User can search articles with full-text search (tsvector), see highlighted results ranked by relevance, and results update as they type (debounced)
-  5. Home page shows recent updates, a search bar, and bookmarked articles; layout is responsive with sidebar collapsing on mobile
-**Plans**: TBD
+  4. Admin can regenerate any article from its page — re-fetches the article's linked source files from GitHub and re-runs AI generation with the current prompt. Uses merge strategy if article has human edits, direct overwrite if AI-only.
+  5. User can search articles with full-text search (tsvector), see highlighted results ranked by relevance, and results update as they type (debounced)
+  6. Home page shows recent updates, a search bar, and bookmarked articles; layout is responsive with sidebar collapsing on mobile
+**Plans:** 3 plans
 
 Plans:
-- [ ] 04-01: App shell layout, sidebar navigation, and category tree
-- [ ] 04-02: Article page with Markdown rendering, TOC, tabs, and metadata
-- [ ] 04-03: Full-text search and home dashboard
+- [ ] 04-01-PLAN.md -- App shell layout with SidebarProvider, collapsible category/article tree, breadcrumbs, data access layer, dependency installation
+- [ ] 04-02-PLAN.md -- Article page with Markdown rendering (shiki syntax highlighting), TOC, tab system, metadata sidebar, admin Regenerate Article action
+- [ ] 04-03-PLAN.md -- Full-text search (tsvector) with debounced input, home dashboard with recent updates and bookmarks, user_bookmarks table
 
 ### Phase 5: Article Editing & Version History
 **Goal**: Users can edit articles with a rich editor, upload images, and track all changes with full version history
@@ -118,13 +119,14 @@ Plans:
 **Requirements**: TECH-01, TECH-02, TECH-03, TECH-04, CMNT-01, CMNT-02, CMNT-03, CMNT-04, CMNT-05, CMNT-06
 **Success Criteria** (what must be TRUE):
   1. Technical View tab shows related source files with AI-generated relevance explanations and clickable GitHub deep links, plus related DB tables with column details and relevance notes
-  2. Technical view content is editable using the same Markdown editor as articles
-  3. User can post threaded comments on any article, with Markdown rendering, avatars, display names, and timestamps
-  4. User can resolve and unresolve comments; @mention autocomplete triggers when typing @ and creates mention records that trigger notifications
+  2. User can click any linked source file to view its code inline in a syntax-highlighted code viewer (fetched from GitHub on-demand), without leaving the wiki
+  3. Technical view content is editable using the same Markdown editor as articles
+  4. User can post threaded comments on any article, with Markdown rendering, avatars, display names, and timestamps
+  5. User can resolve and unresolve comments; @mention autocomplete triggers when typing @ and creates mention records that trigger notifications
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: Technical view tab (file links, DB tables, GitHub deep links)
+- [ ] 06-01: Technical view tab (file links with inline code viewer, DB tables, GitHub deep links)
 - [ ] 06-02: Threaded comments with Markdown, resolve/unresolve, and @mentions
 
 ### Phase 7: Ask AI & Notifications
