@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 5 gap closure plans (05-05 through 05-08).
+**Current focus:** Phase 5 complete. Phase 6 complete. Ready for Phase 7.
 
 ## Current Position
 
-Phase: 5 of 7 (Article Editing) -- gap closure
-Plan: 7 of 8 in current phase (05-07 complete, 05-08 remaining)
-Status: Executing gap closure plans for Phase 5.
-Last activity: 2026-02-14 -- Completed 05-07-PLAN.md (Version Preview Slide-Out)
+Phase: 5 of 7 (Article Editing) -- COMPLETE
+Plan: 8 of 8 in current phase (all plans complete)
+Status: Phase 5 fully delivered including gap closure plans.
+Last activity: 2026-02-14 -- Completed 05-08-PLAN.md (Dark Mode)
 
-Progress: [██████████████████░] 90%
+Progress: [███████████████████] 92%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
-- Average duration: 4min
-- Total execution time: 1.33 hours
+- Total plans completed: 25
+- Average duration: 3min
+- Total execution time: 1.35 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [██████████████████░] 90%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
-| 05 | 7 | 21min | 3min |
+| 05 | 8 | 23min | 3min |
 | 06 | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 4min, 2min, 3min, 2min
+- Last 5 plans: 4min, 2min, 3min, 2min, 2min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -139,6 +139,8 @@ Recent decisions affecting current work:
 - [05-06]: Draft cleanup on successful save via DELETE call (non-blocking, failure acceptable)
 - [05-07]: MarkdownHooks (not MarkdownAsync) for client component markdown rendering -- react-markdown v10 has no sync Markdown export
 - [05-07]: ChangeSourceBadge extracted to shared file to avoid circular imports between version-history and version-preview
+- [05-08]: Text column for themePreference (not enum) -- three values (system/light/dark) don't warrant Postgres enum, avoids migration complexity
+- [05-08]: useTheme for immediate client-side switching + server action for DB persistence -- dual strategy for responsiveness
 
 ### Pending Todos
 
@@ -153,5 +155,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-07-PLAN.md (Version Preview Slide-Out). One gap closure plan remaining (05-08).
-Resume file: .planning/phases/05-article-editing/05-07-SUMMARY.md
+Stopped at: Completed 05-08-PLAN.md (Dark Mode). Phase 5 fully complete (all 8 plans delivered).
+Resume file: .planning/phases/05-article-editing/05-08-SUMMARY.md
