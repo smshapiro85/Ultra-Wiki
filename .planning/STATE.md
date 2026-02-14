@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 6 complete (all 3 plans). Ready for Phase 7.
+**Current focus:** Phase 7 in progress (Ask AI & Notifications). Plan 3 of 3 complete.
 
 ## Current Position
 
-Phase: 6 of 7 (Technical View, Comments, Mentions) -- COMPLETE
-Plan: 3 of 3 in current phase (all plans complete)
-Status: Phase 6 fully delivered including AI file summaries.
-Last activity: 2026-02-14 -- Completed 06-03-PLAN.md (AI File Summaries)
+Phase: 7 of 7 (Ask AI & Notifications)
+Plan: 3 of 3 in current phase
+Status: Plan 07-03 (Notifications) complete. Plans 07-01, 07-02 (Ask AI) pending.
+Last activity: 2026-02-14 -- Completed 07-03-PLAN.md (Notifications)
 
-Progress: [████████████████████] 96%
+Progress: [████████████████████] 97%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26
+- Total plans completed: 27
 - Average duration: 3min
-- Total execution time: 1.4 hours
+- Total execution time: 1.5 hours
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [████████████████████] 96%
 | 04 | 5 | 14min | 3min |
 | 05 | 8 | 23min | 3min |
 | 06 | 3 | 11min | 4min |
+| 07 | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 3min, 2min, 2min, 3min
+- Last 5 plans: 3min, 2min, 2min, 3min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -146,6 +147,9 @@ Recent decisions affecting current work:
 - [06-03]: File summary generation is non-blocking -- failures do not abort sync or article processing
 - [06-03]: AI summaries capped at 500 chars to prevent runaway outputs
 - [06-03]: Dynamic imports for getSummaryModel and buildFileSummaryPrompt in pipeline (build-time safety)
+- [07-03]: No new npm dependencies for Slack/SendGrid -- raw fetch() against REST APIs (one POST call each)
+- [07-03]: Dynamic import() for notification service in pipeline.ts and conflict.ts (matches existing pattern)
+- [07-03]: Notification triggers are fire-and-forget via Promise.catch() -- never block primary actions
 
 ### Pending Todos
 
@@ -160,5 +164,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 06-03-PLAN.md (AI File Summaries). Phase 6 fully complete (all 3 plans delivered).
-Resume file: .planning/phases/06-technical-view-comments-mentions/06-03-SUMMARY.md
+Stopped at: Completed 07-03-PLAN.md (Notifications). Plans 07-01, 07-02 (Ask AI) still pending.
+Resume file: .planning/phases/07-ask-ai-notifications/07-03-SUMMARY.md
