@@ -30,8 +30,8 @@ export function ArticleBreadcrumb({
           <span key={index} className="contents">
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink href={segment.href}>
-                {segment.label}
+              <BreadcrumbLink asChild>
+                <Link href={segment.href}>{segment.label}</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </span>
