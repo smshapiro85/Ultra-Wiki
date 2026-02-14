@@ -61,6 +61,21 @@ export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="file_summary_prompt">File Summary Prompt</Label>
+            <Textarea
+              id="file_summary_prompt"
+              name="file_summary_prompt"
+              rows={4}
+              defaultValue={settings.file_summary_prompt?.value ?? ""}
+              placeholder="Prompt for generating 1-2 sentence file descriptions..."
+            />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Controls how AI generates short descriptions for source files.
+              Used in the Technical View file cards.
+            </p>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="ask_ai_global_prompt">
               Global Ask AI Prompt
             </Label>

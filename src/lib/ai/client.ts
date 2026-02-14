@@ -46,3 +46,37 @@ export async function getAIModel() {
 
   return openrouter(modelName, { reasoning });
 }
+
+/**
+ * Create an OpenRouter AI model instance for short summary outputs.
+ * Uses the same API key as the primary model but a separate model name
+ * (openrouter_summary_model). No reasoning config -- designed for fast,
+ * short outputs like file descriptions.
+ */
+export async function getSummaryModel() {
+  const [apiKey, summaryModelName] = await Promise.all([
+    getSetting(SETTING_KEYS.openrouter_api_key),
+    getSetting(SETTING_KEYS.openrouter_summary_model),
+  ]);
+
+  if (!apiKey) {
+    throw new Error(
+      "OpenRouter API key not configured. Please set it in Admin > Settings."
+    );
+  }
+  if (!summaryModelName) {
+    throw new Error(
+      "Summary model not configured. Please set it in Admin > Settings > API Keys."
+    );
+  }
+
+  const openrouter = createOpenRouter({
+    apiKey,
+    headers: {
+      "HTTP-Referer": "https://codewiki.internal",
+      "X-Title": "CodeWiki",
+    },
+  });
+
+  return openrouter(summaryModelName);
+}

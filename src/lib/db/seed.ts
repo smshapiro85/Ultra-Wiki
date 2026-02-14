@@ -32,6 +32,8 @@ const requiredSettings = [
   { key: "article_style_prompt", description: "AI article writing style prompt", isSecret: false },
   { key: "ask_ai_global_prompt", description: "Global Ask AI system prompt", isSecret: false },
   { key: "ask_ai_page_prompt", description: "Page-level Ask AI system prompt", isSecret: false },
+  { key: "openrouter_summary_model", description: "OpenRouter model for short summaries (file descriptions, etc.)", value: "", isSecret: false },
+  { key: "file_summary_prompt", description: "Prompt for generating short file descriptions", value: "", isSecret: false },
 ];
 
 async function seed() {

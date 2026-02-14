@@ -190,6 +190,19 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
               Controls thinking depth for reasoning-capable models (GPT-5, o3, Claude 3.7+). No effect on other models.
             </p>
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="openrouter_summary_model">Summary Model</Label>
+            <Input
+              id="openrouter_summary_model"
+              name="openrouter_summary_model"
+              type="text"
+              defaultValue={settings.openrouter_summary_model?.value ?? ""}
+              placeholder="google/gemini-2.0-flash-001"
+            />
+            <p className="text-xs text-muted-foreground">
+              Fast model for short outputs like file summaries. Uses the same API key as the primary model.
+            </p>
+          </div>
         </CardContent>
       </Card>
 

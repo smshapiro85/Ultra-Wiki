@@ -86,6 +86,7 @@ export async function saveApiKeys(
     { key: SETTING_KEYS.openrouter_api_key, field: "openrouter_api_key" },
     { key: SETTING_KEYS.openrouter_model, field: "openrouter_model" },
     { key: SETTING_KEYS.openrouter_reasoning_effort, field: "openrouter_reasoning_effort" },
+    { key: SETTING_KEYS.openrouter_summary_model, field: "openrouter_summary_model" },
     { key: SETTING_KEYS.sendgrid_api_key, field: "sendgrid_api_key" },
     { key: SETTING_KEYS.sendgrid_from_email, field: "sendgrid_from_email" },
     { key: SETTING_KEYS.slack_bot_token, field: "slack_bot_token" },
@@ -120,6 +121,7 @@ export async function saveAiPrompts(
     { key: SETTING_KEYS.article_style_prompt, field: "article_style_prompt" },
     { key: SETTING_KEYS.ask_ai_global_prompt, field: "ask_ai_global_prompt" },
     { key: SETTING_KEYS.ask_ai_page_prompt, field: "ask_ai_page_prompt" },
+    { key: SETTING_KEYS.file_summary_prompt, field: "file_summary_prompt" },
   ];
 
   try {

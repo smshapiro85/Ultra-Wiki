@@ -9,6 +9,7 @@ export const SETTING_KEYS = {
   openrouter_api_key: "openrouter_api_key",
   openrouter_model: "openrouter_model",
   openrouter_reasoning_effort: "openrouter_reasoning_effort",
+  openrouter_summary_model: "openrouter_summary_model",
   sync_cron_schedule: "sync_cron_schedule",
   sendgrid_api_key: "sendgrid_api_key",
   sendgrid_from_email: "sendgrid_from_email",
@@ -17,6 +18,7 @@ export const SETTING_KEYS = {
   article_style_prompt: "article_style_prompt",
   ask_ai_global_prompt: "ask_ai_global_prompt",
   ask_ai_page_prompt: "ask_ai_page_prompt",
+  file_summary_prompt: "file_summary_prompt",
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];

@@ -230,6 +230,7 @@ export const githubFiles = pgTable("github_files", {
   filePath: text("file_path").unique().notNull(),
   fileSha: text("file_sha"),
   contentHash: text("content_hash"),
+  aiSummary: text("ai_summary"),
   lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
