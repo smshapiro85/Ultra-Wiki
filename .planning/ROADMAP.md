@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
 - [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
-- [ ] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
+- [x] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
 - [ ] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
 
 ## Phase Details
@@ -157,9 +157,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 07-01-PLAN.md -- Global Ask AI chat panel with streaming markdown, shared chat components, conversation CRUD, header trigger
-- [ ] 07-02-PLAN.md -- Page-level Ask AI with article context assembly and context indicator
-- [ ] 07-03-PLAN.md -- Notification service (Slack DM, SendGrid email) with test buttons and all four trigger points wired
+- [x] 07-01-PLAN.md -- Global Ask AI chat panel with streaming markdown, shared chat components, conversation CRUD, header trigger
+- [x] 07-02-PLAN.md -- Page-level Ask AI with article context assembly and context indicator
+- [x] 07-03-PLAN.md -- Notification service (Slack DM, SendGrid email) with test buttons and all four trigger points wired
 
 ### Phase 8: AI Prompt Refinement & Category Strategy
 **Goal**: The AI pipeline produces consistent, predictable category structures and well-formatted article content across every run — no drift in how categories are created or how articles are structured
@@ -192,5 +192,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 4. Wiki Viewer | 5/5 | ✓ Complete | 2026-02-13 |
 | 5. Article Editing & Version History | 8/8 | ✓ Complete | 2026-02-14 |
 | 6. Technical View, Comments & Mentions | 3/3 | ✓ Complete | 2026-02-14 |
-| 7. Ask AI & Notifications | 0/3 | Not started | - |
+| 7. Ask AI & Notifications | 3/3 | ✓ Complete | 2026-02-14 |
 | 8. AI Prompt Refinement & Category Strategy | 0/4 | Not started | - |
