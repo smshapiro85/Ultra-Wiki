@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 3 complete -- AI Processing Pipeline finished. Ready for Phase 4 (Article Editor).
+**Current focus:** Phase 3 complete (including gap closure) -- AI Processing Pipeline finished. Ready for Phase 4 (Article Editor).
 
 ## Current Position
 
 Phase: 3 of 7 (AI Processing Pipeline) -- COMPLETE
-Plan: 3 of 3 in current phase (all complete)
+Plan: 4 of 4 in current phase (all complete, including gap closure 03-04)
 Status: Phase 3 complete -- ready for Phase 4
-Last activity: 2026-02-13 -- Completed 03-03-PLAN.md (pipeline orchestrator & sync integration)
+Last activity: 2026-02-14 -- Completed 03-04-PLAN.md (gap closure: dynamic markdown import fix)
 
-Progress: [██████░░░░] 43%
+Progress: [███████░░░] 48%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 4min
-- Total execution time: 0.62 hours
+- Total execution time: 0.64 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████░░░░] 43%
 |-------|-------|-------|----------|
 | 01 | 3 | 15min | 5min |
 | 02 | 3 | 11min | 4min |
-| 03 | 3 | 12min | 4min |
+| 03 | 4 | 13min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 4min, 3min, 5min, 4min
+- Last 5 plans: 4min, 3min, 5min, 4min, 1min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -85,6 +85,7 @@ Recent decisions affecting current work:
 - [03-03]: Dynamic import for AI pipeline in sync.ts -- avoids BlockNote/JSDOM createContext build-time error
 - [03-03]: Delete-and-reinsert pattern for article_file_links/article_db_tables (simpler than diff)
 - [03-03]: AI pipeline failure does not abort sync -- errors logged, partial results preserved
+- [03-04]: Dynamic import() at each call site in pipeline.ts for markdown.ts -- prevents @blocknote/server-util from entering module graph at evaluation time
 
 ### Pending Todos
 
@@ -98,6 +99,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-13
-Stopped at: Completed 03-03-PLAN.md -- Phase 3 complete (pipeline orchestrator & sync integration)
-Resume file: .planning/phases/03-ai-processing-pipeline/03-03-SUMMARY.md
+Last session: 2026-02-14
+Stopped at: Completed 03-04-PLAN.md -- Phase 3 gap closure (dynamic markdown import fix)
+Resume file: .planning/phases/03-ai-processing-pipeline/03-04-SUMMARY.md
