@@ -8,6 +8,8 @@ import {
 import { getOctokit, getRepoConfig } from "./client";
 import { fetchRepoTree, isPathIncluded, type TreeFile } from "./tree";
 import { withRetry } from "./retry";
+import { setSetting } from "@/lib/settings";
+import { SETTING_KEYS } from "@/lib/settings/constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,6 +33,10 @@ export interface SyncResult {
     articlesCreated: number;
     articlesUpdated: number;
   };
+}
+
+export interface SyncOptions {
+  onLog?: (message: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -230,9 +236,13 @@ export async function applyChanges(
  * Returns sync result with stats or error information.
  */
 export async function runSync(
-  triggerType: "manual" | "scheduled"
+  triggerType: "manual" | "scheduled",
+  options?: SyncOptions
 ): Promise<SyncResult> {
+  const log = options?.onLog;
+
   // 1. Acquire lock
+  log?.("Acquiring sync lock...");
   const syncLogId = await acquireSyncLock(triggerType);
   if (!syncLogId) {
     return {
@@ -250,20 +260,40 @@ export async function runSync(
     const includedPatterns = patterns.map((p) => p.pattern);
 
     // 3. Get Octokit + repo config
+    log?.("Connecting to GitHub...");
     const [octokit, config] = await Promise.all([
       getOctokit(),
       getRepoConfig(),
     ]);
 
     // 4. Fetch remote tree (with retry for transient errors)
+    log?.("Fetching repository file tree...");
     const remoteTree = await withRetry(() =>
       fetchRepoTree(octokit, config.owner, config.repo, config.branch)
     );
+    const blobCount = remoteTree.filter((f) => f.type === "blob").length;
+    log?.(`File tree loaded: ${blobCount} files found`);
+
+    // 4.5. Cache the full tree so the admin file-picker loads from DB, not GitHub
+    await setSetting(
+      SETTING_KEYS.cached_repo_tree,
+      JSON.stringify(remoteTree),
+      false
+    );
 
     // 5. Detect changes
+    log?.("Detecting changes...");
     const changeSet = await detectChanges(remoteTree, includedPatterns);
+    const totalChanged =
+      changeSet.added.length + changeSet.modified.length + changeSet.removed.length;
+    log?.(
+      `Changes detected: ${changeSet.added.length} added, ${changeSet.modified.length} modified, ${changeSet.removed.length} removed`
+    );
 
     // 6. Apply changes
+    if (totalChanged > 0) {
+      log?.(`Applying ${totalChanged} file changes...`);
+    }
     const { filesProcessed } = await applyChanges(changeSet);
 
     // 6.5. Run AI pipeline on changed files (while lock is still held)
@@ -275,13 +305,20 @@ export async function runSync(
     ];
     let aiStats = { articlesCreated: 0, articlesUpdated: 0 };
     if (changedFilePaths.length > 0) {
+      log?.(`Running AI analysis on ${changedFilePaths.length} files...`);
       try {
         const { runAIPipeline } = await import("@/lib/ai/pipeline");
         aiStats = await runAIPipeline(syncLogId, changedFilePaths);
+        log?.(
+          `AI analysis complete: ${aiStats.articlesCreated} articles created, ${aiStats.articlesUpdated} updated`
+        );
       } catch (error) {
         // AI pipeline failure should NOT fail the sync -- log and continue
         console.error("[sync] AI pipeline error:", error);
+        log?.("AI analysis failed -- continuing without article updates");
       }
+    } else {
+      log?.("No changed files -- skipping AI analysis");
     }
 
     const stats = {
@@ -300,6 +337,10 @@ export async function runSync(
       articlesUpdated: aiStats.articlesUpdated,
     });
 
+    log?.(
+      `Sync complete: ${filesProcessed} files processed, ${aiStats.articlesCreated + aiStats.articlesUpdated} articles updated`
+    );
+
     return { success: true, syncLogId, stats };
   } catch (error) {
     // Release lock with failure
@@ -308,6 +349,7 @@ export async function runSync(
     await releaseSyncLock(syncLogId, "failed", {
       error: errorMessage,
     });
+    log?.(`Sync failed: ${errorMessage}`);
 
     return {
       success: false,
