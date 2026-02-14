@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Authentication** - Database schema, Docker deployment, Google OIDC login, role system
 - [x] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with cron-triggered scheduling
 - [x] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
-- [x] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
+- [ ] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
 - [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [ ] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
@@ -89,12 +89,14 @@ Plans:
   4. Admin can regenerate any article from its page — re-fetches the article's linked source files from GitHub and re-runs AI generation with the current prompt. Uses merge strategy if article has human edits, direct overwrite if AI-only.
   5. User can search articles with full-text search (tsvector), see highlighted results ranked by relevance, and results update as they type (debounced)
   6. Home page shows recent updates, a search bar, and bookmarked articles; layout is responsive with sidebar collapsing on mobile
-**Plans:** 3 plans
+**Plans:** 5 plans
 
 Plans:
 - [x] 04-01-PLAN.md -- App shell layout with SidebarProvider, collapsible category/article tree, breadcrumbs, data access layer, dependency installation
-- [x] 04-02-PLAN.md -- Article page with Markdown rendering (shiki syntax highlighting), TOC, tab system, metadata sidebar, AI review annotation banner with section highlighting, admin Regenerate Article action
+- [x] 04-02-PLAN.md -- Article page with Markdown rendering (shiki syntax highlighting), TOC, tab system, metadata sidebar, admin Regenerate Article action
 - [x] 04-03-PLAN.md -- Full-text search (tsvector) with debounced input, home dashboard with recent updates and bookmarks, user_bookmarks table
+- [ ] 04-04-PLAN.md -- Gap closure: category listing page and breadcrumb link fix
+- [ ] 04-05-PLAN.md -- Gap closure: BookmarkButton component on article pages
 
 ### Phase 5: Article Editing & Version History
 **Goal**: Users can edit articles with a rich editor, upload images, and track all changes with full version history
@@ -106,12 +108,15 @@ Plans:
   3. Editor auto-saves drafts to localStorage; explicit Save creates a version record, sets the human-edited flag, and prompts for an optional change summary
   4. User can view full version history for any article, filter by change source (AI, human, merged), and compare any two versions with side-by-side or inline diff
   5. User can restore (rollback) any article to a previous version
+  6. After AI merges a human-edited article, an LLM review pass analyzes the merged content against the code changes for semantic issues (contradictions, stale info). It never modifies content — it creates annotations in an `ai_review_annotations` table referencing section headings, with severity and timestamp.
+  7. Article page shows a collapsible "AI Review: N items need attention" banner when active annotations exist. Each annotation card shows the concern, referenced section, timestamp, and a Dismiss button. Referenced section headings get a yellow left-border highlight. Clicking an annotation scrolls to that section.
 **Plans**: TBD
 
 Plans:
 - [ ] 05-01: BlockNote editor integration with native JSON storage
 - [ ] 05-02: Image upload/paste, compression (sharp), and serving API
 - [ ] 05-03: Version history, diff viewer, and rollback
+- [ ] 05-04: AI review annotations — `ai_review_annotations` table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
 
 ### Phase 6: Technical View, Comments & Mentions
 **Goal**: Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
@@ -156,7 +161,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Foundation & Authentication | 3/3 | ✓ Complete | 2026-02-13 |
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
-| 4. Wiki Viewer | 3/3 | ✓ Complete | 2026-02-13 |
+| 4. Wiki Viewer | 3/5 | Gap closure | - |
 | 5. Article Editing & Version History | 0/3 | Not started | - |
 | 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
