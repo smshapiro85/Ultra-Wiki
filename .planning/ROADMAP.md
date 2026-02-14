@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
 - [x] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
-- [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
+- [x] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [ ] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
 
 ## Phase Details
@@ -136,8 +136,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 06-01-PLAN.md -- Technical view tab with structured file links, inline code viewer, DB tables, GitHub deep links, and technical view editing
-- [ ] 06-02-PLAN.md -- Threaded comments with Markdown rendering, resolve/unresolve, @mention autocomplete via react-mentions-ts
+- [x] 06-01-PLAN.md -- Technical view tab with structured file links, inline code viewer, DB tables, GitHub deep links, and technical view editing
+- [x] 06-02-PLAN.md -- Threaded comments with Markdown rendering, resolve/unresolve, @mention autocomplete via react-mentions-ts
 
 ### Phase 7: Ask AI & Notifications
 **Goal**: Users can ask AI questions about the wiki and codebase, and receive notifications about activity that matters to them
@@ -168,5 +168,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
 | 4. Wiki Viewer | 5/5 | ✓ Complete | 2026-02-13 |
 | 5. Article Editing & Version History | 4/4 | ✓ Complete | 2026-02-13 |
-| 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
+| 6. Technical View, Comments & Mentions | 2/2 | ✓ Complete | 2026-02-14 |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
