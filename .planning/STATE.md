@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 5 of 7 (Article Editing) -- gap closure
-Plan: 5 of 8 in current phase (05-05 complete, 05-06 through 05-08 remaining)
+Plan: 6 of 8 in current phase (05-06 complete, 05-07 and 05-08 remaining)
 Status: Executing gap closure plans for Phase 5.
-Last activity: 2026-02-14 -- Completed 05-05-PLAN.md (Admin Review Queue)
+Last activity: 2026-02-14 -- Completed 05-06-PLAN.md (Server-Side Draft Auto-Save)
 
 Progress: [██████████████████░] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22
+- Total plans completed: 23
 - Average duration: 4min
-- Total execution time: 1.25 hours
+- Total execution time: 1.30 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [██████████████████░] 88%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
-| 05 | 5 | 16min | 3min |
+| 05 | 6 | 19min | 3min |
 | 06 | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 4min, 4min, 4min, 2min
+- Last 5 plans: 4min, 4min, 4min, 2min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -125,7 +125,7 @@ Recent decisions affecting current work:
 - [05-03]: Client-side diff computation via diffLines -- contentMarkdown sent with versions, diffs computed in browser
 - [05-03]: Selection-based UX for version compare/restore -- click cards to toggle, contextual action buttons
 - [05-03]: Typed enum cast for Drizzle inArray on changeSource PgEnum column
-- [05-01]: Draft auto-save to localStorage on every BlockNote onChange event
+- ~~[05-01]: Draft auto-save to localStorage on every BlockNote onChange event~~ -- REPLACED: 05-06 replaced with server-side draft version records
 - [05-01]: Optimistic locking via ISO timestamp comparison prevents stale saves (409 response)
 - [Phase 05]: uploadFile defined inline in ArticleEditor (self-contained) rather than passed as prop from parent
 - [06-01]: API route approach for code viewing -- shiki highlights server-side, returns HTML, avoids shipping shiki to client bundle
@@ -135,6 +135,8 @@ Recent decisions affecting current work:
 - [06-02]: Single-level reply threading enforced in UI while schema supports deeper nesting
 - [06-02]: Mention markup (@[display](id)) converted to bold (**@display**) for rendering, raw markup preserved in storage
 - [05-05]: Server page + client list pattern for admin review queue -- server fetches all data, client handles search/filter/sort
+- [05-06]: Drafts as version records with changeSource "draft" -- upsert pattern (one per user per article), 3s debounced auto-save
+- [05-06]: Draft cleanup on successful save via DELETE call (non-blocking, failure acceptable)
 
 ### Pending Todos
 
@@ -149,5 +151,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-05-PLAN.md (Admin Review Queue). Gap closure in progress.
-Resume file: .planning/phases/05-article-editing/05-05-SUMMARY.md
+Stopped at: Completed 05-06-PLAN.md (Server-Side Draft Auto-Save). Gap closure in progress.
+Resume file: .planning/phases/05-article-editing/05-06-SUMMARY.md
