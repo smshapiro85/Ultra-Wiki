@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 5 complete -- Article Editing & Version History. All 4 plans done (editor, image upload, version history, AI review). Ready for Phase 6.
+**Current focus:** Phase 6 in progress -- Technical View, Comments & Mentions. Plan 01 (Technical View) complete. Plan 02 (Comments & Mentions) next.
 
 ## Current Position
 
-Phase: 5 of 7 (Article Editing) -- COMPLETE
-Plan: 4 of 4 in current phase
-Status: Phase 5 complete -- all plans executed (editor, image upload, version history UI, AI review annotations).
-Last activity: 2026-02-14 -- Completed 05-03-PLAN.md (version history & diff viewer)
+Phase: 6 of 7 (Technical View, Comments & Mentions)
+Plan: 1 of 2 in current phase
+Status: Plan 01 complete (Technical View). Plan 02 next (Comments & Mentions).
+Last activity: 2026-02-14 -- Completed 06-01-PLAN.md (Technical View tab)
 
-Progress: [████████████████░] 79%
+Progress: [█████████████████░] 83%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
+- Total plans completed: 20
 - Average duration: 4min
-- Total execution time: 1.08 hours
+- Total execution time: 1.15 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [████████████████░] 79%
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
 | 05 | 4 | 14min | 4min |
+| 06 | 1 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 2min, 3min, 3min, 4min
+- Last 5 plans: 2min, 3min, 3min, 4min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -59,7 +60,10 @@ Recent decisions affecting current work:
 - [Decision]: AI must receive full category tree + article index during generation -- always prefer existing categories over creating new ones. Wiki organization is a first-class concern.
 - [Decision]: New repo files/folders surface in a dedicated "New Files Review" admin section (not auto-included). Admin includes or ignores each, then "Apply Updates" triggers AI import + re-index.
 - [Decision]: Admin-only "Regenerate Article" button on article page (Phase 4). Re-fetches linked source files, re-runs generation with current prompt. Respects merge strategy for human-edited articles.
-- [Decision]: AI review annotations after merge (Phase 3 logic, Phase 4 UI). LLM reviews merged content for semantic issues (contradictions, stale info). Never modifies content — creates annotations in `ai_review_annotations` table referencing section headings. Rendered as collapsible banner + section highlights (Option A). Dismissible by any user.
+- [Decision]: AI review annotations after merge (Phase 5). LLM reviews merged content for semantic issues (contradictions, stale info). Never modifies content — creates annotations in `ai_review_annotations` table referencing section headings. Rendered as collapsible banner + section highlights (Option A). Dismissible by any user.
+- [Decision]: Admin Review Queue (Phase 5 gap closure). Centralized page listing all articles with merge conflicts (needsReview) + active AI annotations. Filter by category, search by title, sort by date. Links to article for resolution.
+- [Decision]: Drafts as version records (Phase 5 gap closure). Replace localStorage auto-save with `changeSource: "draft"` version records (one per user per article, upsert). Drafts visible in history with distinct styling, previewable before continuing.
+- [Decision]: Version preview slide-out (Phase 5 gap closure). Click any version history record to view rendered formatted text in a slide-out panel — no restore required.
 - [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
 - [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
 - [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
@@ -123,6 +127,9 @@ Recent decisions affecting current work:
 - [05-01]: Draft auto-save to localStorage on every BlockNote onChange event
 - [05-01]: Optimistic locking via ISO timestamp comparison prevents stale saves (409 response)
 - [Phase 05]: uploadFile defined inline in ArticleEditor (self-contained) rather than passed as prop from parent
+- [06-01]: API route approach for code viewing -- shiki highlights server-side, returns HTML, avoids shipping shiki to client bundle
+- [06-01]: saveMode prop on editor for dual-purpose editing (article vs technical view) -- reuses existing BlockNote editor
+- [06-01]: Technical view saves create version records preserving current article contentMarkdown alongside change
 
 ### Pending Todos
 
@@ -137,5 +144,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-03-PLAN.md (version history & diff viewer). Phase 5 fully complete -- all 4 plans done.
-Resume file: .planning/phases/05-article-editing/05-03-SUMMARY.md
+Stopped at: Completed 06-01-PLAN.md (Technical View tab with file links, code viewer, DB tables, editing).
+Resume file: .planning/phases/06-technical-view-comments-mentions/06-01-SUMMARY.md
