@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation & Authentication** - Database schema, Docker deployment, Google OIDC login, role system
 - [x] **Phase 2: Admin Settings & GitHub Sync** - Admin dashboard, site_settings, GitHub file sync with cron-triggered scheduling
 - [x] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
-- [ ] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
+- [x] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
 - [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [ ] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
@@ -92,9 +92,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- App shell layout with SidebarProvider, collapsible category/article tree, breadcrumbs, data access layer, dependency installation
-- [ ] 04-02-PLAN.md -- Article page with Markdown rendering (shiki syntax highlighting), TOC, tab system, metadata sidebar, admin Regenerate Article action
-- [ ] 04-03-PLAN.md -- Full-text search (tsvector) with debounced input, home dashboard with recent updates and bookmarks, user_bookmarks table
+- [x] 04-01-PLAN.md -- App shell layout with SidebarProvider, collapsible category/article tree, breadcrumbs, data access layer, dependency installation
+- [x] 04-02-PLAN.md -- Article page with Markdown rendering (shiki syntax highlighting), TOC, tab system, metadata sidebar, AI review annotation banner with section highlighting, admin Regenerate Article action
+- [x] 04-03-PLAN.md -- Full-text search (tsvector) with debounced input, home dashboard with recent updates and bookmarks, user_bookmarks table
 
 ### Phase 5: Article Editing & Version History
 **Goal**: Users can edit articles with a rich editor, upload images, and track all changes with full version history
@@ -156,7 +156,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. Foundation & Authentication | 3/3 | ✓ Complete | 2026-02-13 |
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
-| 4. Wiki Viewer | 0/3 | Not started | - |
+| 4. Wiki Viewer | 3/3 | ✓ Complete | 2026-02-13 |
 | 5. Article Editing & Version History | 0/3 | Not started | - |
 | 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
