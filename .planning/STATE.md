@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 7 in progress (Ask AI & Notifications). Plan 3 of 3 complete.
+**Current focus:** Phase 7 in progress (Ask AI & Notifications). Plans 1 and 3 of 3 complete.
 
 ## Current Position
 
 Phase: 7 of 7 (Ask AI & Notifications)
-Plan: 3 of 3 in current phase
-Status: Plan 07-03 (Notifications) complete. Plans 07-01, 07-02 (Ask AI) pending.
-Last activity: 2026-02-14 -- Completed 07-03-PLAN.md (Notifications)
+Plan: 2 of 3 in current phase (07-01, 07-03 complete; 07-02 pending)
+Status: Plan 07-01 (Global Ask AI) complete. Plan 07-02 (Page-level Ask AI) pending.
+Last activity: 2026-02-14 -- Completed 07-01-PLAN.md (Global Ask AI)
 
-Progress: [████████████████████] 97%
+Progress: [████████████████████] 98%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27
+- Total plans completed: 28
 - Average duration: 3min
-- Total execution time: 1.5 hours
+- Total execution time: 1.6 hours
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [████████████████████] 97%
 | 04 | 5 | 14min | 3min |
 | 05 | 8 | 23min | 3min |
 | 06 | 3 | 11min | 4min |
-| 07 | 1 | 4min | 4min |
+| 07 | 2 | 10min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 2min, 2min, 3min, 4min
+- Last 5 plans: 2min, 2min, 3min, 4min, 6min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -147,6 +147,10 @@ Recent decisions affecting current work:
 - [06-03]: File summary generation is non-blocking -- failures do not abort sync or article processing
 - [06-03]: AI summaries capped at 500 chars to prevent runaway outputs
 - [06-03]: Dynamic imports for getSummaryModel and buildFileSummaryPrompt in pipeline (build-time safety)
+- [07-01]: useChat v6 uses messages prop (not initialMessages) + setMessages for conversation switching
+- [07-01]: Conversation created before first message (POST /api/conversations then sendMessage) for cleaner flow
+- [07-01]: @ai-sdk/react installed separately (not bundled with ai package in v6)
+- [07-01]: conversationIdRef pattern to pass latest ID to prepareSendMessagesRequest transport closure
 - [07-03]: No new npm dependencies for Slack/SendGrid -- raw fetch() against REST APIs (one POST call each)
 - [07-03]: Dynamic import() for notification service in pipeline.ts and conflict.ts (matches existing pattern)
 - [07-03]: Notification triggers are fire-and-forget via Promise.catch() -- never block primary actions
@@ -164,5 +168,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 07-03-PLAN.md (Notifications). Plans 07-01, 07-02 (Ask AI) still pending.
-Resume file: .planning/phases/07-ask-ai-notifications/07-03-SUMMARY.md
+Stopped at: Completed 07-01-PLAN.md (Global Ask AI). Plan 07-02 (Page-level Ask AI) pending.
+Resume file: .planning/phases/07-ask-ai-notifications/07-01-SUMMARY.md
