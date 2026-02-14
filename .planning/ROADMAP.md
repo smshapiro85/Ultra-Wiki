@@ -171,11 +171,13 @@ Plans:
   3. Article content always uses H1 (`#`) as the top-level section heading within articles. The CSS sizing for H1 in prose/article content is reduced so it is visually smaller than the article title (`text-3xl font-bold`), creating a clear hierarchy: article title > H1 section heading > H2 sub-heading.
   4. The prompts include explicit structural rules: articles start with H1 section headings (not H2), each major section uses H1, sub-sections use H2, and no heading level is skipped.
   5. Run-to-run consistency: given the same set of source files and the same existing category tree, the AI produces the same category assignments and article groupings. The prompt includes anchoring instructions (prefer existing patterns, match naming conventions already in use) to minimize non-deterministic drift.
-**Plans:** 2 plans
+**Plans:** 4 plans
 
 Plans:
 - [ ] 08-01-PLAN.md -- Category strategy: analyze existing data, define deterministic category rules, update analysis prompt with explicit category creation/reuse strategy
 - [ ] 08-02-PLAN.md -- Article content formatting: no title duplication rule, heading hierarchy (H1 sections), CSS size reduction for prose H1/H2, structural heading rules in style prompt
+- [ ] 08-03-PLAN.md -- Show default prompt text in admin settings AI Prompts textareas (not blank when unconfigured)
+- [ ] 08-04-PLAN.md -- Sync page: live log panel via SSE during manual sync, file tree expand/collapse all + default collapsed + search filter
 
 ## Progress
 
@@ -191,4 +193,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. Article Editing & Version History | 8/8 | ✓ Complete | 2026-02-14 |
 | 6. Technical View, Comments & Mentions | 3/3 | ✓ Complete | 2026-02-14 |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
-| 8. AI Prompt Refinement & Category Strategy | 0/2 | Not started | - |
+| 8. AI Prompt Refinement & Category Strategy | 0/4 | Not started | - |
