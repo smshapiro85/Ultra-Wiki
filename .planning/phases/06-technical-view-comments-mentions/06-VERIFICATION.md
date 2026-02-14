@@ -1,24 +1,32 @@
 ---
 phase: 06-technical-view-comments-mentions
-verified: 2026-02-13T21:30:00Z
+verified: 2026-02-13T22:15:00Z
 status: passed
-score: 5/5 must-haves verified
-re_verification: false
+score: 11/11 must-haves verified
+re_verification:
+  previous_status: passed
+  previous_score: 5/5
+  gaps_closed: []
+  gaps_remaining: []
+  regressions: []
+  new_truths_verified: 6
 ---
 
 # Phase 6: Technical View, Comments & Mentions Verification Report
 
 **Phase Goal:** Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
 
-**Verified:** 2026-02-13T21:30:00Z
+**Verified:** 2026-02-13T22:15:00Z
 
 **Status:** passed
 
-**Re-verification:** No — initial verification
+**Re-verification:** Yes — after 06-03 (AI file summaries) completion
 
 ## Goal Achievement
 
 ### Observable Truths
+
+**Previous verification (06-01, 06-02):**
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
@@ -28,43 +36,51 @@ re_verification: false
 | 4 | User can post threaded comments on any article, with Markdown rendering, avatars, display names, and timestamps | ✓ VERIFIED | CommentsSection orchestrates comment list with CommentInput and CommentThread components. Comments stored in DB via POST /api/articles/[id]/comments. CommentCard renders Markdown with react-markdown + remarkGfm, shows avatars, display names, and relative timestamps. One level of reply nesting enforced. |
 | 5 | User can resolve and unresolve comments; @mention autocomplete triggers when typing @ and creates mention records that trigger notifications | ✓ VERIFIED | Resolve/unresolve toggle in CommentCard calls POST /api/articles/[id]/comments/[commentId]/resolve. CommentInput uses react-mentions-ts MentionsInput with @ trigger, fetches /api/users/search for autocomplete. POST comments route extracts @[display](id) markup and inserts mention records in mentions table. |
 
-**Score:** 5/5 truths verified
+**New truths verified (06-03):**
 
-### Required Artifacts
+| # | Truth | Status | Evidence |
+|---|-------|--------|----------|
+| 6 | Admin can configure a separate summary model name in the API Keys settings tab | ✓ VERIFIED | api-keys-settings.tsx has Summary Model input field with id="openrouter_summary_model". actions.ts saveApiKeys includes field mapping. Setting key exists in constants.ts and seed.ts. |
+| 7 | Admin can configure a file summary prompt in the AI Prompts settings tab | ✓ VERIFIED | ai-prompts-settings.tsx has File Summary Prompt textarea with id="file_summary_prompt". actions.ts saveAiPrompts includes field mapping. Setting key exists in constants.ts and seed.ts. |
+| 8 | Each github_files row has an aiSummary text column storing AI-generated file descriptions | ✓ VERIFIED | schema.ts githubFiles table has aiSummary: text("ai_summary") column at line 233. |
+| 9 | During sync, new or changed files get 1-2 sentence AI summaries generated via the summary model | ✓ VERIFIED | pipeline.ts generateFileSummaries function (lines 84-137) fetches file contents, calls getSummaryModel(), generates text via buildFileSummaryPrompt, updates githubFiles.aiSummary (capped at 500 chars). Called at line 233 in runAIPipeline with changedFilePaths. Non-blocking with try/catch wrapper. |
+| 10 | Technical View file cards display the aiSummary text instead of only the relevance explanation | ✓ VERIFIED | file-link-card.tsx renders aiSummary as CardDescription at line 43-46, above relevanceExplanation. queries.ts getArticleFileLinks returns aiSummary at line 508. technical-view.tsx passes aiSummary prop at line 59. |
+| 11 | Summary model client is reusable for other short-summary needs | ✓ VERIFIED | client.ts exports getSummaryModel() function (lines 56-82) following same pattern as getAIModel(). Returns OpenRouter model without reasoning config. Used via dynamic import in pipeline. |
+
+**Score:** 11/11 truths verified (5 previous + 6 new)
+
+### Required Artifacts (06-03 Focus)
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `src/lib/github/language.ts` | inferLanguage helper mapping file extensions to shiki language IDs | ✓ VERIFIED | 107 lines. EXT_MAP and FILENAME_MAP with 60+ language mappings. Exports inferLanguage function. |
-| `src/app/api/github/file-content/route.ts` | GET endpoint fetching file from GitHub and returning syntax-highlighted HTML via shiki | ✓ VERIFIED | 83 lines. Auth check, path validation, Octokit fetch with retry, 500KB size limit, shiki highlighting with dual themes, returns {html, content, lang, path}. |
-| `src/components/wiki/technical-view.tsx` | Server component rendering file links and DB tables sections with edit button | ✓ VERIFIED | 128 lines. Parallel data fetching (getArticleFileLinks, getArticleDbTables, auth), GitHub deep link construction, renders FileLinkCard/DbTableCard lists, edit button with mode=technical link. |
-| `src/components/wiki/file-link-card.tsx` | Card for each linked file with GitHub deep link and View Code button | ✓ VERIFIED | 80 lines. Client component with CodeViewerDialog state management, shows file path + relevance, "View Code" and "GitHub" buttons. |
-| `src/components/wiki/code-viewer-dialog.tsx` | Client component dialog displaying syntax-highlighted file content | ✓ VERIFIED | 164 lines. Fetch on open, loading skeleton, too-large handling with GitHub fallback, error retry, dangerouslySetInnerHTML for shiki HTML, max-w-4xl dialog. |
-| `src/components/wiki/db-table-card.tsx` | Card for each related DB table with column details | ✓ VERIFIED | 62 lines. Renders table name + relevance, maps columns array to display with name/description. |
-| `src/components/wiki/comments-section.tsx` | Client component orchestrating comment list, input, and real-time updates | ✓ VERIFIED | 168 lines. Manages comments state, loading, replyingTo, resolvingCommentId. Fetches GET /api/articles/[id]/comments, handles post/reply/resolve. Renders CommentInput and CommentThread list. |
-| `src/components/wiki/comment-thread.tsx` | Recursive comment rendering with reply indentation (max 1 level) | ✓ VERIFIED | 68 lines. Renders root CommentCard, inline reply input, and indented replies with showReplyButton=false for replies. |
-| `src/components/wiki/comment-card.tsx` | Single comment card with avatar, name, timestamp, Markdown body, resolve button, reply button | ✓ VERIFIED | 156 lines. Avatar with initials fallback, relative time formatting, processMentions converts @[display](id) to **@display**, MarkdownAsync with remarkGfm, resolve/unresolve toggle with spinner, reply button. Resolved comments have green styling. |
-| `src/components/wiki/comment-input.tsx` | Comment textarea with react-mentions-ts @mention autocomplete | ✓ VERIFIED | 120 lines. MentionsInput with @ trigger, fetchUsers calls /api/users/search, Cmd/Ctrl+Enter submit, classNames-based styling, shows "Markdown supported. Type @ to mention" hint. |
-| `src/lib/wiki/queries.ts` | getArticleFileLinks/DbTables/Comments tree-building and searchUsers query functions | ✓ VERIFIED | Exports all 4 functions. getArticleFileLinks joins article_file_links + github_files. getArticleDbTables queries article_db_tables with jsonb columns. getArticleComments builds tree with Map-based parent-child assignment. searchUsers uses ILIKE on name/email. |
-| `src/app/api/articles/[id]/comments/route.ts` | GET (list comments tree) and POST (create comment with mention extraction) | ✓ VERIFIED | 115 lines. GET calls getArticleComments. POST validates content, inserts comment, extracts @[display](id) via regex, inserts mention records with onConflictDoNothing. |
-| `src/app/api/articles/[id]/comments/[commentId]/resolve/route.ts` | POST toggle resolve/unresolve on a comment | ✓ VERIFIED | 61 lines. Fetches current state, toggles isResolved/resolvedBy/resolvedAt, returns updated state. |
-| `src/app/api/users/search/route.ts` | GET user search for @mention autocomplete | ✓ VERIFIED | 32 lines. Auth check, calls searchUsers(q), maps to {id, display} format for react-mentions-ts. |
-| `src/components/wiki/article-tabs.tsx` | Updated tab system with commentsContent prop and enabled Comments tab | ✓ VERIFIED | Comments tab enabled (no disabled prop), accepts commentsContent prop, renders in TabsContent. |
-| `src/app/(wiki)/wiki/[articleSlug]/page.tsx` | Wired TechnicalView and CommentsSection in ArticleTabs | ✓ VERIFIED | Imports and renders TechnicalView with articleId/slug/technicalViewMarkdown props. Renders CommentsSection with articleId/currentUserId if authenticated. |
+| `src/lib/settings/constants.ts` | openrouter_summary_model and file_summary_prompt setting keys | ✓ VERIFIED | 35 lines. Keys exist at lines 12 and 21. |
+| `src/lib/db/schema.ts` | aiSummary column on githubFiles table | ✓ VERIFIED | 456 lines. aiSummary: text("ai_summary") at line 233 in githubFiles definition. |
+| `src/lib/db/seed.ts` | Seed entries for new settings | ✓ VERIFIED | Both settings seeded with descriptions at lines 35-36. |
+| `src/lib/ai/client.ts` | getSummaryModel function for short AI outputs | ✓ VERIFIED | 82 lines. getSummaryModel exported at line 56, reads openrouter_api_key and openrouter_summary_model, returns OpenRouter model without reasoning config. Error handling for unconfigured model. |
+| `src/lib/ai/pipeline.ts` | generateFileSummaries function called during pipeline | ✓ VERIFIED | 644 lines. generateFileSummaries defined at line 84, called at line 233 in runAIPipeline. Dynamic imports for getSummaryModel and buildFileSummaryPrompt. Per-file error isolation with try/catch. Updates githubFiles.aiSummary via db.update().set(). |
+| `src/lib/ai/prompts.ts` | buildFileSummaryPrompt function and DEFAULT_FILE_SUMMARY_PROMPT | ✓ VERIFIED | DEFAULT_FILE_SUMMARY_PROMPT constant at line 124. buildFileSummaryPrompt exported at line 129, takes filePath/fileContent/customPrompt, returns formatted prompt with code block. |
+| `src/lib/wiki/queries.ts` | getArticleFileLinks returns aiSummary | ✓ VERIFIED | ArticleFileLink interface includes aiSummary: string | null at line 490. getArticleFileLinks selects aiSummary from githubFiles join at line 508. |
+| `src/app/(admin)/admin/settings/actions.ts` | Save logic for both new settings | ✓ VERIFIED | saveApiKeys includes openrouter_summary_model at line 89. saveAiPrompts includes file_summary_prompt at line 124. |
+| `src/app/(admin)/admin/settings/api-keys-settings.tsx` | Summary Model input field | ✓ VERIFIED | Label and Input for openrouter_summary_model at lines 194-200 with placeholder "google/gemini-2.0-flash-001". Helper text explains it uses same API key. |
+| `src/app/(admin)/admin/settings/ai-prompts-settings.tsx` | File Summary Prompt textarea | ✓ VERIFIED | Label and Textarea for file_summary_prompt at lines 64-70 with 4 rows, placeholder about file descriptions. Helper text explains usage in Technical View. |
+| `src/components/wiki/file-link-card.tsx` | Renders aiSummary prop on file cards | ✓ VERIFIED | 86 lines. aiSummary prop in interface at line 18. Renders as CardDescription at lines 43-46 above relevanceExplanation. |
+| `src/components/wiki/technical-view.tsx` | Pass aiSummary to FileLinkCard | ✓ VERIFIED | Passes aiSummary={link.aiSummary} at line 59 in fileLinks.map. |
 
-### Key Link Verification
+### Key Link Verification (06-03 Focus)
 
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
-| `file-link-card.tsx` | `/api/github/file-content` | CodeViewerDialog fetch on View Code click | ✓ WIRED | CodeViewerDialog (opened by FileLinkCard) fetches `/api/github/file-content?path=${filePath}` in useEffect when open=true. Response HTML rendered via dangerouslySetInnerHTML. |
-| `technical-view.tsx` | `queries.ts` | getArticleFileLinks and getArticleDbTables calls | ✓ WIRED | Promise.all fetches getArticleFileLinks(articleId) and getArticleDbTables(articleId) in server component, results mapped to FileLinkCard/DbTableCard. |
-| `article page.tsx` | `technical-view.tsx` | renders TechnicalView component in ArticleTabs | ✓ WIRED | Imports TechnicalView, passes as technicalView prop to ArticleTabs with articleId/slug/technicalViewMarkdown. |
-| `file-content route.ts` | `github/client.ts` | getOctokit and getRepoConfig for GitHub API | ✓ WIRED | Imports and calls getOctokit(), getRepoConfig(), uses octokit.repos.getContent with withRetry wrapper. |
-| `comments-section.tsx` | `/api/articles/[id]/comments` | fetch for loading and posting comments | ✓ WIRED | Fetches GET on mount via fetchComments, POST in handlePostComment with {contentMarkdown, parentCommentId} body. Re-fetches after post/resolve. |
-| `comment-input.tsx` | `/api/users/search` | fetch for @mention autocomplete suggestions | ✓ WIRED | fetchUsers callback fetches `/api/users/search?q=${query}`, maps response to MentionDataItem[] for react-mentions-ts Mention data prop. |
-| `comments route.ts` | `schema.ts` | INSERT into comments and mentions tables | ✓ WIRED | Imports comments and mentions from schema. Inserts comment, extracts @[display](id) via regex, inserts mention records with .onConflictDoNothing(). |
-| `article page.tsx` | `comments-section.tsx` | renders CommentsSection in ArticleTabs commentsContent prop | ✓ WIRED | Imports CommentsSection, conditionally renders with articleId/currentUserId if session exists, else shows "Sign in" message. |
+| `pipeline.ts` | `client.ts` | getSummaryModel() call | ✓ WIRED | Dynamic import of getSummaryModel at line 92, called at line 93. Result used as model param for generateText. |
+| `pipeline.ts` | `schema.ts` | update githubFiles.aiSummary | ✓ WIRED | db.update(githubFiles).set({ aiSummary: ... }) at lines 121-124. Sets trimmed/capped text where filePath matches. |
+| `technical-view.tsx` | `queries.ts` | getArticleFileLinks returns aiSummary | ✓ WIRED | getArticleFileLinks called in Promise.all, result includes aiSummary field selected from join. |
+| `file-link-card.tsx` | `technical-view.tsx` | aiSummary prop passed to FileLinkCard | ✓ WIRED | technical-view.tsx passes aiSummary prop at line 59. file-link-card.tsx receives and renders it at lines 43-46. |
+| `pipeline.ts` | `prompts.ts` | buildFileSummaryPrompt() call | ✓ WIRED | Dynamic import of buildFileSummaryPrompt at line 103, called at line 118 with file.path, file.content, customPrompt. Result used as prompt for generateText. |
+| `client.ts` | `settings constants` | reads openrouter_summary_model setting | ✓ WIRED | getSummaryModel reads SETTING_KEYS.openrouter_summary_model at line 59, throws if not configured at line 67-70. |
+| `pipeline.ts` | `settings constants` | reads file_summary_prompt setting | ✓ WIRED | Reads SETTING_KEYS.file_summary_prompt at line 106, uses as customPrompt parameter. |
 
 ### Requirements Coverage
+
+**Previous requirements (06-01, 06-02):**
 
 | Requirement | Status | Blocking Issue |
 |-------------|--------|----------------|
@@ -79,6 +95,16 @@ re_verification: false
 | CMNT-05: @mention autocomplete dropdown triggered by typing @ | ✓ SATISFIED | CommentInput uses react-mentions-ts MentionsInput with @ trigger, fetches user search |
 | CMNT-06: Mentions stored in mentions table and trigger notifications per user preferences | ✓ SATISFIED | POST comments route extracts mention markup, inserts mention records (notifications deferred to Phase 7) |
 
+**New requirements (06-03):**
+
+| Requirement | Status | Blocking Issue |
+|-------------|--------|----------------|
+| FILE-SUM-01: Admin can configure separate summary model and file summary prompt | ✓ SATISFIED | Both settings configurable in admin UI, seeded in database, wired to save actions |
+| FILE-SUM-02: github_files table has aiSummary column | ✓ SATISFIED | Schema updated with text column, nullable |
+| FILE-SUM-03: Sync pipeline generates AI summaries for new/changed files | ✓ SATISFIED | generateFileSummaries function wired into runAIPipeline, non-blocking with error isolation |
+| FILE-SUM-04: Technical View displays AI summaries on file cards | ✓ SATISFIED | FileLinkCard renders aiSummary above relevanceExplanation when present |
+| FILE-SUM-05: Summary model is reusable for other features | ✓ SATISFIED | getSummaryModel exported from client.ts, follows same pattern as getAIModel |
+
 ### Anti-Patterns Found
 
 No blocking anti-patterns detected. All files contain substantive implementations.
@@ -87,69 +113,85 @@ No blocking anti-patterns detected. All files contain substantive implementation
 |------|------|---------|----------|--------|
 | N/A | N/A | N/A | N/A | N/A |
 
+**Positive patterns observed:**
+- Non-blocking supplementary step: generateFileSummaries wrapped in try/catch
+- Per-file error isolation: individual file summary failures logged but don't block remaining files
+- Dynamic imports for optional dependencies in pipeline
+- 500-char cap on AI summaries prevents runaway outputs
+- Graceful degradation when summary model not configured
+
 ### Human Verification Required
 
-#### 1. Technical View File Link Navigation
+#### 1. Admin Settings - Summary Model Configuration
 
-**Test:** Navigate to any article with linked source files (e.g., articles generated by AI pipeline). Click the Technical View tab. Click "View Code" on a file link.
+**Test:** Navigate to Admin > Settings > API Keys. Verify "Summary Model" input field appears in OpenRouter section. Enter a model name (e.g., "google/gemini-2.0-flash-001"). Save. Refresh page, verify value persists.
 
-**Expected:** Dialog opens showing syntax-highlighted code for that file. Language detection is correct. Dual theme support (light/dark) works. For large files (>500KB), see "File too large" message with GitHub fallback link.
+**Expected:** Input field visible with placeholder, saves to database, persists across page loads.
 
-**Why human:** Visual appearance of syntax highlighting, dialog UX, theme switching behavior cannot be verified programmatically.
+**Why human:** UI appearance, form submission behavior, persistence cannot be verified without running the app.
 
-#### 2. Technical View Edit Mode
+#### 2. Admin Settings - File Summary Prompt Configuration
 
-**Test:** On any article's Technical View tab, click "Edit Technical View". Verify the BlockNote editor loads with technical view markdown content. Make edits, save. Return to article, verify edits appear in Technical View tab.
+**Test:** Navigate to Admin > Settings > AI Prompts. Verify "File Summary Prompt" textarea appears. Enter custom prompt text. Save. Refresh page, verify value persists.
 
-**Expected:** Editor loads existing technical view content. Save creates version record with changeSource="human_edited". Edit appears immediately on Technical View tab after save.
+**Expected:** Textarea visible with 4 rows, saves to database, persists across page loads.
 
-**Why human:** Editor loading, navigation flow, post-save redirect cannot be verified without running the app.
+**Why human:** UI appearance, form submission behavior, persistence cannot be verified without running the app.
 
-#### 3. Comment Posting and Threading
+#### 3. File Summary Generation During Sync
 
-**Test:** Navigate to any article. Click Comments tab. Post a new comment with Markdown (bold, code, links). Verify it appears with your avatar and timestamp. Reply to a comment. Verify reply is indented under parent. Try replying to a reply (should not have Reply button).
+**Test:** Configure summary model and optional custom prompt in admin settings. Trigger a sync that includes new or changed files. After sync completes, check database (Drizzle Studio) for github_files rows with populated aiSummary column. Verify summaries are 1-2 sentences describing file purpose.
 
-**Expected:** New comments appear immediately. Markdown renders (bold as **text**, code as `code`). Replies are indented with left border. Replies have no Reply button (single-level threading enforced).
+**Expected:** New/changed files get AI summaries. Summaries are concise, specific, not generic. Max 500 chars. Sync succeeds even if some summaries fail.
 
-**Why human:** Real-time UI updates, visual indentation, Markdown rendering appearance, interaction flow.
+**Why human:** Requires running sync pipeline, inspecting database, evaluating AI summary quality.
 
-#### 4. @Mention Autocomplete
+#### 4. Technical View - AI Summary Display
 
-**Test:** In comment input, type "@" followed by a letter. Verify dropdown appears with user suggestions. Select a user from dropdown. Verify mention appears as @Username in the input. Submit comment. View the posted comment — mention should appear as bold text.
+**Test:** Navigate to any article with linked source files. Click Technical View tab. Verify file cards show AI summary text above the relevance explanation. If aiSummary is null, only relevance explanation should appear.
 
-**Expected:** Typing @ triggers dropdown after 1+ characters. Selecting user inserts @[Name](id) markup in input. Posted comment shows @Name in bold.
+**Expected:** AI summaries display as CardDescription above relevance explanation. Both are visible when both exist. Layout is clear and readable.
 
-**Why human:** Dropdown appearance, autocomplete timing, keyboard navigation, visual styling cannot be verified programmatically.
+**Why human:** Visual layout, text rendering, conditional display behavior cannot be verified programmatically.
 
-#### 5. Comment Resolve/Unresolve
+#### 5. Summary Model Error Handling
 
-**Test:** Post a comment. Click "Resolve". Verify comment gets green left border and "Resolved" badge. Click "Unresolve". Verify styling reverts.
+**Test:** Navigate to Admin > Settings > API Keys. Clear the Summary Model field (leave empty). Trigger a sync with changed files. Verify sync completes successfully, logs warning about summary model not configured, and does NOT generate summaries.
 
-**Expected:** Resolve adds green-tinted background, green left border, "Resolved" badge with checkmark icon. Unresolve removes styling. Spinner appears during API call.
+**Expected:** Sync succeeds. Log message indicates summary model skipped. No crash or blocking error.
 
-**Why human:** Visual styling changes, spinner timing, color appearance in light/dark mode.
+**Why human:** Error handling behavior, log output, graceful degradation requires running the app.
 
-#### 6. GitHub Deep Links and Code Viewer Fallback
+#### 6. Custom File Summary Prompt
 
-**Test:** On Technical View tab, click "GitHub" button on a file link. Verify it opens the file on GitHub in a new tab at the correct line/path. For a large file (>500KB if available), click "View Code" and verify "too large" fallback message with GitHub link.
+**Test:** Configure a custom file summary prompt (e.g., "Explain this file's purpose in one sentence, focusing on business logic."). Trigger sync with new files. Inspect generated summaries in database. Verify they follow the custom prompt style.
 
-**Expected:** GitHub link opens correct file in repository. Too-large files show graceful fallback with external link button.
+**Expected:** Generated summaries reflect custom prompt instructions. If custom prompt empty, use default prompt.
 
-**Why human:** External link navigation, GitHub URL correctness, edge case handling for large files.
+**Why human:** AI output evaluation, prompt adherence cannot be verified programmatically.
 
 ---
 
 ## Summary
 
-**Phase 6 goal ACHIEVED.** All 5 observable truths verified. All 16 required artifacts exist, are substantive (not stubs), and are properly wired. All 10 requirements satisfied. No blocking anti-patterns found.
+**Phase 6 goal ACHIEVED.** All 11 observable truths verified (5 from initial plans + 6 from AI file summaries plan). All 28 required artifacts (16 from previous + 12 from 06-03) exist, are substantive, and are properly wired. All 15 requirements satisfied (10 from previous + 5 new). No blocking anti-patterns found. No regressions detected.
 
-**Technical View:** Users can see related source files with relevance explanations and GitHub deep links, view code inline with syntax highlighting, see related DB tables with column details, and edit technical view content.
+**06-01 & 06-02 (Previously verified):**
+- Technical View: Users can see related source files with relevance explanations and GitHub deep links, view code inline with syntax highlighting, see related DB tables with column details, and edit technical view content.
+- Comments & Mentions: Users can post threaded comments (one level of replies) with Markdown rendering, avatars, timestamps, resolve/unresolve toggle, and @mention autocomplete creating mention records in the database.
 
-**Comments & Mentions:** Users can post threaded comments (one level of replies) with Markdown rendering, avatars, timestamps, resolve/unresolve toggle, and @mention autocomplete creating mention records in the database.
+**06-03 (New verification):**
+- AI File Summaries: Admin can configure separate summary model and file summary prompt. During sync, new/changed files automatically get 1-2 sentence AI summaries via the summary model, stored in githubFiles.aiSummary column. Technical View file cards display AI summaries above relevance explanations. Summary generation is non-blocking and gracefully degrades if model not configured. getSummaryModel() is reusable for future short-output AI needs.
+
+**Re-verification assessment:**
+- All previous functionality remains intact (no regressions)
+- All new functionality from 06-03 is fully implemented and wired
+- Commits verified: 85aec88 (Task 1), 7935264 (Task 2)
+- 6 human verification items added for new functionality
 
 **Phase 6 complete.** Ready to proceed to Phase 7 (Ask AI & Notifications).
 
 ---
 
-_Verified: 2026-02-13T21:30:00Z_
+_Verified: 2026-02-13T22:15:00Z_
 _Verifier: Claude (gsd-verifier)_
