@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 5 complete. Phase 6 complete. Ready for Phase 7.
+**Current focus:** Phase 6 complete (all 3 plans). Ready for Phase 7.
 
 ## Current Position
 
-Phase: 5 of 7 (Article Editing) -- COMPLETE
-Plan: 8 of 8 in current phase (all plans complete)
-Status: Phase 5 fully delivered including gap closure plans.
-Last activity: 2026-02-14 -- Completed 05-08-PLAN.md (Dark Mode)
+Phase: 6 of 7 (Technical View, Comments, Mentions) -- COMPLETE
+Plan: 3 of 3 in current phase (all plans complete)
+Status: Phase 6 fully delivered including AI file summaries.
+Last activity: 2026-02-14 -- Completed 06-03-PLAN.md (AI File Summaries)
 
-Progress: [███████████████████] 92%
+Progress: [████████████████████] 96%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
+- Total plans completed: 26
 - Average duration: 3min
-- Total execution time: 1.35 hours
+- Total execution time: 1.4 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [███████████████████] 92%
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
 | 05 | 8 | 23min | 3min |
-| 06 | 2 | 8min | 4min |
+| 06 | 3 | 11min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 2min, 3min, 2min, 2min
+- Last 5 plans: 2min, 3min, 2min, 2min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -142,6 +142,10 @@ Recent decisions affecting current work:
 - [05-08]: Text column for themePreference (not enum) -- three values (system/light/dark) don't warrant Postgres enum, avoids migration complexity
 - [05-08]: useTheme for immediate client-side switching + server action for DB persistence -- dual strategy for responsiveness
 - [Phase 08]: New phase for AI prompt refinement -- category strategy (deterministic rules for reuse vs. creation) and article formatting (no title duplication, H1 as top-level section headings, reduced prose heading CSS sizes)
+- [06-03]: Summary model reuses same OpenRouter API key as primary model -- no separate key needed
+- [06-03]: File summary generation is non-blocking -- failures do not abort sync or article processing
+- [06-03]: AI summaries capped at 500 chars to prevent runaway outputs
+- [06-03]: Dynamic imports for getSummaryModel and buildFileSummaryPrompt in pipeline (build-time safety)
 
 ### Pending Todos
 
@@ -156,5 +160,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-08-PLAN.md (Dark Mode). Phase 5 fully complete (all 8 plans delivered).
-Resume file: .planning/phases/05-article-editing/05-08-SUMMARY.md
+Stopped at: Completed 06-03-PLAN.md (AI File Summaries). Phase 6 fully complete (all 3 plans delivered).
+Resume file: .planning/phases/06-technical-view-comments-mentions/06-03-SUMMARY.md
