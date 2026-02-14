@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 5 in progress -- Article Editing & Version History. Plan 4 of 4 complete (AI review annotations).
+**Current focus:** Phase 5 in progress -- Article Editing & Version History. 3 of 4 plans complete (05-01, 05-02, 05-04). Remaining: 05-03 (version history UI).
 
 ## Current Position
 
 Phase: 5 of 7 (Article Editing) -- IN PROGRESS
-Plan: 4 of 4 in current phase (05-04 complete)
-Status: Plan 05-04 complete -- AI review annotations (schema, LLM review, banner UI, API routes).
-Last activity: 2026-02-14 -- Completed 05-04-PLAN.md (AI review annotations)
+Plan: 3 of 4 complete in current phase (05-03 remaining)
+Status: Plan 05-02 complete -- image upload with sharp compression, filesystem storage, and editor integration.
+Last activity: 2026-02-14 -- Completed 05-02-PLAN.md (image upload & compression)
 
 Progress: [████████████░] 72%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 4min
-- Total execution time: 0.96 hours
+- Total execution time: 1.01 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████████░] 72%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
-| 05 | 2 | 7min | 4min |
+| 05 | 3 | 10min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 4min, 2min, 1min, 3min
+- Last 5 plans: 3min, 4min, 2min, 3min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -119,6 +119,7 @@ Recent decisions affecting current work:
 - [05-01]: EditorLoader client wrapper for ssr:false dynamic import -- Next.js 16 disallows ssr:false in server components
 - [05-01]: Draft auto-save to localStorage on every BlockNote onChange event
 - [05-01]: Optimistic locking via ISO timestamp comparison prevents stale saves (409 response)
+- [Phase 05]: uploadFile defined inline in ArticleEditor (self-contained) rather than passed as prop from parent
 
 ### Pending Todos
 
@@ -133,5 +134,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-04-PLAN.md (AI review annotations). Plan 4 of 4 in Phase 5 done.
-Resume file: .planning/phases/05-article-editing/05-04-SUMMARY.md
+Stopped at: Completed 05-02-PLAN.md (image upload & compression). 3 of 4 plans done in Phase 5 (05-03 remaining).
+Resume file: .planning/phases/05-article-editing/05-02-SUMMARY.md
