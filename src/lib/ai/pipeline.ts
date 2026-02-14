@@ -487,6 +487,18 @@ async function processUpdateArticle(
     }
   }
 
+  // Fire-and-forget notification for AI sync update (NOTF-05)
+  // Only notify when a human-edited article was updated by AI
+  if (existing.hasHumanEdits) {
+    import("@/lib/notifications/service")
+      .then(({ notifyAiSyncUpdate }) =>
+        notifyAiSyncUpdate(articleId, articlePlan.title, articlePlan.slug)
+      )
+      .catch((err) =>
+        console.error("[notify] ai sync update failed:", err)
+      );
+  }
+
   // c. Update article_file_links: delete and reinsert
   await db
     .delete(articleFileLinks)

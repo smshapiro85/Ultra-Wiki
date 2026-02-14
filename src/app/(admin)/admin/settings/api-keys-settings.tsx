@@ -83,10 +83,84 @@ function TestConnectionButton({
   );
 }
 
+function TestNotificationButton({
+  type,
+  getPayload,
+}: {
+  type: "slack" | "sendgrid";
+  getPayload: () =>
+    | { type: string; value: string; fromEmail?: string; testEmail?: string }
+    | null;
+}) {
+  const [testing, setTesting] = useState(false);
+  const [result, setResult] = useState<{
+    success: boolean;
+    message?: string;
+    error?: string;
+  } | null>(null);
+
+  async function handleTest() {
+    const payload = getPayload();
+    if (!payload) {
+      setResult({ success: false, error: "Fill in the required fields first" });
+      return;
+    }
+
+    setTesting(true);
+    setResult(null);
+    try {
+      const response = await fetch("/api/admin/settings/test-notification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      setResult(data);
+    } catch {
+      setResult({ success: false, error: "Request failed" });
+    } finally {
+      setTesting(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={handleTest}
+        disabled={testing}
+      >
+        {testing
+          ? "Testing..."
+          : type === "slack"
+            ? "Test Slack Bot"
+            : "Send Test Email"}
+      </Button>
+      {result && (
+        <span
+          className={`text-xs ${
+            result.success ? "text-green-600" : "text-red-500"
+          }`}
+        >
+          {result.success
+            ? result.message ?? "Success"
+            : result.error ?? "Failed"}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
   const [state, formAction, isPending] = useActionState(saveApiKeys, null);
   const githubKeyRef = useRef<HTMLInputElement>(null);
   const openrouterKeyRef = useRef<HTMLInputElement>(null);
+  const slackTokenRef = useRef<HTMLInputElement>(null);
+  const sendgridKeyRef = useRef<HTMLInputElement>(null);
+  const sendgridFromRef = useRef<HTMLInputElement>(null);
+  const [testRecipientEmail, setTestRecipientEmail] = useState("");
 
   useEffect(() => {
     if (state?.success) {
@@ -216,6 +290,7 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
           <div className="space-y-2">
             <Label htmlFor="sendgrid_api_key">API Key</Label>
             <Input
+              ref={sendgridKeyRef}
               id="sendgrid_api_key"
               name="sendgrid_api_key"
               type="password"
@@ -226,6 +301,7 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
           <div className="space-y-2">
             <Label htmlFor="sendgrid_from_email">From Email</Label>
             <Input
+              ref={sendgridFromRef}
               id="sendgrid_from_email"
               name="sendgrid_from_email"
               type="email"
@@ -233,6 +309,28 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
               placeholder="noreply@example.com"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="sendgrid_test_email">Test Email Recipient</Label>
+            <Input
+              id="sendgrid_test_email"
+              type="email"
+              value={testRecipientEmail}
+              onChange={(e) => setTestRecipientEmail(e.target.value)}
+              placeholder="your-email@example.com"
+            />
+          </div>
+          <TestNotificationButton
+            type="sendgrid"
+            getPayload={() => {
+              const value = sendgridKeyRef.current?.value;
+              const fromEmail = sendgridFromRef.current?.value;
+              if (!value || value === MASK_VALUE || !fromEmail || !testRecipientEmail) return null;
+              return { type: "sendgrid", value, fromEmail, testEmail: testRecipientEmail };
+            }}
+          />
+          <p className="text-xs text-muted-foreground">
+            Sender email must be verified in SendGrid.
+          </p>
         </CardContent>
       </Card>
 
@@ -246,12 +344,25 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
           <div className="space-y-2">
             <Label htmlFor="slack_bot_token">Bot Token</Label>
             <Input
+              ref={slackTokenRef}
               id="slack_bot_token"
               name="slack_bot_token"
               type="password"
               defaultValue={secretDefaultValue("slack_bot_token")}
               placeholder={secretPlaceholder("slack_bot_token")}
             />
+            <TestNotificationButton
+              type="slack"
+              getPayload={() => {
+                const value = slackTokenRef.current?.value;
+                if (!value || value === MASK_VALUE) return null;
+                return { type: "slack", value };
+              }}
+            />
+            <p className="text-xs text-muted-foreground">
+              Required Slack bot scope: <code>chat:write</code>. The bot token
+              starts with <code>xoxb-</code>.
+            </p>
           </div>
         </CardContent>
       </Card>

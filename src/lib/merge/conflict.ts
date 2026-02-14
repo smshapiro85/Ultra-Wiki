@@ -69,6 +69,25 @@ export async function resolveConflict(params: {
       .set({ needsReview: true })
       .where(eq(articles.id, articleId));
 
+    // Fire-and-forget notification for AI conflict (NOTF-06)
+    try {
+      const [articleInfo] = await db
+        .select({ title: articles.title, slug: articles.slug })
+        .from(articles)
+        .where(eq(articles.id, articleId))
+        .limit(1);
+      if (articleInfo) {
+        const { notifyAiConflict } = await import(
+          "@/lib/notifications/service"
+        );
+        notifyAiConflict(articleId, articleInfo.title, articleInfo.slug).catch(
+          (err) => console.error("[notify] ai conflict failed:", err)
+        );
+      }
+    } catch (err) {
+      console.error("[notify] ai conflict notification error:", err);
+    }
+
     return {
       finalMarkdown: currentMarkdown,
       changeSource: "ai_merged",

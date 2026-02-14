@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
-import { comments, mentions } from "@/lib/db/schema";
+import { articles, comments, mentions } from "@/lib/db/schema";
 import { getArticleComments } from "@/lib/wiki/queries";
+import { notifyMention, notifyNewComment } from "@/lib/notifications/service";
 
 /**
  * GET /api/articles/[id]/comments
@@ -105,6 +107,44 @@ export async function POST(
         }))
       )
       .onConflictDoNothing();
+  }
+
+  // --- Notification triggers (fire-and-forget) ---
+  // Get article info for notification context (shared by both triggers)
+  const [articleInfo] = await db
+    .select({ title: articles.title, slug: articles.slug })
+    .from(articles)
+    .where(eq(articles.id, articleId))
+    .limit(1);
+
+  if (articleInfo) {
+    const commenterName = session.user.name || "Someone";
+
+    // Notify @mentioned users (NOTF-03)
+    if (mentionedUserIds.size > 0) {
+      const commentPreview = body.contentMarkdown
+        .replace(/@\[([^\]]+)\]\([^)]+\)/g, "@$1")
+        .slice(0, 200);
+
+      for (const userId of mentionedUserIds) {
+        notifyMention(
+          userId,
+          commenterName,
+          articleInfo.title,
+          articleInfo.slug,
+          commentPreview
+        ).catch((err) => console.error("[notify] mention failed:", err));
+      }
+    }
+
+    // Notify users who previously commented on or edited this article (NOTF-04)
+    notifyNewComment(
+      articleId,
+      session.user.id,
+      commenterName,
+      articleInfo.title,
+      articleInfo.slug
+    ).catch((err) => console.error("[notify] new comment failed:", err));
   }
 
   return NextResponse.json(
