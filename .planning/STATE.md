@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 4 complete -- Wiki Viewer done (sidebar, article pages, search, home dashboard). Ready for Phase 5.
+**Current focus:** Phase 4 complete -- Wiki Viewer done (sidebar, article pages, search, home dashboard, gap closure). Ready for Phase 5.
 
 ## Current Position
 
 Phase: 4 of 7 (Wiki Viewer) -- COMPLETE
-Plan: 3 of 3 in current phase (04-03 complete)
-Status: Phase 4 complete -- all 3 plans executed. Ready for Phase 5.
-Last activity: 2026-02-14 -- Completed 04-03-PLAN.md (home dashboard, search, bookmarks)
+Plan: 5 of 5 in current phase (04-05 complete)
+Status: Phase 4 complete -- all 5 plans executed (3 core + 2 gap closure). Ready for Phase 5.
+Last activity: 2026-02-14 -- Completed 04-05-PLAN.md (bookmark button gap closure)
 
 Progress: [██████████░] 62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 15
 - Average duration: 4min
-- Total execution time: 0.80 hours
+- Total execution time: 0.84 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [██████████░] 62%
 | 01 | 3 | 15min | 5min |
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
-| 04 | 3 | 10min | 3min |
+| 04 | 5 | 14min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 1min, 3min, 3min, 4min
+- Last 5 plans: 3min, 3min, 4min, 2min, 1min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -107,6 +107,8 @@ Recent decisions affecting current work:
 - [04-03]: Headline sanitization: strip all HTML except <mark> tags via regex for XSS prevention in search results
 - [04-03]: user_bookmarks uses composite PK (userId, articleId) -- no separate id column needed for junction table
 - [04-03]: actions.ts created fresh with toggleBookmark; Plan 02's regenerateArticle will be added to same file
+- [04-05]: BookmarkButton visible to all users; toggleBookmark server action handles auth enforcement
+- [04-05]: Optimistic state flip before server call with revert on error for instant feedback
 
 ### Pending Todos
 
@@ -121,5 +123,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 04-03-PLAN.md -- Home dashboard, search, bookmarks. Phase 4 complete.
-Resume file: .planning/phases/04-wiki-viewer/04-03-SUMMARY.md
+Stopped at: Completed 04-05-PLAN.md -- Bookmark button gap closure. Phase 4 fully complete with gap closures.
+Resume file: .planning/phases/04-wiki-viewer/04-05-SUMMARY.md
