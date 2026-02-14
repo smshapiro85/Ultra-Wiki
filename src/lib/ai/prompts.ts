@@ -116,7 +116,15 @@ const DEFAULT_ARTICLE_STYLE_PROMPT = `Write internal wiki articles that explain 
 - Use "If / Then" logic flows for business rules
 - Mention User Roles explicitly (Admin, User, etc.)
 - Mention Site Settings names (human readable)
-- Document defaults (what happens if nothing is configured)`;
+- Document defaults (what happens if nothing is configured)
+
+### Content Structure Rules
+- NEVER start the article with the article title as a heading. The title is already displayed separately above the content. The first line of content should be either an introductory paragraph or the first section heading -- never a repetition of the title.
+- Use H1 (#) for top-level section headings within the article (e.g., "# Overview", "# How It Works", "# Permissions")
+- Use H2 (##) for sub-sections within an H1 section
+- Use H3 (###) for sub-sub-sections within an H2 section
+- Never skip heading levels (no H1 followed directly by H3)
+- Every article should have at least one H1 section heading`;
 
 /**
  * Build the full analysis prompt from context.
@@ -222,5 +230,7 @@ export function buildGenerationPrompt(
 ## Article Writing Style
 ${style}
 
-Generate the full article content in Markdown following the style guidelines above.`;
+Generate the full article content in Markdown following the style guidelines above.
+
+IMPORTANT: Do NOT start the article content with the article title as a heading. The title "${articlePlan.title}" is displayed separately. Begin with an introductory paragraph or the first section heading (using H1 #).`;
 }
