@@ -117,6 +117,30 @@ ${stylePrompt}
 ${filesSummary}`;
 }
 
+// =============================================================================
+// File Summary Prompts
+// =============================================================================
+
+const DEFAULT_FILE_SUMMARY_PROMPT = `Describe what this source file does in 1-2 concise sentences. Focus on its purpose and role in the application. Be specific about functionality, not generic descriptions.`;
+
+/**
+ * Build a prompt for generating a short AI summary of a source file.
+ */
+export function buildFileSummaryPrompt(
+  filePath: string,
+  fileContent: string,
+  customPrompt: string
+): string {
+  const lang = filePath.split(".").pop() ?? "";
+  return `${customPrompt || DEFAULT_FILE_SUMMARY_PROMPT}
+
+File: ${filePath}
+
+\`\`\`${lang}
+${fileContent}
+\`\`\``;
+}
+
 /**
  * Build a prompt for generating a single article's full content.
  * Used when the analysis step produced a plan item but deferred full content generation.

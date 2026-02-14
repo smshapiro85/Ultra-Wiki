@@ -56,6 +56,7 @@ export async function TechnicalView({ articleId }: TechnicalViewProps) {
                 key={link.githubFileId}
                 filePath={link.filePath}
                 relevanceExplanation={link.relevanceExplanation}
+                aiSummary={link.aiSummary}
                 githubUrl={buildGithubUrl(link.filePath)}
               />
             ))}

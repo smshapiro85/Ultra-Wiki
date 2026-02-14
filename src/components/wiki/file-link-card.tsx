@@ -15,6 +15,7 @@ import { CodeViewerDialog } from "./code-viewer-dialog";
 interface FileLinkCardProps {
   filePath: string;
   relevanceExplanation: string | null;
+  aiSummary: string | null;
   githubUrl: string;
 }
 
@@ -26,6 +27,7 @@ interface FileLinkCardProps {
 export function FileLinkCard({
   filePath,
   relevanceExplanation,
+  aiSummary,
   githubUrl,
 }: FileLinkCardProps) {
   const [codeViewerOpen, setCodeViewerOpen] = useState(false);
@@ -38,6 +40,11 @@ export function FileLinkCard({
             <FileCode className="size-4 shrink-0 text-muted-foreground" />
             <span className="truncate">{filePath}</span>
           </CardTitle>
+          {aiSummary && (
+            <CardDescription className="text-sm line-clamp-2">
+              {aiSummary}
+            </CardDescription>
+          )}
           {relevanceExplanation && (
             <CardDescription className="line-clamp-2">
               {relevanceExplanation}

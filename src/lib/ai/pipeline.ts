@@ -73,6 +73,70 @@ async function ensureUniqueSlug(slug: string): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
+// File Summary Generation
+// ---------------------------------------------------------------------------
+
+/**
+ * Generate short AI summaries for changed source files.
+ * Uses the separate summary model (fast/cheap) for 1-2 sentence descriptions.
+ * Non-fatal: if summary model is not configured, logs a warning and returns.
+ */
+async function generateFileSummaries(
+  changedFilePaths: string[]
+): Promise<void> {
+  if (changedFilePaths.length === 0) return;
+
+  // Dynamic import to avoid build-time issues
+  let model;
+  try {
+    const { getSummaryModel } = await import("@/lib/ai/client");
+    model = await getSummaryModel();
+  } catch (error) {
+    console.warn(
+      "[pipeline] Summary model not configured, skipping file summaries:",
+      error instanceof Error ? error.message : String(error)
+    );
+    return;
+  }
+
+  const { generateText } = await import("ai");
+  const { buildFileSummaryPrompt } = await import("@/lib/ai/prompts");
+
+  const customPrompt =
+    (await getSetting(SETTING_KEYS.file_summary_prompt)) ?? "";
+
+  // Fetch file contents for the changed paths
+  const fileContents = await fetchFileContents(changedFilePaths);
+
+  let count = 0;
+  const db = getDb();
+
+  for (const file of fileContents) {
+    try {
+      const result = await generateText({
+        model,
+        prompt: buildFileSummaryPrompt(file.path, file.content, customPrompt),
+      });
+
+      await db
+        .update(githubFiles)
+        .set({ aiSummary: result.text.trim().slice(0, 500) })
+        .where(eq(githubFiles.filePath, file.path));
+
+      count++;
+    } catch (error) {
+      console.error(
+        `[pipeline] Failed to generate summary for "${file.path}":`,
+        error instanceof Error ? error.message : String(error)
+      );
+      // Continue with remaining files
+    }
+  }
+
+  console.log(`[pipeline] Generated ${count} file summaries`);
+}
+
+// ---------------------------------------------------------------------------
 // Pipeline Orchestrator
 // ---------------------------------------------------------------------------
 
@@ -162,6 +226,14 @@ export async function runAIPipeline(
       );
       errors.push(`${articlePlan.slug}: ${msg}`);
     }
+  }
+
+  // 6.5. Generate file summaries for changed files (non-blocking)
+  try {
+    await generateFileSummaries(changedFilePaths);
+  } catch (error) {
+    console.error("[pipeline] File summary generation error:", error);
+    // Non-fatal -- summaries are supplementary
   }
 
   // 7. Update sync_logs with article counts

@@ -487,6 +487,7 @@ export interface ArticleFileLink {
   filePath: string;
   relevanceExplanation: string | null;
   githubFileId: string;
+  aiSummary: string | null;
 }
 
 /**
@@ -504,6 +505,7 @@ export async function getArticleFileLinks(
       filePath: githubFiles.filePath,
       relevanceExplanation: articleFileLinks.relevanceExplanation,
       githubFileId: articleFileLinks.githubFileId,
+      aiSummary: githubFiles.aiSummary,
     })
     .from(articleFileLinks)
     .innerJoin(githubFiles, eq(articleFileLinks.githubFileId, githubFiles.id))
