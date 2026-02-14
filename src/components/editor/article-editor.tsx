@@ -14,13 +14,19 @@ import { EditorSaveDialog } from "./editor-save-dialog";
 import { ArrowLeft, Save } from "lucide-react";
 import { toast } from "sonner";
 
+interface DraftData {
+  id: string;
+  contentJson: unknown;
+  contentMarkdown: string;
+  createdAt: string;
+}
+
 interface ArticleEditorProps {
   articleId: string;
   articleSlug: string;
   initialContentJson: unknown | null;
   initialContentMarkdown: string;
   articleUpdatedAt: string;
-  saveMode?: "article" | "technical";
   onSaveSuccess?: () => void;
 }
 
@@ -32,8 +38,8 @@ interface ArticleEditorProps {
  * - Otherwise, parse contentMarkdown client-side via BlockNote
  *
  * Features:
- * - Auto-save drafts to localStorage on every change
- * - Draft recovery banner when localStorage draft exists
+ * - Auto-save drafts to server via /api/articles/[id]/draft (debounced)
+ * - Draft recovery banner when server-side draft exists
  * - Save dialog with optional change summary
  * - Optimistic locking via loadedUpdatedAt comparison
  */
@@ -43,16 +49,15 @@ export function ArticleEditor({
   initialContentJson,
   initialContentMarkdown,
   articleUpdatedAt,
-  saveMode = "article",
   onSaveSuccess,
 }: ArticleEditorProps) {
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
+  const [draftData, setDraftData] = useState<DraftData | null>(null);
   const initializedRef = useRef(false);
-
-  const draftKey = `draft-${articleId}`;
+  const draftTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Image upload handler for BlockNote's built-in image block.
   // Uploads to /api/articles/[id]/images which compresses and stores the image.
@@ -76,13 +81,24 @@ export function ArticleEditor({
 
   const editor = useCreateBlockNote({ uploadFile });
 
-  // Check for existing draft on mount
+  // Check for existing server-side draft on mount
   useEffect(() => {
-    const draft = localStorage.getItem(draftKey);
-    if (draft) {
-      setHasDraft(true);
+    async function checkDraft() {
+      try {
+        const res = await fetch(`/api/articles/${articleId}/draft`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.draft) {
+            setDraftData(data.draft);
+            setHasDraft(true);
+          }
+        }
+      } catch {
+        // Silently ignore draft check failures
+      }
     }
-  }, [draftKey]);
+    checkDraft();
+  }, [articleId]);
 
   // Load initial content into the editor
   useEffect(() => {
@@ -114,22 +130,45 @@ export function ArticleEditor({
     loadContent();
   }, [editor, initialContentJson, initialContentMarkdown]);
 
-  // Auto-save to localStorage on change
+  // Save draft to server (debounced via timeout ref)
+  const saveDraft = useCallback(async () => {
+    if (!editor) return;
+    try {
+      const contentMarkdown = await editor.blocksToMarkdownLossy(
+        editor.document
+      );
+      await fetch(`/api/articles/${articleId}/draft`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentJson: editor.document,
+          contentMarkdown,
+        }),
+      });
+    } catch {
+      // Draft save failures are not critical -- silently ignore
+    }
+  }, [editor, articleId]);
+
+  // Debounced onChange handler for auto-saving drafts
   const handleChange = useCallback(() => {
     if (!isReady) return;
-    try {
-      localStorage.setItem(draftKey, JSON.stringify(editor.document));
-    } catch {
-      // localStorage might be full; ignore
-    }
-  }, [editor, draftKey, isReady]);
+    if (draftTimeoutRef.current) clearTimeout(draftTimeoutRef.current);
+    draftTimeoutRef.current = setTimeout(() => saveDraft(), 3000);
+  }, [isReady, saveDraft]);
 
-  // Restore draft from localStorage
+  // Cleanup draft timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (draftTimeoutRef.current) clearTimeout(draftTimeoutRef.current);
+    };
+  }, []);
+
+  // Restore draft from server
   function restoreDraft() {
-    const draft = localStorage.getItem(draftKey);
-    if (draft) {
+    if (draftData?.contentJson) {
       try {
-        const blocks = JSON.parse(draft);
+        const blocks = draftData.contentJson as any[];
         editor.replaceBlocks(editor.document, blocks);
         toast.success("Draft restored");
       } catch {
@@ -139,10 +178,15 @@ export function ArticleEditor({
     setHasDraft(false);
   }
 
-  // Discard localStorage draft
-  function discardDraft() {
-    localStorage.removeItem(draftKey);
+  // Discard server-side draft
+  async function discardDraft() {
     setHasDraft(false);
+    setDraftData(null);
+    try {
+      await fetch(`/api/articles/${articleId}/draft`, { method: "DELETE" });
+    } catch {
+      // Silently ignore discard failures
+    }
   }
 
   // Save handler (called from save dialog)
@@ -165,7 +209,6 @@ export function ArticleEditor({
         contentMarkdown,
         changeSummary: changeSummary || null,
         loadedUpdatedAt: articleUpdatedAt,
-        mode: saveMode,
       }),
     });
 
@@ -180,8 +223,13 @@ export function ArticleEditor({
       throw new Error("Save failed");
     }
 
-    // Clear draft on successful save
-    localStorage.removeItem(draftKey);
+    // Clear server-side draft on successful save
+    try {
+      await fetch(`/api/articles/${articleId}/draft`, { method: "DELETE" });
+    } catch {
+      // Non-critical -- draft cleanup failure is acceptable
+    }
+
     toast.success("Article saved");
     onSaveSuccess?.();
     router.push(`/wiki/${articleSlug}`);

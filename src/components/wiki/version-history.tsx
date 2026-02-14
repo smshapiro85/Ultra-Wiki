@@ -6,6 +6,7 @@ import {
   Bot,
   User,
   GitMerge,
+  FileEdit,
   RotateCcw,
   ArrowLeftRight,
   Loader2,
@@ -52,6 +53,7 @@ const SOURCE_FILTERS = [
   { label: "Human Edited", value: "human_edited" },
   { label: "AI Merged", value: "ai_merged" },
   { label: "AI Updated", value: "ai_updated" },
+  { label: "Draft", value: "draft" },
 ] as const;
 
 // =============================================================================
@@ -90,6 +92,16 @@ function ChangeSourceBadge({
         <Badge variant="outline" className="gap-1 text-xs">
           <GitMerge className="size-3" />
           AI Merged
+        </Badge>
+      );
+    case "draft":
+      return (
+        <Badge
+          variant="outline"
+          className="gap-1 text-xs border-dashed text-muted-foreground"
+        >
+          <FileEdit className="size-3" />
+          Draft
         </Badge>
       );
     default:
@@ -223,7 +235,7 @@ export function VersionHistory({ articleId, articleSlug }: VersionHistoryProps) 
   // =============================================================================
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="mt-6 space-y-4">
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-medium text-muted-foreground">
@@ -300,7 +312,7 @@ export function VersionHistory({ articleId, articleSlug }: VersionHistoryProps) 
                   isSelected
                     ? "border-primary bg-primary/5 ring-1 ring-primary"
                     : ""
-                }`}
+                } ${version.changeSource === "draft" ? "border-dashed opacity-75" : ""}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1 space-y-1">
