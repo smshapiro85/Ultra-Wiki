@@ -19,9 +19,9 @@ Progress: [████████████░] 72%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 4min
-- Total execution time: 0.89 hours
+- Total execution time: 0.96 hours
 
 **By Phase:**
 
@@ -31,7 +31,7 @@ Progress: [████████████░] 72%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
-| 05 | 1 | 3min | 3min |
+| 05 | 2 | 7min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: 3min, 4min, 2min, 1min, 3min
@@ -116,6 +116,9 @@ Recent decisions affecting current work:
 - [05-04]: Server-side annotation count as initialCount prop avoids loading flash on banner
 - [05-04]: Inline CSS via style tag for annotation-highlight class (self-contained in component)
 - [05-04]: Dynamic import for review module in conflict.ts matching existing pipeline pattern
+- [05-01]: EditorLoader client wrapper for ssr:false dynamic import -- Next.js 16 disallows ssr:false in server components
+- [05-01]: Draft auto-save to localStorage on every BlockNote onChange event
+- [05-01]: Optimistic locking via ISO timestamp comparison prevents stale saves (409 response)
 
 ### Pending Todos
 
