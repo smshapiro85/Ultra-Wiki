@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 4 of 7 (Wiki Viewer)
-Plan: 1 of 3 in current phase (04-01 complete)
-Status: Executing Phase 4 -- Plan 01 complete, Plans 02-03 remaining
-Last activity: 2026-02-14 -- Completed 04-01-PLAN.md (wiki app shell: sidebar, category tree, data access)
+Plan: 2 of 3 in current phase (04-02 complete)
+Status: Executing Phase 4 -- Plans 01-02 complete, Plan 03 remaining
+Last activity: 2026-02-14 -- Completed 04-02-PLAN.md (article page: Markdown renderer, TOC, tabs, metadata, regenerate)
 
-Progress: [███████░░░] 52%
+Progress: [████████░░] 57%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 4min
-- Total execution time: 0.69 hours
+- Total execution time: 0.74 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████░░░] 52%
 | 01 | 3 | 15min | 5min |
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
-| 04 | 1 | 3min | 3min |
+| 04 | 2 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 5min, 4min, 1min, 3min
+- Last 5 plans: 5min, 4min, 1min, 3min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -58,6 +58,7 @@ Recent decisions affecting current work:
 - [Decision]: AI must receive full category tree + article index during generation -- always prefer existing categories over creating new ones. Wiki organization is a first-class concern.
 - [Decision]: New repo files/folders surface in a dedicated "New Files Review" admin section (not auto-included). Admin includes or ignores each, then "Apply Updates" triggers AI import + re-index.
 - [Decision]: Admin-only "Regenerate Article" button on article page (Phase 4). Re-fetches linked source files, re-runs generation with current prompt. Respects merge strategy for human-edited articles.
+- [Decision]: AI review annotations after merge (Phase 3 logic, Phase 4 UI). LLM reviews merged content for semantic issues (contradictions, stale info). Never modifies content — creates annotations in `ai_review_annotations` table referencing section headings. Rendered as collapsible banner + section highlights (Option A). Dismissible by any user.
 - [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
 - [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
 - [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
@@ -98,6 +99,10 @@ Recent decisions affecting current work:
 - [04-01]: CategoryTree as client component (interactive Collapsible state), layout remains server component
 - [04-01]: Categories use href="#" in breadcrumbs (no standalone category pages)
 - [04-01]: SidebarProvider + AppSidebar + SidebarInset layout pattern for all wiki pages
+- [04-02]: MarkdownAsync named export from react-markdown v10 for async rehype plugin support in RSC
+- [04-02]: Shared slugify function between TOC extraction and heading ID generation ensures anchor links match
+- [04-02]: Dynamic imports for all AI/merge modules in regenerateArticle to avoid BlockNote createContext crash
+- [04-02]: useTransition + sonner toast pattern for server action loading/feedback in client components
 
 ### Pending Todos
 
@@ -112,5 +117,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 04-01-PLAN.md -- Wiki app shell (sidebar, category tree, data access layer)
-Resume file: .planning/phases/04-wiki-viewer/04-01-SUMMARY.md
+Stopped at: Completed 04-02-PLAN.md -- Article page (Markdown renderer, TOC, tabs, metadata, regenerate)
+Resume file: .planning/phases/04-wiki-viewer/04-02-SUMMARY.md
