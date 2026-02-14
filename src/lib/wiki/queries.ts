@@ -457,7 +457,7 @@ export async function getArticleVersions(
 
   if (sourceFilter && sourceFilter.length > 0) {
     const validSources = sourceFilter as Array<
-      "ai_generated" | "ai_updated" | "human_edited" | "ai_merged"
+      "ai_generated" | "ai_updated" | "human_edited" | "ai_merged" | "draft"
     >;
     conditions.push(inArray(articleVersions.changeSource, validSources));
   }
@@ -622,6 +622,54 @@ export async function getArticleComments(
   }
 
   return roots;
+}
+
+// =============================================================================
+// getReviewQueueItems
+// =============================================================================
+
+export interface ReviewQueueItem {
+  id: string;
+  title: string;
+  slug: string;
+  needsReview: boolean;
+  categoryName: string | null;
+  categorySlug: string | null;
+  updatedAt: string;
+  annotationCount: number;
+}
+
+/**
+ * Get all articles needing review: either needsReview=true (merge conflicts)
+ * or having active (non-dismissed) AI review annotations.
+ * Returns items sorted by updatedAt DESC.
+ */
+export async function getReviewQueueItems(): Promise<ReviewQueueItem[]> {
+  const db = getDb();
+
+  const results = await db.execute(sql`
+    SELECT DISTINCT
+      a.id,
+      a.title,
+      a.slug,
+      a.needs_review AS "needsReview",
+      c.name AS "categoryName",
+      c.slug AS "categorySlug",
+      a.updated_at AS "updatedAt",
+      COALESCE(ann.count, 0)::int AS "annotationCount"
+    FROM articles a
+    LEFT JOIN categories c ON a.category_id = c.id
+    LEFT JOIN (
+      SELECT article_id, COUNT(*) AS count
+      FROM ai_review_annotations
+      WHERE is_dismissed = false
+      GROUP BY article_id
+    ) ann ON a.id = ann.article_id
+    WHERE a.needs_review = true OR ann.count > 0
+    ORDER BY a.updated_at DESC
+  `);
+
+  return results.rows as unknown as ReviewQueueItem[];
 }
 
 // =============================================================================

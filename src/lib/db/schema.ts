@@ -35,6 +35,7 @@ export const changeSourceEnum = pgEnum("change_source", [
   "ai_updated",
   "human_edited",
   "ai_merged",
+  "draft",
 ]);
 
 export const syncStatusEnum = pgEnum("sync_status", [

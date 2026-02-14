@@ -15,7 +15,7 @@ export async function createArticleVersion(params: {
   contentMarkdown: string;
   contentJson?: unknown;
   technicalViewMarkdown?: string;
-  changeSource: "ai_generated" | "ai_updated" | "human_edited" | "ai_merged";
+  changeSource: "ai_generated" | "ai_updated" | "human_edited" | "ai_merged" | "draft";
   changeSummary?: string;
   createdBy?: string;
 }): Promise<string> {
