@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: AI Processing Pipeline** - Code analysis, article generation, merge strategy with conflict detection
 - [x] **Phase 4: Wiki Viewer** - Category navigation, article rendering, full-text search, dashboard
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
-- [x] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
+- [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [ ] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
 - [ ] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
 
@@ -137,12 +137,12 @@ Plans:
   4. User can post threaded comments on any article, with Markdown rendering, avatars, display names, and timestamps
   5. User can resolve and unresolve comments; @mention autocomplete triggers when typing @ and creates mention records that trigger notifications
   6. Admin can configure a separate OpenRouter "summary model" (efficient, fast model for short outputs) and a file summary prompt in settings. Each source file in `github_files` has an `aiSummary` column with a 1-2 sentence AI-generated description of what the file does. Summaries are generated/updated automatically during sync whenever a file is new or changed. Technical View file cards display the file's `aiSummary` instead of generic text. The summary model is reusable for other short-summary needs across the app.
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
 - [x] 06-01-PLAN.md -- Technical view tab with structured file links, inline code viewer, DB tables, GitHub deep links, and technical view editing
 - [x] 06-02-PLAN.md -- Threaded comments with Markdown rendering, resolve/unresolve, @mention autocomplete via react-mentions-ts
-- [ ] 06-03: AI file summaries — summary model setting, file_summary_prompt, `github_files.aiSummary` column, sync pipeline integration (generate on new/changed files), Technical View card update
+- [ ] 06-03-PLAN.md -- AI file summaries: summary model setting, file_summary_prompt, github_files.aiSummary column, sync pipeline integration, Technical View card update
 
 ### Phase 7: Ask AI & Notifications
 **Goal**: Users can ask AI questions about the wiki and codebase, and receive notifications about activity that matters to them
@@ -189,6 +189,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
 | 4. Wiki Viewer | 5/5 | ✓ Complete | 2026-02-13 |
 | 5. Article Editing & Version History | 8/8 | ✓ Complete | 2026-02-14 |
-| 6. Technical View, Comments & Mentions | 2/2 | ✓ Complete | 2026-02-14 |
+| 6. Technical View, Comments & Mentions | 2/3 | In Progress | - |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
 | 8. AI Prompt Refinement & Category Strategy | 0/2 | Not started | - |
