@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { eq } from "drizzle-orm";
+import { Pencil } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { users } from "@/lib/db/schema";
+import { Button } from "@/components/ui/button";
 import {
   getArticleBySlug,
   getCategoryChain,
   isArticleBookmarked,
+  getActiveAnnotationCount,
 } from "@/lib/wiki/queries";
 import { ArticleBreadcrumb } from "@/components/wiki/article-breadcrumb";
 import { ArticleContent } from "@/components/wiki/article-content";
@@ -18,6 +22,7 @@ import { ArticleTabs } from "@/components/wiki/article-tabs";
 import { ArticleMetadata } from "@/components/wiki/article-metadata";
 import { RegenerateButton } from "@/components/wiki/regenerate-button";
 import { BookmarkButton } from "@/components/wiki/bookmark-button";
+import { AnnotationBanner } from "@/components/wiki/annotation-banner";
 
 /**
  * Article page at /wiki/[articleSlug].
@@ -68,10 +73,13 @@ export default async function ArticlePage({
   // Check session for admin access
   const session = await auth();
 
-  // Check if current user has bookmarked this article
-  const bookmarked = session?.user?.id
-    ? await isArticleBookmarked(session.user.id, article.id)
-    : false;
+  // Check if current user has bookmarked this article and get annotation count
+  const [bookmarked, annotationCount] = await Promise.all([
+    session?.user?.id
+      ? isArticleBookmarked(session.user.id, article.id)
+      : Promise.resolve(false),
+    getActiveAnnotationCount(article.id),
+  ]);
 
   return (
     <div>
@@ -94,9 +102,25 @@ export default async function ArticlePage({
             </div>
           )}
 
-          {/* Bookmark + Admin regenerate buttons */}
+          {/* AI Review annotation banner */}
+          {annotationCount > 0 && (
+            <AnnotationBanner
+              articleId={article.id}
+              initialCount={annotationCount}
+            />
+          )}
+
+          {/* Bookmark + Edit + Admin regenerate buttons */}
           <div className="mb-4 flex items-center gap-2">
             <BookmarkButton articleId={article.id} initialBookmarked={bookmarked} />
+            {session?.user && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/wiki/${article.slug}/edit`}>
+                  <Pencil className="size-4" />
+                  Edit
+                </Link>
+              </Button>
+            )}
             {session?.user?.role === "admin" && (
               <RegenerateButton articleId={article.id} />
             )}

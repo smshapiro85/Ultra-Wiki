@@ -4,6 +4,7 @@ import {
   categories,
   articleVersions,
   userBookmarks,
+  aiReviewAnnotations,
 } from "@/lib/db/schema";
 import { eq, desc, sql, and } from "drizzle-orm";
 
@@ -125,6 +126,7 @@ export async function getArticleBySlug(slug: string) {
       title: articles.title,
       slug: articles.slug,
       contentMarkdown: articles.contentMarkdown,
+      contentJson: articles.contentJson,
       technicalViewMarkdown: articles.technicalViewMarkdown,
       categoryId: articles.categoryId,
       hasHumanEdits: articles.hasHumanEdits,
@@ -151,6 +153,7 @@ export async function getArticleBySlug(slug: string) {
       title: row.title,
       slug: row.slug,
       contentMarkdown: row.contentMarkdown,
+      contentJson: row.contentJson,
       technicalViewMarkdown: row.technicalViewMarkdown,
       categoryId: row.categoryId,
       hasHumanEdits: row.hasHumanEdits,
@@ -393,4 +396,30 @@ export async function isArticleBookmarked(
     .limit(1);
 
   return rows.length > 0;
+}
+
+// =============================================================================
+// getActiveAnnotationCount
+// =============================================================================
+
+/**
+ * Get the number of active (non-dismissed) AI review annotations for an article.
+ * Used by the article page to determine whether to render the annotation banner.
+ */
+export async function getActiveAnnotationCount(
+  articleId: string
+): Promise<number> {
+  const db = getDb();
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(aiReviewAnnotations)
+    .where(
+      and(
+        eq(aiReviewAnnotations.articleId, articleId),
+        eq(aiReviewAnnotations.isDismissed, false)
+      )
+    );
+
+  return Number(result[0].count);
 }
