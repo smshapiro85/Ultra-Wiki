@@ -15,6 +15,7 @@ import { AppSidebar } from "@/components/wiki/app-sidebar";
 import { SearchInput } from "@/components/wiki/search-input";
 import { TocProvider } from "@/components/wiki/toc-context";
 import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
+import { AskAiGlobalTrigger } from "@/components/chat/ask-ai-global-trigger";
 
 export default async function WikiLayout({
   children,
@@ -55,6 +56,7 @@ export default async function WikiLayout({
             <SidebarTrigger />
             <div className="flex flex-1 items-center gap-2">
               <Separator orientation="vertical" className="h-4" />
+              <AskAiGlobalTrigger />
               <div className="ml-auto w-64">
                 <Suspense fallback={<Skeleton className="h-9 w-full" />}>
                   <SearchInput />
