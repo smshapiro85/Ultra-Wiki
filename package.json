@@ -14,7 +14,10 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
+    "@blocknote/core": "^0.46.2",
+    "@blocknote/react": "^0.46.2",
     "@blocknote/server-util": "^0.46.2",
+    "@blocknote/shadcn": "^0.46.2",
     "@neondatabase/serverless": "^1.0.2",
     "@octokit/rest": "^22.0.1",
     "@openrouter/ai-sdk-provider": "^2.2.3",
