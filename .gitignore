@@ -39,6 +39,9 @@ yarn-error.log*
 drizzle/*.sql
 drizzle/meta/
 
+# uploaded images (local dev storage)
+/data/
+
 # vercel
 .vercel
 

@@ -19,7 +19,6 @@ interface ArticleEditorProps {
   initialContentJson: unknown | null;
   initialContentMarkdown: string;
   articleUpdatedAt: string;
-  uploadFile?: (file: File) => Promise<string>;
   onSaveSuccess?: () => void;
 }
 
@@ -42,7 +41,6 @@ export function ArticleEditor({
   initialContentJson,
   initialContentMarkdown,
   articleUpdatedAt,
-  uploadFile,
   onSaveSuccess,
 }: ArticleEditorProps) {
   const [isReady, setIsReady] = useState(false);
@@ -51,6 +49,26 @@ export function ArticleEditor({
   const initializedRef = useRef(false);
 
   const draftKey = `draft-${articleId}`;
+
+  // Image upload handler for BlockNote's built-in image block.
+  // Uploads to /api/articles/[id]/images which compresses and stores the image.
+  const uploadFile = useCallback(
+    async (file: File): Promise<string> => {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch(`/api/articles/${articleId}/images`, {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Upload failed" }));
+        throw new Error(err.error || "Upload failed");
+      }
+      const { url } = await res.json();
+      return url;
+    },
+    [articleId]
+  );
 
   const editor = useCreateBlockNote({ uploadFile });
 
