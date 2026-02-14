@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 6 complete. Ready for Phase 7 (Ask AI & Notifications).
+**Current focus:** Phase 5 gap closure plans (05-05 through 05-08).
 
 ## Current Position
 
-Phase: 6 of 7 (Technical View, Comments & Mentions) -- COMPLETE
-Plan: 2 of 2 in current phase (all plans complete)
-Status: Phase 6 complete. All article tabs functional. Ready for Phase 7.
-Last activity: 2026-02-14 -- Completed 06-02-PLAN.md (Comments & Mentions)
+Phase: 5 of 7 (Article Editing) -- gap closure
+Plan: 5 of 8 in current phase (05-05 complete, 05-06 through 05-08 remaining)
+Status: Executing gap closure plans for Phase 5.
+Last activity: 2026-02-14 -- Completed 05-05-PLAN.md (Admin Review Queue)
 
 Progress: [██████████████████░] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: 4min
-- Total execution time: 1.22 hours
+- Total execution time: 1.25 hours
 
 **By Phase:**
 
@@ -31,11 +31,11 @@ Progress: [██████████████████░] 88%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
-| 05 | 4 | 14min | 4min |
+| 05 | 5 | 16min | 3min |
 | 06 | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 3min, 4min, 4min, 4min
+- Last 5 plans: 3min, 4min, 4min, 4min, 2min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -64,6 +64,7 @@ Recent decisions affecting current work:
 - [Decision]: Admin Review Queue (Phase 5 gap closure). Centralized page listing all articles with merge conflicts (needsReview) + active AI annotations. Filter by category, search by title, sort by date. Links to article for resolution.
 - [Decision]: Drafts as version records (Phase 5 gap closure). Replace localStorage auto-save with `changeSource: "draft"` version records (one per user per article, upsert). Drafts visible in history with distinct styling, previewable before continuing.
 - [Decision]: Version preview slide-out (Phase 5 gap closure). Click any version history record to view rendered formatted text in a slide-out panel — no restore required.
+- [Decision]: Separate "summary model" for short AI outputs (Phase 6 gap closure). New `openrouter_summary_model` setting + `file_summary_prompt`. `github_files.aiSummary` column stores 1-2 sentence file descriptions. Generated during sync on new/changed files. Displayed on Technical View file cards. Summary model reusable for other short-summary needs.
 - [01-02]: Lazy NextAuth initialization (factory function) to defer DrizzleAdapter creation until request time
 - [01-02]: Lazy db client via Proxy + getDb() for build-time safety without DATABASE_URL
 - [01-02]: Admin pages at (admin)/admin/users/ path for /admin/users URL with route group layout
@@ -133,6 +134,7 @@ Recent decisions affecting current work:
 - [06-02]: CSS classNames approach for react-mentions-ts styling -- integrates with CSS variables for dark mode
 - [06-02]: Single-level reply threading enforced in UI while schema supports deeper nesting
 - [06-02]: Mention markup (@[display](id)) converted to bold (**@display**) for rendering, raw markup preserved in storage
+- [05-05]: Server page + client list pattern for admin review queue -- server fetches all data, client handles search/filter/sort
 
 ### Pending Todos
 
@@ -147,5 +149,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 06-02-PLAN.md (Comments & Mentions). Phase 6 complete.
-Resume file: .planning/phases/06-technical-view-comments-mentions/06-02-SUMMARY.md
+Stopped at: Completed 05-05-PLAN.md (Admin Review Queue). Gap closure in progress.
+Resume file: .planning/phases/05-article-editing/05-05-SUMMARY.md
