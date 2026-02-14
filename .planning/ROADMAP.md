@@ -113,10 +113,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 05-01-PLAN.md -- BlockNote editor integration with native JSON storage, localStorage drafts, save with version tracking
-- [ ] 05-02-PLAN.md -- Image upload/paste with sharp compression, filesystem storage, and serving API
-- [ ] 05-03-PLAN.md -- Version history UI with source filtering, diff viewer (inline + side-by-side), and rollback
-- [ ] 05-04-PLAN.md -- AI review annotations: ai_review_annotations table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
+- [x] 05-01-PLAN.md -- BlockNote editor integration with native JSON storage, localStorage drafts, save with version tracking
+- [x] 05-02-PLAN.md -- Image upload/paste with sharp compression, filesystem storage, and serving API
+- [x] 05-03-PLAN.md -- Version history UI with source filtering, diff viewer (inline + side-by-side), and rollback
+- [x] 05-04-PLAN.md -- AI review annotations: ai_review_annotations table, LLM review pass after merge, annotation banner UI with section highlighting and dismiss
 
 ### Phase 6: Technical View, Comments & Mentions
 **Goal**: Users can see how articles relate to source code, discuss content in threaded comments, and mention colleagues
@@ -162,6 +162,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Admin Settings & GitHub Sync | 3/3 | ✓ Complete | 2026-02-13 |
 | 3. AI Processing Pipeline | 4/4 | ✓ Complete | 2026-02-13 |
 | 4. Wiki Viewer | 5/5 | ✓ Complete | 2026-02-13 |
-| 5. Article Editing & Version History | 0/4 | Not started | - |
+| 5. Article Editing & Version History | 4/4 | ✓ Complete | 2026-02-13 |
 | 6. Technical View, Comments & Mentions | 0/2 | Not started | - |
 | 7. Ask AI & Notifications | 0/3 | Not started | - |
