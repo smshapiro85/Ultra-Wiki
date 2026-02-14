@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 4 complete -- Wiki Viewer done (sidebar, article pages, search, home dashboard, gap closure). Ready for Phase 5.
+**Current focus:** Phase 5 in progress -- Article Editing & Version History. Plan 4 of 4 complete (AI review annotations).
 
 ## Current Position
 
-Phase: 4 of 7 (Wiki Viewer) -- COMPLETE
-Plan: 5 of 5 in current phase (04-05 complete)
-Status: Phase 4 complete -- all 5 plans executed (3 core + 2 gap closure). Ready for Phase 5.
-Last activity: 2026-02-14 -- Completed 04-05-PLAN.md (bookmark button gap closure)
+Phase: 5 of 7 (Article Editing) -- IN PROGRESS
+Plan: 4 of 4 in current phase (05-04 complete)
+Status: Plan 05-04 complete -- AI review annotations (schema, LLM review, banner UI, API routes).
+Last activity: 2026-02-14 -- Completed 05-04-PLAN.md (AI review annotations)
 
-Progress: [██████████░] 62%
+Progress: [████████████░] 72%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 4min
-- Total execution time: 0.84 hours
+- Total execution time: 0.89 hours
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [██████████░] 62%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
+| 05 | 1 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 3min, 4min, 2min, 1min
+- Last 5 plans: 3min, 4min, 2min, 1min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -111,6 +112,10 @@ Recent decisions affecting current work:
 - [04-04]: Breadcrumb segments always use asChild + Link for client-side navigation (matching Home link pattern)
 - [04-05]: BookmarkButton visible to all users; toggleBookmark server action handles auth enforcement
 - [04-05]: Optimistic state flip before server call with revert on error for instant feedback
+- [05-04]: Review triggered inside resolveConflict without versionId -- simpler approach, articleId sufficient for annotation queries
+- [05-04]: Server-side annotation count as initialCount prop avoids loading flash on banner
+- [05-04]: Inline CSS via style tag for annotation-highlight class (self-contained in component)
+- [05-04]: Dynamic import for review module in conflict.ts matching existing pipeline pattern
 
 ### Pending Todos
 
@@ -125,5 +130,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Phase 4 fully complete -- all 5 plans executed including gap closure (04-04 breadcrumbs, 04-05 bookmarks). Verified passed. Ready for Phase 5.
-Resume file: .planning/phases/04-wiki-viewer/04-VERIFICATION.md
+Stopped at: Completed 05-04-PLAN.md (AI review annotations). Plan 4 of 4 in Phase 5 done.
+Resume file: .planning/phases/05-article-editing/05-04-SUMMARY.md
