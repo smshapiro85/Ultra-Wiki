@@ -200,7 +200,7 @@ export async function getCategoryChain(
     // Prepend to build path from root to current
     segments.unshift({
       label: cat.name,
-      href: "#", // Categories don't have their own page
+      href: `/wiki/category/${cat.slug}`,
     });
 
     currentId = cat.parentCategoryId;
@@ -208,6 +208,58 @@ export async function getCategoryChain(
   }
 
   return segments;
+}
+
+// =============================================================================
+// getCategoryBySlug
+// =============================================================================
+
+export async function getCategoryBySlug(slug: string) {
+  const db = getDb();
+
+  // Fetch the category by slug
+  const [category] = await db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      icon: categories.icon,
+      parentCategoryId: categories.parentCategoryId,
+    })
+    .from(categories)
+    .where(eq(categories.slug, slug))
+    .limit(1);
+
+  if (!category) return null;
+
+  // Fetch articles in this category
+  const categoryArticles = await db
+    .select({
+      id: articles.id,
+      title: articles.title,
+      slug: articles.slug,
+    })
+    .from(articles)
+    .where(eq(articles.categoryId, category.id))
+    .orderBy(articles.sortOrder, articles.title);
+
+  // Fetch subcategories
+  const subcategories = await db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      slug: categories.slug,
+      icon: categories.icon,
+    })
+    .from(categories)
+    .where(eq(categories.parentCategoryId, category.id))
+    .orderBy(categories.sortOrder, categories.name);
+
+  return {
+    category,
+    articles: categoryArticles,
+    subcategories,
+  };
 }
 
 // =============================================================================
