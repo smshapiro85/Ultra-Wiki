@@ -7,6 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DEFAULT_ANALYSIS_PROMPT,
+  DEFAULT_ARTICLE_STYLE_PROMPT,
+  DEFAULT_FILE_SUMMARY_PROMPT,
+} from "@/lib/ai/prompts";
 
 interface AiPromptsSettingsProps {
   settings: Record<string, { value: string; isSecret: boolean }>;
@@ -35,8 +40,8 @@ export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
             <Textarea
               id="analysis_prompt"
               name="analysis_prompt"
-              rows={6}
-              defaultValue={settings.analysis_prompt?.value ?? ""}
+              rows={12}
+              defaultValue={settings.analysis_prompt?.value || DEFAULT_ANALYSIS_PROMPT}
               placeholder="System prompt for analyzing code files..."
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -50,8 +55,8 @@ export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
             <Textarea
               id="article_style_prompt"
               name="article_style_prompt"
-              rows={6}
-              defaultValue={settings.article_style_prompt?.value ?? ""}
+              rows={12}
+              defaultValue={settings.article_style_prompt?.value || DEFAULT_ARTICLE_STYLE_PROMPT}
               placeholder="System prompt for writing article content..."
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -66,7 +71,7 @@ export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
               id="file_summary_prompt"
               name="file_summary_prompt"
               rows={4}
-              defaultValue={settings.file_summary_prompt?.value ?? ""}
+              defaultValue={settings.file_summary_prompt?.value || DEFAULT_FILE_SUMMARY_PROMPT}
               placeholder="Prompt for generating 1-2 sentence file descriptions..."
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">

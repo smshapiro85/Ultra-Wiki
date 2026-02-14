@@ -57,7 +57,7 @@ export interface PromptContext {
  * Default analysis prompt used when no admin-configured prompt exists.
  * Based on the CodeWiki spec section 6.
  */
-const DEFAULT_ANALYSIS_PROMPT = `You are updating internal wiki documentation for a software platform based on recent code changes.
+export const DEFAULT_ANALYSIS_PROMPT = `You are updating internal wiki documentation for a software platform based on recent code changes.
 
 ## Your Task
 
@@ -106,7 +106,7 @@ For articles flagged as human-edited, you MUST:
  * Default article style prompt used when no admin-configured style exists.
  * Based on the CodeWiki spec section 6.
  */
-const DEFAULT_ARTICLE_STYLE_PROMPT = `Write internal wiki articles that explain how the product works (business rules, logic flows, permissions) for an internal team audience of Developers, QA Engineers, and Product Managers.
+export const DEFAULT_ARTICLE_STYLE_PROMPT = `Write internal wiki articles that explain how the product works (business rules, logic flows, permissions) for an internal team audience of Developers, QA Engineers, and Product Managers.
 
 ### Output Rules
 - No code blocks or snippets in the article body
@@ -182,7 +182,7 @@ ${filesSummary}`;
 // File Summary Prompts
 // =============================================================================
 
-const DEFAULT_FILE_SUMMARY_PROMPT = `Describe what this source file does in 1-2 concise sentences. Focus on its purpose and role in the application. Be specific about functionality, not generic descriptions.`;
+export const DEFAULT_FILE_SUMMARY_PROMPT = `Describe what this source file does in 1-2 concise sentences. Focus on its purpose and role in the application. Be specific about functionality, not generic descriptions.`;
 
 /**
  * Build a prompt for generating a short AI summary of a source file.
