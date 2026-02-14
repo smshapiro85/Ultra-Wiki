@@ -6,6 +6,7 @@ import { users } from "@/lib/db/schema";
 import {
   getArticleBySlug,
   getCategoryChain,
+  isArticleBookmarked,
 } from "@/lib/wiki/queries";
 import { ArticleBreadcrumb } from "@/components/wiki/article-breadcrumb";
 import { ArticleContent } from "@/components/wiki/article-content";
@@ -16,6 +17,7 @@ import {
 import { ArticleTabs } from "@/components/wiki/article-tabs";
 import { ArticleMetadata } from "@/components/wiki/article-metadata";
 import { RegenerateButton } from "@/components/wiki/regenerate-button";
+import { BookmarkButton } from "@/components/wiki/bookmark-button";
 
 /**
  * Article page at /wiki/[articleSlug].
@@ -66,6 +68,11 @@ export default async function ArticlePage({
   // Check session for admin access
   const session = await auth();
 
+  // Check if current user has bookmarked this article
+  const bookmarked = session?.user?.id
+    ? await isArticleBookmarked(session.user.id, article.id)
+    : false;
+
   return (
     <div>
       {/* Breadcrumb */}
@@ -87,12 +94,13 @@ export default async function ArticlePage({
             </div>
           )}
 
-          {/* Admin regenerate button */}
-          {session?.user?.role === "admin" && (
-            <div className="mb-4">
+          {/* Bookmark + Admin regenerate buttons */}
+          <div className="mb-4 flex items-center gap-2">
+            <BookmarkButton articleId={article.id} initialBookmarked={bookmarked} />
+            {session?.user?.role === "admin" && (
               <RegenerateButton articleId={article.id} />
-            </div>
-          )}
+            )}
+          </div>
 
           <ArticleTabs
             articleContent={
