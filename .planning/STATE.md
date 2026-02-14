@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 4 in progress -- Wiki Viewer (sidebar navigation, article pages, home dashboard).
+**Current focus:** Phase 4 complete -- Wiki Viewer done (sidebar, article pages, search, home dashboard). Ready for Phase 5.
 
 ## Current Position
 
-Phase: 4 of 7 (Wiki Viewer)
-Plan: 2 of 3 in current phase (04-02 complete)
-Status: Executing Phase 4 -- Plans 01-02 complete, Plan 03 remaining
-Last activity: 2026-02-14 -- Completed 04-02-PLAN.md (article page: Markdown renderer, TOC, tabs, metadata, regenerate)
+Phase: 4 of 7 (Wiki Viewer) -- COMPLETE
+Plan: 3 of 3 in current phase (04-03 complete)
+Status: Phase 4 complete -- all 3 plans executed. Ready for Phase 5.
+Last activity: 2026-02-14 -- Completed 04-03-PLAN.md (home dashboard, search, bookmarks)
 
-Progress: [████████░░] 57%
+Progress: [██████████░] 62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 4min
-- Total execution time: 0.74 hours
+- Total execution time: 0.80 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [████████░░] 57%
 | 01 | 3 | 15min | 5min |
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
-| 04 | 2 | 6min | 3min |
+| 04 | 3 | 10min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 5min, 4min, 1min, 3min, 3min
+- Last 5 plans: 4min, 1min, 3min, 3min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -103,6 +103,10 @@ Recent decisions affecting current work:
 - [04-02]: Shared slugify function between TOC extraction and heading ID generation ensures anchor links match
 - [04-02]: Dynamic imports for all AI/merge modules in regenerateArticle to avoid BlockNote createContext crash
 - [04-02]: useTransition + sonner toast pattern for server action loading/feedback in client components
+- [04-03]: SearchInput uses useDebouncedCallback with URL param navigation (router.push) for shareable search URLs
+- [04-03]: Headline sanitization: strip all HTML except <mark> tags via regex for XSS prevention in search results
+- [04-03]: user_bookmarks uses composite PK (userId, articleId) -- no separate id column needed for junction table
+- [04-03]: actions.ts created fresh with toggleBookmark; Plan 02's regenerateArticle will be added to same file
 
 ### Pending Todos
 
@@ -117,5 +121,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 04-02-PLAN.md -- Article page (Markdown renderer, TOC, tabs, metadata, regenerate)
-Resume file: .planning/phases/04-wiki-viewer/04-02-SUMMARY.md
+Stopped at: Completed 04-03-PLAN.md -- Home dashboard, search, bookmarks. Phase 4 complete.
+Resume file: .planning/phases/04-wiki-viewer/04-03-SUMMARY.md
