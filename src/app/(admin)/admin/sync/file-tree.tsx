@@ -1,10 +1,27 @@
 "use client";
 
-import { useState, useCallback, useTransition, useRef, useEffect } from "react";
-import { Folder, FolderOpen, File, ChevronRight, ChevronDown } from "lucide-react";
+import {
+  useState,
+  useCallback,
+  useTransition,
+  useRef,
+  useEffect,
+  useMemo,
+} from "react";
+import {
+  Folder,
+  FolderOpen,
+  File,
+  ChevronRight,
+  ChevronDown,
+  ChevronsDownUp,
+  ChevronsUpDown,
+  Search,
+} from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { saveIncludedPaths } from "./actions";
 import type { TreeNode } from "@/lib/github/tree";
 
@@ -57,6 +74,54 @@ function getDirectoryState(
   if (checkedCount === 0) return "unchecked";
   if (checkedCount === leaves.length) return "checked";
   return "indeterminate";
+}
+
+/** Build a flat map from path -> original TreeNode for all nodes in the tree. */
+function buildNodeMap(nodes: TreeNode[]): Map<string, TreeNode> {
+  const map = new Map<string, TreeNode>();
+  function walk(list: TreeNode[]) {
+    for (const node of list) {
+      map.set(node.path, node);
+      if (node.children) walk(node.children);
+    }
+  }
+  walk(nodes);
+  return map;
+}
+
+/**
+ * Recursively filter a tree by a search query.
+ * - If a node's name or path matches, include it and all descendants.
+ * - If any descendant matches, include the node (ancestor path) with only matching children.
+ * - Non-matching leaves and directories with no matching descendants are excluded.
+ */
+function filterTree(nodes: TreeNode[], query: string): TreeNode[] {
+  if (!query) return nodes;
+  const lower = query.toLowerCase();
+
+  return nodes
+    .map((node) => {
+      const nameMatches = node.name.toLowerCase().includes(lower);
+      const pathMatches = node.path.toLowerCase().includes(lower);
+
+      if (node.type === "file") {
+        return nameMatches || pathMatches ? node : null;
+      }
+
+      // Directory: check if any children match
+      const filteredChildren = node.children
+        ? filterTree(node.children, query)
+        : [];
+
+      if (nameMatches || pathMatches || filteredChildren.length > 0) {
+        return {
+          ...node,
+          children: nameMatches ? node.children : filteredChildren,
+        };
+      }
+      return null;
+    })
+    .filter(Boolean) as TreeNode[];
 }
 
 // ---------------------------------------------------------------------------
@@ -156,7 +221,7 @@ function TreeNodeItem({
               includedSet={includedSet}
               onToggle={onToggle}
               depth={depth + 1}
-              defaultExpanded={false}
+              defaultExpanded={defaultExpanded}
             />
           ))}
         </div>
@@ -186,6 +251,37 @@ export function FileTree({
   const [hasChanges, setHasChanges] = useState(false);
   const initialRef = useRef(new Set(initialIncludedPaths));
 
+  // Expand/collapse all state
+  const [expandKey, setExpandKey] = useState(0);
+  const [expandAll, setExpandAll] = useState(false);
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Build a map of original nodes by path for correct folder selection during search
+  const originalNodeMap = useMemo(() => buildNodeMap(tree), [tree]);
+
+  // Filter tree based on search query
+  const filteredTree = useMemo(
+    () => filterTree(tree, searchQuery),
+    [tree, searchQuery]
+  );
+
+  // Auto-expand when searching, collapse when clearing
+  const prevSearchRef = useRef("");
+  useEffect(() => {
+    if (searchQuery && !prevSearchRef.current) {
+      // Started searching: expand all
+      setExpandAll(true);
+      setExpandKey((k) => k + 1);
+    } else if (!searchQuery && prevSearchRef.current) {
+      // Cleared search: collapse all
+      setExpandAll(false);
+      setExpandKey((k) => k + 1);
+    }
+    prevSearchRef.current = searchQuery;
+  }, [searchQuery]);
+
   // Track changes from initial state
   useEffect(() => {
     const current = [...includedPaths].sort().join(",");
@@ -193,38 +289,44 @@ export function FileTree({
     setHasChanges(current !== initial);
   }, [includedPaths]);
 
-  const handleToggle = useCallback((node: TreeNode, checked: boolean) => {
-    setIncludedPaths((prev) => {
-      const next = new Set(prev);
-      const allPaths = collectAllPaths(node);
+  const handleToggle = useCallback(
+    (node: TreeNode, checked: boolean) => {
+      // Always use the original (unfiltered) node for path collection
+      // so that selecting a folder during search includes ALL children
+      const originalNode = originalNodeMap.get(node.path) ?? node;
+      setIncludedPaths((prev) => {
+        const next = new Set(prev);
+        const allPaths = collectAllPaths(originalNode);
 
-      if (checked) {
-        // When checking a directory, add the directory path itself
-        // (which implicitly includes all children via isPathIncluded logic).
-        // For a file, just add the file path.
-        if (node.type === "directory") {
-          next.add(node.path);
-          // Remove individual children that are now covered by the parent
-          for (const p of allPaths) {
-            if (p !== node.path) next.delete(p);
+        if (checked) {
+          // When checking a directory, add the directory path itself
+          // (which implicitly includes all children via isPathIncluded logic).
+          // For a file, just add the file path.
+          if (originalNode.type === "directory") {
+            next.add(originalNode.path);
+            // Remove individual children that are now covered by the parent
+            for (const p of allPaths) {
+              if (p !== originalNode.path) next.delete(p);
+            }
+          } else {
+            next.add(originalNode.path);
           }
         } else {
-          next.add(node.path);
+          // When unchecking, remove the path and all descendants
+          for (const p of allPaths) {
+            next.delete(p);
+          }
+          // Also check if any ancestor directory was included -- if so,
+          // we need to remove it and add back siblings individually
+          // For simplicity in the MVP, just remove exact matches.
+          // The user can re-check individual items as needed.
         }
-      } else {
-        // When unchecking, remove the path and all descendants
-        for (const p of allPaths) {
-          next.delete(p);
-        }
-        // Also check if any ancestor directory was included -- if so,
-        // we need to remove it and add back siblings individually
-        // For simplicity in the MVP, just remove exact matches.
-        // The user can re-check individual items as needed.
-      }
 
-      return next;
-    });
-  }, []);
+        return next;
+      });
+    },
+    [originalNodeMap]
+  );
 
   const handleSave = useCallback(() => {
     setSaveError(null);
@@ -277,17 +379,59 @@ export function FileTree({
         <p className="text-sm text-red-600 dark:text-red-400">{saveError}</p>
       )}
 
-      <ScrollArea className="h-[500px] rounded-md border border-zinc-200 p-2 dark:border-zinc-800">
-        {tree.map((node) => (
-          <TreeNodeItem
-            key={node.path}
-            node={node}
-            includedSet={includedPaths}
-            onToggle={handleToggle}
-            depth={0}
-            defaultExpanded={true}
+      {/* Tree controls: expand/collapse all + search */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setExpandAll(true);
+            setExpandKey((k) => k + 1);
+          }}
+        >
+          <ChevronsUpDown className="mr-1 h-3.5 w-3.5" />
+          Expand All
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setExpandAll(false);
+            setExpandKey((k) => k + 1);
+          }}
+        >
+          <ChevronsDownUp className="mr-1 h-3.5 w-3.5" />
+          Collapse All
+        </Button>
+        <div className="relative flex-1">
+          <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" />
+          <Input
+            placeholder="Search files and folders..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 pl-7 text-sm"
           />
-        ))}
+        </div>
+      </div>
+
+      <ScrollArea className="h-[500px] rounded-md border border-zinc-200 p-2 dark:border-zinc-800">
+        <div key={expandKey}>
+          {filteredTree.map((node) => (
+            <TreeNodeItem
+              key={node.path}
+              node={node}
+              includedSet={includedPaths}
+              onToggle={handleToggle}
+              depth={0}
+              defaultExpanded={expandAll}
+            />
+          ))}
+        </div>
+        {searchQuery && filteredTree.length === 0 && (
+          <p className="py-4 text-center text-sm text-zinc-400">
+            No files or folders match &ldquo;{searchQuery}&rdquo;
+          </p>
+        )}
       </ScrollArea>
     </div>
   );
