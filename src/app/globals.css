@@ -171,6 +171,18 @@ article :not(pre) > code {
   margin-top: 1em;
 }
 
+/* Prose heading sizes: subordinate to article title (text-3xl = 1.875rem).
+   H1 sections sit clearly below the page title in visual hierarchy. */
+.prose h1 {
+  font-size: 1.5em;
+}
+.prose h2 {
+  font-size: 1.25em;
+}
+.prose h3 {
+  font-size: 1.1em;
+}
+
 /* Match article view (prose) typography in BlockNote editor.
    Overrides BlockNote defaults to align with Tailwind Typography prose class
    so the editor and reader views look the same. */
@@ -190,30 +202,33 @@ article :not(pre) > code {
   margin-top: 0;
 }
 
-/* Heading sizes: match prose (h1 2.25em, h2 1.5em, h3 1.25em).
+/* Heading sizes: match prose (h1 1.5em, h2 1.25em, h3 1.1em).
    BlockNote defaults are much larger (h1 3em, h2 2em, h3 1.3em). */
 .bn-editor [data-content-type="heading"] {
-  --level: 2.25em;
-}
-.bn-editor [data-content-type="heading"][data-level="2"] {
   --level: 1.5em;
 }
-.bn-editor [data-content-type="heading"][data-level="3"] {
+.bn-editor [data-content-type="heading"][data-level="2"] {
   --level: 1.25em;
+}
+.bn-editor [data-content-type="heading"][data-level="3"] {
+  --level: 1.1em;
 }
 
 /* Side menu (drag handle + plus button): override fixed pixel heights
    to match our smaller prose-sized headings. Heights = font-size * 1.75
    line-height + 6px block-content padding.
+   H1: 1.5em * 16px * 1.75 + 6 = 48px
+   H2: 1.25em * 16px * 1.75 + 6 = 41px
+   H3: 1.1em * 16px * 1.75 + 6 = 37px
    BlockNote defaults: h1 78px, h2 54px, h3 37px, normal 30px. */
 .bn-container .bn-side-menu[data-block-type="heading"][data-level="1"] {
-  height: 69px;
+  height: 48px;
 }
 .bn-container .bn-side-menu[data-block-type="heading"][data-level="2"] {
-  height: 44px;
+  height: 41px;
 }
 .bn-container .bn-side-menu[data-block-type="heading"][data-level="3"] {
-  height: 41px;
+  height: 37px;
 }
 
 /* Nested list blocks should have tighter spacing */
