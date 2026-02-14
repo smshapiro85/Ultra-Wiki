@@ -23,6 +23,7 @@ import { ArticleMetadata } from "@/components/wiki/article-metadata";
 import { RegenerateButton } from "@/components/wiki/regenerate-button";
 import { BookmarkButton } from "@/components/wiki/bookmark-button";
 import { AnnotationBanner } from "@/components/wiki/annotation-banner";
+import { VersionHistory } from "@/components/wiki/version-history";
 
 /**
  * Article page at /wiki/[articleSlug].
@@ -140,6 +141,12 @@ export default async function ArticlePage({
                   No technical view available.
                 </p>
               )
+            }
+            historyContent={
+              <VersionHistory
+                articleId={article.id}
+                articleSlug={article.slug}
+              />
             }
           />
         </div>
