@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 6 in progress -- Technical View, Comments & Mentions. Plan 01 (Technical View) complete. Plan 02 (Comments & Mentions) next.
+**Current focus:** Phase 6 complete. Ready for Phase 7 (Ask AI & Notifications).
 
 ## Current Position
 
-Phase: 6 of 7 (Technical View, Comments & Mentions)
-Plan: 1 of 2 in current phase
-Status: Plan 01 complete (Technical View). Plan 02 next (Comments & Mentions).
-Last activity: 2026-02-14 -- Completed 06-01-PLAN.md (Technical View tab)
+Phase: 6 of 7 (Technical View, Comments & Mentions) -- COMPLETE
+Plan: 2 of 2 in current phase (all plans complete)
+Status: Phase 6 complete. All article tabs functional. Ready for Phase 7.
+Last activity: 2026-02-14 -- Completed 06-02-PLAN.md (Comments & Mentions)
 
-Progress: [█████████████████░] 83%
+Progress: [██████████████████░] 88%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 4min
-- Total execution time: 1.15 hours
+- Total execution time: 1.22 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [█████████████████░] 83%
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
 | 05 | 4 | 14min | 4min |
-| 06 | 1 | 4min | 4min |
+| 06 | 2 | 8min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 3min, 3min, 4min, 4min
+- Last 5 plans: 3min, 3min, 4min, 4min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -130,6 +130,9 @@ Recent decisions affecting current work:
 - [06-01]: API route approach for code viewing -- shiki highlights server-side, returns HTML, avoids shipping shiki to client bundle
 - [06-01]: saveMode prop on editor for dual-purpose editing (article vs technical view) -- reuses existing BlockNote editor
 - [06-01]: Technical view saves create version records preserving current article contentMarkdown alongside change
+- [06-02]: CSS classNames approach for react-mentions-ts styling -- integrates with CSS variables for dark mode
+- [06-02]: Single-level reply threading enforced in UI while schema supports deeper nesting
+- [06-02]: Mention markup (@[display](id)) converted to bold (**@display**) for rendering, raw markup preserved in storage
 
 ### Pending Todos
 
@@ -144,5 +147,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 06-01-PLAN.md (Technical View tab with file links, code viewer, DB tables, editing).
-Resume file: .planning/phases/06-technical-view-comments-mentions/06-01-SUMMARY.md
+Stopped at: Completed 06-02-PLAN.md (Comments & Mentions). Phase 6 complete.
+Resume file: .planning/phases/06-technical-view-comments-mentions/06-02-SUMMARY.md
