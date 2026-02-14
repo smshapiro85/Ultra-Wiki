@@ -11,6 +11,8 @@ import {
   getCategoryChain,
   isArticleBookmarked,
   getActiveAnnotationCount,
+  getArticleFileLinks,
+  getArticleDbTables,
 } from "@/lib/wiki/queries";
 import { ArticleBreadcrumb } from "@/components/wiki/article-breadcrumb";
 import { ArticleContent } from "@/components/wiki/article-content";
@@ -24,6 +26,7 @@ import { AnnotationBanner } from "@/components/wiki/annotation-banner";
 import { VersionHistory } from "@/components/wiki/version-history";
 import { TechnicalView } from "@/components/wiki/technical-view";
 import { CommentsSection } from "@/components/wiki/comments-section";
+import { AskAiPageTrigger } from "@/components/chat/ask-ai-page-trigger";
 
 /**
  * Article page at /wiki/[articleSlug].
@@ -76,12 +79,14 @@ export default async function ArticlePage({
   // Check session for admin access
   const session = await auth();
 
-  // Check if current user has bookmarked this article and get annotation count
-  const [bookmarked, annotationCount] = await Promise.all([
+  // Check if current user has bookmarked this article and get annotation count + file/table counts for Ask AI
+  const [bookmarked, annotationCount, fileLinks, dbTables] = await Promise.all([
     session?.user?.id
       ? isArticleBookmarked(session.user.id, article.id)
       : Promise.resolve(false),
     getActiveAnnotationCount(article.id),
+    getArticleFileLinks(article.id),
+    getArticleDbTables(article.id),
   ]);
 
   return (
@@ -94,6 +99,13 @@ export default async function ArticlePage({
         />
         <div className="flex items-center gap-2">
           <BookmarkButton articleId={article.id} initialBookmarked={bookmarked} />
+          <AskAiPageTrigger
+            articleId={article.id}
+            articleTitle={article.title}
+            hasTechnicalView={!!article.technicalViewMarkdown}
+            fileCount={fileLinks.length}
+            tableCount={dbTables.length}
+          />
           {session?.user && (
             <Button variant="outline" size="sm" asChild>
               <Link href={`/wiki/${article.slug}/edit`}>
