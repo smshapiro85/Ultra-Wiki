@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 3 complete (including gap closure) -- AI Processing Pipeline finished. Ready for Phase 4 (Article Editor).
+**Current focus:** Phase 4 in progress -- Wiki Viewer (sidebar navigation, article pages, home dashboard).
 
 ## Current Position
 
-Phase: 3 of 7 (AI Processing Pipeline) -- COMPLETE
-Plan: 4 of 4 in current phase (all complete, including gap closure 03-04)
-Status: Phase 3 complete -- ready for Phase 4
-Last activity: 2026-02-14 -- Completed 03-04-PLAN.md (gap closure: dynamic markdown import fix)
+Phase: 4 of 7 (Wiki Viewer)
+Plan: 1 of 3 in current phase (04-01 complete)
+Status: Executing Phase 4 -- Plan 01 complete, Plans 02-03 remaining
+Last activity: 2026-02-14 -- Completed 04-01-PLAN.md (wiki app shell: sidebar, category tree, data access)
 
-Progress: [███████░░░] 48%
+Progress: [███████░░░] 52%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 4min
-- Total execution time: 0.64 hours
+- Total execution time: 0.69 hours
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: [███████░░░] 48%
 | 01 | 3 | 15min | 5min |
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
+| 04 | 1 | 3min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 3min, 5min, 4min, 1min
+- Last 5 plans: 3min, 5min, 4min, 1min, 3min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -93,6 +94,10 @@ Recent decisions affecting current work:
 - [03-UAT]: Both AI calls (analyze + generate) now use structured output via Output.object() with Zod schemas
 - [03-UAT]: temperature: 0.2 for both AI calls (low creativity, more consistent)
 - [03-UAT]: Reasoning effort configurable via admin settings dropdown (none/minimal/low/medium/high/xhigh), passed as reasoning.effort to OpenRouter
+- [04-01]: @plugin syntax for @tailwindcss/typography in Tailwind v4 CSS-first config
+- [04-01]: CategoryTree as client component (interactive Collapsible state), layout remains server component
+- [04-01]: Categories use href="#" in breadcrumbs (no standalone category pages)
+- [04-01]: SidebarProvider + AppSidebar + SidebarInset layout pattern for all wiki pages
 
 ### Pending Todos
 
@@ -107,5 +112,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 03-04-PLAN.md -- Phase 3 gap closure (dynamic markdown import fix)
-Resume file: .planning/phases/03-ai-processing-pipeline/03-04-SUMMARY.md
+Stopped at: Completed 04-01-PLAN.md -- Wiki app shell (sidebar, category tree, data access layer)
+Resume file: .planning/phases/04-wiki-viewer/04-01-SUMMARY.md
