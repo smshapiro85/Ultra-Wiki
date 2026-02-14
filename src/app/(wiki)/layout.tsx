@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
@@ -8,7 +9,10 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AppSidebar } from "@/components/wiki/app-sidebar";
+import { SearchInput } from "@/components/wiki/search-input";
 import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
 
 export default async function WikiLayout({
@@ -47,6 +51,14 @@ export default async function WikiLayout({
       <SidebarInset>
         <header className="flex h-14 items-center gap-2 border-b px-4">
           <SidebarTrigger />
+          <div className="flex flex-1 items-center gap-2">
+            <Separator orientation="vertical" className="h-4" />
+            <div className="ml-auto w-64">
+              <Suspense fallback={<Skeleton className="h-9 w-full" />}>
+                <SearchInput />
+              </Suspense>
+            </div>
+          </div>
         </header>
         <main className="flex-1 p-6">{children}</main>
       </SidebarInset>
