@@ -1,3 +1,37 @@
+// =============================================================================
+// Data Pattern Analysis (08-01 Task 1)
+//
+// Category Structure:
+// - Categories table supports parent-child hierarchy (parentCategoryId FK)
+// - Pipeline resolves categories by slug-first, then case-insensitive name match
+// - New categories auto-created when no match found (resolveOrCreateCategory)
+// - Category names are auto-capitalized (first char uppercase + rest)
+//
+// Identified Issues:
+// 1. CATEGORY DRIFT: No deterministic rules in prompt for when to create vs. reuse
+//    categories. Same folder (e.g., resource-library/) can produce different
+//    category assignments across runs because the LLM has no explicit strategy.
+// 2. NAMING INCONSISTENCY: resolveOrCreateCategory capitalizes first char only
+//    (e.g., "resource-library" -> "Resource-library") but prompt doesn't tell
+//    LLM to match existing casing patterns (Title Case, singular/plural).
+// 3. FLAT vs. NESTED: No guidance on when to use parent categories vs. top-level.
+//    The LLM might create "Modules > Auth" one run and "Authentication" the next.
+// 4. GENERIC PARENTS: No rule against creating broad parent categories like
+//    "Modules", "Features", or "Components" that add hierarchy without meaning.
+//
+// Article Content Patterns:
+// 1. TITLE DUPLICATION: No rule preventing LLM from starting article content with
+//    an H1 that repeats the article title (displayed separately by the UI).
+// 2. HEADING LEVELS: No guidance on H1 vs H2 for top-level sections. Articles
+//    may inconsistently use ## or # for their first section heading.
+// 3. STYLE PROMPT: Currently covers tone and exclusions but not structure.
+//
+// Resolution:
+// - Task 2 adds explicit 6-rule Category Strategy to DEFAULT_ANALYSIS_PROMPT
+// - Task 3 adds Content Structure Rules to DEFAULT_ARTICLE_STYLE_PROMPT
+// - Task 3 adds no-title-duplication to buildGenerationPrompt
+// =============================================================================
+
 /**
  * Context required to build the analysis prompt.
  */
