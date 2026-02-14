@@ -23,7 +23,9 @@ import {
   createArticleVersion,
   getLastAIVersion,
 } from "@/lib/content/version";
-import { blocksToMarkdown, markdownToBlocks } from "@/lib/content/markdown";
+// blocksToMarkdown and markdownToBlocks are dynamically imported at call
+// sites below to avoid pulling @blocknote/server-util into the module graph
+// at evaluation time (causes createContext crash in RSC/Turbopack).
 
 // Re-export ChangeSet from sync for convenience
 export type { ChangeSet } from "@/lib/github/sync";
@@ -232,6 +234,7 @@ async function processCreateArticle(
   }
 
   // c. Convert markdown to BlockNote JSON
+  const { markdownToBlocks } = await import("@/lib/content/markdown");
   const contentJson = await markdownToBlocks(contentMarkdown);
 
   // d. Generate unique slug and insert article
@@ -343,6 +346,7 @@ async function processUpdateArticle(
   // b. Check has_human_edits flag
   if (!existing.hasHumanEdits) {
     // AI-only article: overwrite directly
+    const { markdownToBlocks } = await import("@/lib/content/markdown");
     const contentJson = await markdownToBlocks(contentMarkdown);
 
     await db
@@ -376,6 +380,7 @@ async function processUpdateArticle(
     // iii. If contentJson exists, prefer converting it to markdown for accuracy
     if (existing.contentJson) {
       try {
+        const { blocksToMarkdown } = await import("@/lib/content/markdown");
         currentMarkdown = await blocksToMarkdown(existing.contentJson);
       } catch {
         // Fallback to stored contentMarkdown if conversion fails
@@ -402,6 +407,7 @@ async function processUpdateArticle(
     });
 
     // vi. Update article with resolved content
+    const { markdownToBlocks } = await import("@/lib/content/markdown");
     const finalContentJson = await markdownToBlocks(
       resolution.finalMarkdown
     );
