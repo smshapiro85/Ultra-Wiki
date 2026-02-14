@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { getArticleVersions } from "@/lib/wiki/queries";
+import { normalizeMarkdown } from "@/lib/content/normalize-markdown";
 
 /**
  * GET /api/articles/[id]/versions
@@ -33,5 +34,14 @@ export async function GET(
 
   const versions = await getArticleVersions(articleId, sourceFilter);
 
-  return NextResponse.json(versions);
+  // Normalize markdown for consistent diffs. Older versions may have been
+  // stored with different formatting (AI tight lists vs BlockNote loose lists).
+  const normalized = versions.map((v) => ({
+    ...v,
+    contentMarkdown: v.contentMarkdown
+      ? normalizeMarkdown(v.contentMarkdown)
+      : v.contentMarkdown,
+  }));
+
+  return NextResponse.json(normalized);
 }

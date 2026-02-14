@@ -4,6 +4,7 @@ import { getDb } from "@/lib/db";
 import { articles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { createArticleVersion } from "@/lib/content/version";
+import { normalizeMarkdown } from "@/lib/content/normalize-markdown";
 
 /**
  * POST /api/articles/[id]/save
@@ -61,10 +62,16 @@ export async function POST(
 
   const db = getDb();
 
+  // Normalize markdown so format matches what the AI pipeline stores.
+  // Both sources go through the same remark pipeline, ensuring diffs
+  // only show real content changes.
+  const normalizedMarkdown = normalizeMarkdown(body.contentMarkdown);
+
   // Fetch current article for optimistic lock check
   const [article] = await db
     .select({
       id: articles.id,
+      contentMarkdown: articles.contentMarkdown,
       updatedAt: articles.updatedAt,
     })
     .from(articles)
@@ -84,13 +91,20 @@ export async function POST(
     );
   }
 
+  // No-op detection: skip version creation if content hasn't changed.
+  // This prevents false "human_edited" versions when the user opens the
+  // editor and saves without making real changes (formatting-only diffs
+  // are eliminated by the normalizer above).
+  const contentChanged = normalizedMarkdown !== article.contentMarkdown;
+
   const now = new Date();
 
-  // Update article content
+  // Always update contentJson (stores BlockNote native format for future edits)
+  // and mark as human-edited, but only create a version if content changed.
   await db
     .update(articles)
     .set({
-      contentMarkdown: body.contentMarkdown,
+      contentMarkdown: normalizedMarkdown,
       contentJson: body.contentJson,
       hasHumanEdits: true,
       lastHumanEditedAt: now,
@@ -99,15 +113,16 @@ export async function POST(
     })
     .where(eq(articles.id, id));
 
-  // Create version record
-  await createArticleVersion({
-    articleId: id,
-    contentMarkdown: body.contentMarkdown,
-    contentJson: body.contentJson,
-    changeSource: "human_edited",
-    changeSummary: body.changeSummary || undefined,
-    createdBy: session.user.id,
-  });
+  if (contentChanged) {
+    await createArticleVersion({
+      articleId: id,
+      contentMarkdown: normalizedMarkdown,
+      contentJson: body.contentJson,
+      changeSource: "human_edited",
+      changeSummary: body.changeSummary || undefined,
+      createdBy: session.user.id,
+    });
+  }
 
   return NextResponse.json({ success: true });
 }

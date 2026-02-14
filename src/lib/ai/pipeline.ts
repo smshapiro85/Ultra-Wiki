@@ -23,9 +23,12 @@ import {
   createArticleVersion,
   getLastAIVersion,
 } from "@/lib/content/version";
+import { normalizeMarkdown } from "@/lib/content/normalize-markdown";
 // BlockNote JSON conversion is deferred to viewer/editor — storing markdown
 // only in the pipeline avoids @blocknote/server-util createContext crash
 // in RSC/Turbopack. contentJson is set to null; converted on first view.
+// All markdown is normalized via remark before storage so that diffs between
+// AI-generated and human-edited versions only reflect real content changes.
 
 // Re-export ChangeSet from sync for convenience
 export type { ChangeSet } from "@/lib/github/sync";
@@ -233,6 +236,9 @@ async function processCreateArticle(
     technicalViewMarkdown = generated.technicalViewMarkdown;
   }
 
+  // Normalize markdown so diffs against future human edits are clean
+  contentMarkdown = normalizeMarkdown(contentMarkdown);
+
   // c. contentJson left null — BlockNote conversion deferred to viewer/editor
   //    to avoid @blocknote/server-util createContext crash in RSC/Turbopack.
   const contentJson = null;
@@ -342,6 +348,9 @@ async function processUpdateArticle(
     contentMarkdown = generated.contentMarkdown;
     technicalViewMarkdown = generated.technicalViewMarkdown;
   }
+
+  // Normalize markdown so diffs against human edits are clean
+  contentMarkdown = normalizeMarkdown(contentMarkdown);
 
   // b. Check has_human_edits flag
   if (!existing.hasHumanEdits) {

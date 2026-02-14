@@ -152,3 +152,53 @@ article pre code {
 article :not(pre) > code {
   @apply rounded bg-muted px-1.5 py-0.5 text-sm;
 }
+
+/* Match article view (prose) typography in BlockNote editor.
+   Overrides BlockNote defaults to align with Tailwind Typography prose class
+   so the editor and reader views look the same. */
+
+/* Line height: prose uses 1.75, BlockNote default is 1.5 */
+.bn-editor {
+  line-height: 1.75;
+}
+
+/* Block spacing: prose uses ~1.25em between paragraphs */
+.bn-editor .bn-block-outer {
+  margin-top: 0.75em;
+  margin-bottom: 0.75em;
+}
+.bn-editor .bn-block-outer:first-child {
+  margin-top: 0;
+}
+
+/* Heading sizes: match prose (h1 2.25em, h2 1.5em, h3 1.25em).
+   BlockNote defaults are much larger (h1 3em, h2 2em, h3 1.3em). */
+.bn-editor [data-content-type="heading"] {
+  --level: 2.25em;
+}
+.bn-editor [data-content-type="heading"][data-level="2"] {
+  --level: 1.5em;
+}
+.bn-editor [data-content-type="heading"][data-level="3"] {
+  --level: 1.25em;
+}
+
+/* Side menu (drag handle + plus button): override fixed pixel heights
+   to match our smaller prose-sized headings. Heights = font-size * 1.75
+   line-height + 6px block-content padding.
+   BlockNote defaults: h1 78px, h2 54px, h3 37px, normal 30px. */
+.bn-container .bn-side-menu[data-block-type="heading"][data-level="1"] {
+  height: 69px;
+}
+.bn-container .bn-side-menu[data-block-type="heading"][data-level="2"] {
+  height: 44px;
+}
+.bn-container .bn-side-menu[data-block-type="heading"][data-level="3"] {
+  height: 41px;
+}
+
+/* Nested list blocks should have tighter spacing */
+.bn-editor .bn-block-group .bn-block-group .bn-block-outer {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}

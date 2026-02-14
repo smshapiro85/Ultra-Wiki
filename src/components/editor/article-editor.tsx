@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/shadcn";
 import "@blocknote/core/fonts/inter.css";
@@ -43,6 +44,7 @@ export function ArticleEditor({
   articleUpdatedAt,
   onSaveSuccess,
 }: ArticleEditorProps) {
+  const router = useRouter();
   const [isReady, setIsReady] = useState(false);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
@@ -179,6 +181,7 @@ export function ArticleEditor({
     localStorage.removeItem(draftKey);
     toast.success("Article saved");
     onSaveSuccess?.();
+    router.push(`/wiki/${articleSlug}`);
   }
 
   return (
