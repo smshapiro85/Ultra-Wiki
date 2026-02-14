@@ -81,6 +81,7 @@ export const users = pgTable("users", {
     .notNull(),
   notifyOnMention: boolean("notify_on_mention").default(true).notNull(),
   notifyOnActivity: boolean("notify_on_activity").default(true).notNull(),
+  themePreference: text("theme_preference").default("system").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
