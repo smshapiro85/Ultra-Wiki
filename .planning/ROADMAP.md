@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Article Editing & Version History** - WYSIWYG editor, image handling, version tracking with diff and rollback
 - [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [x] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
-- [ ] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
+- [x] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
 
 ## Phase Details
 
@@ -174,10 +174,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 08-01-PLAN.md -- Category strategy: analyze existing data, define deterministic category rules, update analysis prompt with explicit category creation/reuse strategy
-- [ ] 08-02-PLAN.md -- Article content formatting: no title duplication rule, heading hierarchy (H1 sections), CSS size reduction for prose H1/H2, structural heading rules in style prompt
-- [ ] 08-03-PLAN.md -- Show default prompt text in admin settings AI Prompts textareas (not blank when unconfigured)
-- [ ] 08-04-PLAN.md -- Sync page: live log panel via SSE during manual sync, file tree expand/collapse all + default collapsed + search filter
+- [x] 08-01-PLAN.md -- Category strategy: analyze existing data, define deterministic category rules, update analysis prompt with explicit category creation/reuse strategy
+- [x] 08-02-PLAN.md -- Article content formatting: no title duplication rule, heading hierarchy (H1 sections), CSS size reduction for prose H1/H2, structural heading rules in style prompt
+- [x] 08-03-PLAN.md -- Show default prompt text in admin settings AI Prompts textareas (not blank when unconfigured)
+- [x] 08-04-PLAN.md -- Sync page: live log panel via SSE during manual sync, file tree expand/collapse all + default collapsed + search filter
 
 ## Progress
 
@@ -193,4 +193,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 5. Article Editing & Version History | 8/8 | ✓ Complete | 2026-02-14 |
 | 6. Technical View, Comments & Mentions | 3/3 | ✓ Complete | 2026-02-14 |
 | 7. Ask AI & Notifications | 3/3 | ✓ Complete | 2026-02-14 |
-| 8. AI Prompt Refinement & Category Strategy | 0/4 | Not started | - |
+| 8. AI Prompt Refinement & Category Strategy | 4/4 | ✓ Complete | 2026-02-14 |
