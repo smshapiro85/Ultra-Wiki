@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 8 (AI Prompt Refinement). Plans 1, 2, 4 of 4 complete. Plan 3 remaining.
+**Current focus:** Phase 8 (AI Prompt Refinement). All 4 plans complete. Project complete.
 
 ## Current Position
 
 Phase: 8 of 8 (AI Prompt Refinement)
-Plan: 4 of 4 in current phase (3 complete, plan 3 still pending)
-Status: Executing Phase 8 plans. 08-01 (prompt hardening), 08-02 (heading sizes), 08-04 (sync page improvements) complete. 08-03 pending.
-Last activity: 2026-02-14 -- Completed 08-04-PLAN.md (Sync Page Improvements)
+Plan: 4 of 4 in current phase (4 complete)
+Status: All phases complete. All 32 plans executed across 8 phases.
+Last activity: 2026-02-14 -- Completed 08-03-PLAN.md (Default Prompts in Settings UI)
 
-Progress: [████████████████████] 100% (phases 1-7) + Phase 8: 3/4 plans complete
+Progress: [████████████████████] 100% (all 8 phases, 32 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
+- Total plans completed: 32
 - Average duration: 3min
 - Total execution time: 1.6 hours
 
@@ -34,10 +34,10 @@ Progress: [████████████████████] 100% (p
 | 05 | 8 | 23min | 3min |
 | 06 | 3 | 11min | 4min |
 | 07 | 3 | 12min | 4min |
-| 08 | 2 | 4min | 2min |
+| 08 | 4 | 5min | 1min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 4min, 6min, 2min, 1min
+- Last 5 plans: 4min, 6min, 2min, 1min, 1min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -165,6 +165,8 @@ Recent decisions affecting current work:
 - [08-04]: SSE endpoint at /api/sync/stream parallel to existing server action -- SyncTrigger uses EventSource, cron/API callers unaffected
 - [08-04]: expandKey + key prop re-mount pattern for expand/collapse all tree controls (simpler than imperative state management)
 - [08-04]: originalNodeMap via useMemo for correct all-children folder selection during filtered search
+- [08-03]: Default prompt constants exported from prompts.ts -- reused in both AI pipeline (fallback) and admin settings UI (textarea pre-fill)
+- [08-03]: || (not ??) for default prompt fallback -- empty string saved in DB also triggers showing the default
 
 ### Pending Todos
 
@@ -179,5 +181,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 08-04-PLAN.md (Sync Page Improvements). Plans 08-01, 08-02, 08-04 complete. 08-03 remaining.
-Resume file: .planning/phases/08-ai-prompt-refinement/08-04-SUMMARY.md
+Stopped at: Completed 08-03-PLAN.md (Default Prompts in Settings UI). All 8 phases complete. All 32 plans executed.
+Resume file: .planning/phases/08-ai-prompt-refinement/08-03-SUMMARY.md
