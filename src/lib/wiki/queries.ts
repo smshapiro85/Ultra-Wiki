@@ -5,6 +5,9 @@ import {
   articleVersions,
   userBookmarks,
   aiReviewAnnotations,
+  articleFileLinks,
+  articleDbTables,
+  githubFiles,
   users,
 } from "@/lib/db/schema";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
@@ -472,4 +475,72 @@ export async function getArticleVersions(
     .orderBy(desc(articleVersions.createdAt));
 
   return rows;
+}
+
+// =============================================================================
+// getArticleFileLinks
+// =============================================================================
+
+export interface ArticleFileLink {
+  filePath: string;
+  relevanceExplanation: string | null;
+  githubFileId: string;
+}
+
+/**
+ * Get all file links for an article, joined with github_files
+ * to get the file path. Returns file path, relevance explanation,
+ * and github file ID.
+ */
+export async function getArticleFileLinks(
+  articleId: string
+): Promise<ArticleFileLink[]> {
+  const db = getDb();
+
+  const rows = await db
+    .select({
+      filePath: githubFiles.filePath,
+      relevanceExplanation: articleFileLinks.relevanceExplanation,
+      githubFileId: articleFileLinks.githubFileId,
+    })
+    .from(articleFileLinks)
+    .innerJoin(githubFiles, eq(articleFileLinks.githubFileId, githubFiles.id))
+    .where(eq(articleFileLinks.articleId, articleId));
+
+  return rows;
+}
+
+// =============================================================================
+// getArticleDbTables
+// =============================================================================
+
+export interface ArticleDbTable {
+  tableName: string;
+  columns: Array<{ name: string; description: string }> | null;
+  relevanceExplanation: string | null;
+}
+
+/**
+ * Get all DB table mappings for an article with table name,
+ * columns (jsonb), and relevance explanation.
+ */
+export async function getArticleDbTables(
+  articleId: string
+): Promise<ArticleDbTable[]> {
+  const db = getDb();
+
+  const rows = await db
+    .select({
+      tableName: articleDbTables.tableName,
+      columns: articleDbTables.columns,
+      relevanceExplanation: articleDbTables.relevanceExplanation,
+    })
+    .from(articleDbTables)
+    .where(eq(articleDbTables.articleId, articleId));
+
+  return rows.map((row) => ({
+    tableName: row.tableName,
+    columns: row.columns as ArticleDbTable["columns"],
+    relevanceExplanation: row.relevanceExplanation,
+  }));
 }
