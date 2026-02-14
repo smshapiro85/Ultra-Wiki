@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@plugin "@tailwindcss/typography";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -125,4 +127,26 @@
     @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
+}
+
+/* Shiki dual theme support */
+.shiki,
+.shiki span {
+  color: var(--shiki-light) !important;
+  background-color: var(--shiki-light-bg) !important;
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+/* Code block styling */
+article pre {
+  @apply overflow-x-auto rounded-lg border border-border p-4 text-sm;
+}
+article pre code {
+  @apply bg-transparent;
+}
+article :not(pre) > code {
+  @apply rounded bg-muted px-1.5 py-0.5 text-sm;
 }
