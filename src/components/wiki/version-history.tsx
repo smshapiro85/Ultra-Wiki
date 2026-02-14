@@ -2,17 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-  Sparkles,
-  Bot,
-  User,
-  GitMerge,
-  FileEdit,
+  Eye,
   RotateCcw,
   ArrowLeftRight,
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -23,7 +18,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { DiffViewer } from "@/components/wiki/diff-viewer";
+import { ChangeSourceBadge } from "@/components/wiki/change-source-badge";
+import { VersionPreview } from "@/components/wiki/version-preview";
 
 // =============================================================================
 // Types
@@ -57,63 +55,6 @@ const SOURCE_FILTERS = [
 ] as const;
 
 // =============================================================================
-// ChangeSourceBadge
-// =============================================================================
-
-function ChangeSourceBadge({
-  changeSource,
-}: {
-  changeSource: string;
-}) {
-  switch (changeSource) {
-    case "ai_generated":
-      return (
-        <Badge variant="secondary" className="gap-1 text-xs">
-          <Sparkles className="size-3" />
-          AI Generated
-        </Badge>
-      );
-    case "ai_updated":
-      return (
-        <Badge variant="secondary" className="gap-1 text-xs">
-          <Bot className="size-3" />
-          AI Updated
-        </Badge>
-      );
-    case "human_edited":
-      return (
-        <Badge variant="outline" className="gap-1 text-xs">
-          <User className="size-3" />
-          Human Edited
-        </Badge>
-      );
-    case "ai_merged":
-      return (
-        <Badge variant="outline" className="gap-1 text-xs">
-          <GitMerge className="size-3" />
-          AI Merged
-        </Badge>
-      );
-    case "draft":
-      return (
-        <Badge
-          variant="outline"
-          className="gap-1 text-xs border-dashed text-muted-foreground"
-        >
-          <FileEdit className="size-3" />
-          Draft
-        </Badge>
-      );
-    default:
-      return (
-        <Badge variant="secondary" className="gap-1 text-xs">
-          {changeSource}
-        </Badge>
-      );
-  }
-}
-
-// =============================================================================
 // Date Formatter
 // =============================================================================
 
@@ -137,6 +78,7 @@ export function VersionHistory({ articleId, articleSlug }: VersionHistoryProps) 
   const [showDiff, setShowDiff] = useState(false);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [previewVersion, setPreviewVersion] = useState<Version | null>(null);
 
   const fetchVersions = useCallback(async () => {
     setLoading(true);
@@ -336,7 +278,18 @@ export function VersionHistory({ articleId, articleSlug }: VersionHistoryProps) 
                       </p>
                     )}
                   </div>
-                  <div className="shrink-0 mt-1">
+                  <div className="flex items-center gap-2 shrink-0 mt-1">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewVersion(version);
+                      }}
+                      className="shrink-0 p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                      title="Preview this version"
+                    >
+                      <Eye className="size-4" />
+                    </button>
                     <div
                       className={`size-5 rounded-full border-2 transition-colors ${
                         isSelected
@@ -410,6 +363,15 @@ export function VersionHistory({ articleId, articleSlug }: VersionHistoryProps) 
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Version preview slide-out */}
+      <VersionPreview
+        open={previewVersion !== null}
+        onOpenChange={(open) => {
+          if (!open) setPreviewVersion(null);
+        }}
+        version={previewVersion}
+      />
     </div>
   );
 }
