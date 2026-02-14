@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 04-wiki-viewer
 source: 04-01-SUMMARY.md, 04-02-SUMMARY.md, 04-03-SUMMARY.md
 started: 2026-02-14T02:00:00Z
@@ -75,9 +75,16 @@ skipped: 0
   reason: "User reported: i see it but the 2nd breadcrumb is not clickable it doesnt go anywhere, it doesn't seem like there is a page for the category"
   severity: minor
   test: 2
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "getCategoryChain() in src/lib/wiki/queries.ts line 203 hardcodes href='#' for categories. No category page route exists at /wiki/category/[slug]. This was an intentional decision during 04-01 but results in dead breadcrumb links."
+  artifacts:
+    - path: "src/lib/wiki/queries.ts"
+      issue: "getCategoryChain() sets href='#' on line 203"
+    - path: "src/components/wiki/article-breadcrumb.tsx"
+      issue: "Renders BreadcrumbLink with href='#' from segments"
+  missing:
+    - "Create category page route at src/app/(wiki)/wiki/category/[categorySlug]/page.tsx"
+    - "Add getCategoryBySlug() query function to src/lib/wiki/queries.ts"
+    - "Update getCategoryChain() to use /wiki/category/{slug} instead of #"
   debug_session: ""
 
 - truth: "User can bookmark an article via a visible toggle on the article page"
@@ -85,7 +92,14 @@ skipped: 0
   reason: "User reported: i dont see where the bookmark is shown"
   severity: major
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "toggleBookmark server action and isArticleBookmarked query exist and are functional, but no BookmarkButton UI component was ever created. The backend is 100% complete — only the client component and its integration into the article page are missing."
+  artifacts:
+    - path: "src/lib/wiki/actions.ts"
+      issue: "toggleBookmark action exists but is never imported by any UI component"
+    - path: "src/app/(wiki)/wiki/[articleSlug]/page.tsx"
+      issue: "No bookmark button rendered, no isArticleBookmarked() call"
+  missing:
+    - "Create BookmarkButton client component at src/components/wiki/bookmark-button.tsx (follow RegenerateButton pattern)"
+    - "Add isArticleBookmarked() call in article page to get initial state"
+    - "Render BookmarkButton in article page header area"
   debug_session: ""

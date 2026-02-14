@@ -14,10 +14,8 @@ import {
 } from "@/lib/wiki/queries";
 import { ArticleBreadcrumb } from "@/components/wiki/article-breadcrumb";
 import { ArticleContent } from "@/components/wiki/article-content";
-import {
-  extractToc,
-  TableOfContents,
-} from "@/components/wiki/table-of-contents";
+import { extractToc } from "@/components/wiki/table-of-contents";
+import { TocSetter } from "@/components/wiki/toc-setter";
 import { ArticleTabs } from "@/components/wiki/article-tabs";
 import { ArticleMetadata } from "@/components/wiki/article-metadata";
 import { RegenerateButton } from "@/components/wiki/regenerate-button";
@@ -60,14 +58,16 @@ export default async function ArticlePage({
 
   // Fetch editor name if there was a human editor
   let editorName: string | null = null;
+  let editorImage: string | null = null;
   if (article.lastHumanEditorId) {
     const db = getDb();
     const [editor] = await db
-      .select({ name: users.name })
+      .select({ name: users.name, image: users.image, avatarUrl: users.avatarUrl })
       .from(users)
       .where(eq(users.id, article.lastHumanEditorId))
       .limit(1);
     editorName = editor?.name ?? null;
+    editorImage = editor?.avatarUrl ?? editor?.image ?? null;
   }
 
   // Extract TOC from markdown headings
@@ -86,99 +86,89 @@ export default async function ArticlePage({
 
   return (
     <div>
-      {/* Breadcrumb */}
-      <ArticleBreadcrumb
-        segments={segments}
-        currentTitle={article.title}
-      />
-
-      <div className="mt-4 flex gap-8">
-        {/* Main content area */}
-        <div className="min-w-0 flex-1">
-          <h1 className="text-3xl font-bold mb-4">{article.title}</h1>
-
-          {/* Review banner for merge conflicts */}
-          {article.needsReview && (
-            <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              This article has unresolved merge conflicts and needs admin
-              review.
-            </div>
+      {/* Breadcrumb + action buttons */}
+      <div className="flex items-center justify-between">
+        <ArticleBreadcrumb
+          segments={segments}
+          currentTitle={article.title}
+        />
+        <div className="flex items-center gap-2">
+          <BookmarkButton articleId={article.id} initialBookmarked={bookmarked} />
+          {session?.user && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/wiki/${article.slug}/edit`}>
+                <Pencil className="size-4" />
+                Edit
+              </Link>
+            </Button>
           )}
-
-          {/* AI Review annotation banner */}
-          {annotationCount > 0 && (
-            <AnnotationBanner
-              articleId={article.id}
-              initialCount={annotationCount}
-            />
+          {session?.user?.role === "admin" && (
+            <RegenerateButton articleId={article.id} />
           )}
+        </div>
+      </div>
 
-          {/* Bookmark + Edit + Admin regenerate buttons */}
-          <div className="mb-4 flex items-center gap-2">
-            <BookmarkButton articleId={article.id} initialBookmarked={bookmarked} />
-            {session?.user && (
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/wiki/${article.slug}/edit`}>
-                  <Pencil className="size-4" />
-                  Edit
-                </Link>
-              </Button>
-            )}
-            {session?.user?.role === "admin" && (
-              <RegenerateButton articleId={article.id} />
-            )}
-          </div>
+      <div className="mt-4 max-w-[1150px] mx-auto">
+        <h1 className="text-3xl font-bold mb-2">{article.title}</h1>
 
-          <ArticleTabs
-            articleContent={
-              <ArticleContent markdown={article.contentMarkdown} />
-            }
-            technicalView={
-              <TechnicalView
-                articleId={article.id}
-                articleSlug={article.slug}
-                technicalViewMarkdown={article.technicalViewMarkdown}
-              />
-            }
-            commentsContent={
-              session?.user?.id ? (
-                <CommentsSection
-                  articleId={article.id}
-                  currentUserId={session.user.id}
-                />
-              ) : (
-                <p className="py-8 text-center text-muted-foreground">
-                  Sign in to view and post comments.
-                </p>
-              )
-            }
-            historyContent={
-              <VersionHistory
-                articleId={article.id}
-                articleSlug={article.slug}
-              />
-            }
+        {/* Metadata bar */}
+        <div className="mt-4 mb-4">
+          <ArticleMetadata
+            updatedAt={article.updatedAt}
+            lastAiGeneratedAt={article.lastAiGeneratedAt}
+            lastHumanEditedAt={article.lastHumanEditedAt}
+            lastEditorName={editorName}
+            lastEditorImage={editorImage}
+            hasHumanEdits={article.hasHumanEdits}
+            categoryName={category?.name ?? "Uncategorized"}
+            categorySlug={category?.slug ?? ""}
           />
         </div>
 
-        {/* Right sidebar: TOC + Metadata */}
-        <aside className="hidden w-64 shrink-0 lg:block">
-          {tocEntries.length > 0 && (
-            <TableOfContents entries={tocEntries} />
-          )}
-          <div className={tocEntries.length > 0 ? "mt-6" : ""}>
-            <ArticleMetadata
-              updatedAt={article.updatedAt}
-              lastAiGeneratedAt={article.lastAiGeneratedAt}
-              lastHumanEditedAt={article.lastHumanEditedAt}
-              lastEditorName={editorName}
-              hasHumanEdits={article.hasHumanEdits}
-              needsReview={article.needsReview}
-              categoryName={category?.name ?? "Uncategorized"}
-              categorySlug={category?.slug ?? ""}
-            />
+        {/* Review banner for merge conflicts */}
+        {article.needsReview && (
+          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+            This article has unresolved merge conflicts and needs admin
+            review.
           </div>
-        </aside>
+        )}
+
+        {/* AI Review annotation banner */}
+        {annotationCount > 0 && (
+          <AnnotationBanner
+            articleId={article.id}
+            initialCount={annotationCount}
+          />
+        )}
+
+      <TocSetter entries={tocEntries} />
+
+      <ArticleTabs
+        articleContent={
+          <ArticleContent markdown={article.contentMarkdown} />
+        }
+        technicalView={
+          <TechnicalView articleId={article.id} />
+        }
+        commentsContent={
+          session?.user?.id ? (
+            <CommentsSection
+              articleId={article.id}
+              currentUserId={session.user.id}
+            />
+          ) : (
+            <p className="py-8 text-center text-muted-foreground">
+              Sign in to view and post comments.
+            </p>
+          )
+        }
+        historyContent={
+          <VersionHistory
+            articleId={article.id}
+            articleSlug={article.slug}
+          />
+        }
+      />
       </div>
     </div>
   );

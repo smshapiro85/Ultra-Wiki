@@ -11,11 +11,7 @@ interface ArticleTabsProps {
 }
 
 /**
- * Tab system for article page with four tabs:
- * - Article (default, active)
- * - Technical View (active, renders technicalView prop)
- * - Comments (active, renders commentsContent prop)
- * - History (active, renders historyContent prop)
+ * Tab system for article page with four tabs.
  */
 export function ArticleTabs({
   articleContent,
@@ -45,11 +41,8 @@ export function ArticleTabs({
       </TabsList>
 
       <TabsContent value="article">{articleContent}</TabsContent>
-
       <TabsContent value="technical">{technicalView}</TabsContent>
-
       <TabsContent value="comments">{commentsContent}</TabsContent>
-
       <TabsContent value="history">{historyContent}</TabsContent>
     </Tabs>
   );

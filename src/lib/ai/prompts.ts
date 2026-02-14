@@ -32,7 +32,6 @@ const DEFAULT_ANALYSIS_PROMPT = `You are updating internal wiki documentation fo
 3. For each affected article, provide:
    - The article slug (existing or new)
    - Updated content in Markdown
-   - Updated technical view listing related files and DB tables
    - A brief change summary
 
 ### Guidelines
@@ -146,10 +145,5 @@ export function buildGenerationPrompt(
 ## Article Writing Style
 ${style}
 
-Generate the full article content in Markdown following the style guidelines above.
-Also generate a Technical View section in Markdown that lists the related source files and database tables.
-
-Respond with two sections:
-1. The main article content (business-focused, no code)
-2. The technical view content (file paths, DB tables, endpoints)`;
+Generate the full article content in Markdown following the style guidelines above.`;
 }

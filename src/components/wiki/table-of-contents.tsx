@@ -21,7 +21,7 @@ export function slugify(text: string): string {
  */
 export function extractToc(markdown: string): TocEntry[] {
   const entries: TocEntry[] = [];
-  const regex = /^(#{1,6})\s+(.+)$/gm;
+  const regex = /^(#{1,3})\s+(.+)$/gm;
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(markdown)) !== null) {

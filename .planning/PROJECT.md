@@ -66,8 +66,10 @@ AI-generated wiki articles stay automatically in sync with the codebase while ne
 | OpenRouter as AI gateway | Model-agnostic, single API key, configurable model | — Pending |
 | Local filesystem for images | Simple, no external service, Docker volume mount | — Pending |
 | site_settings key-value table for config | Flexible, admin-editable, secrets masked in UI | — Pending |
-| Four admin-editable AI prompts | Analysis, article style, global Ask AI, page-level Ask AI — all customizable | — Pending |
+| Five admin-editable AI prompts | Analysis, article style, file summary, global Ask AI, page-level Ask AI — all customizable | — Pending |
+| Dual AI models (primary + summary) | Primary model for article generation/merge. Separate "summary model" (efficient/fast) for short outputs like file summaries. Both configurable via OpenRouter settings. | Decided |
 | Category-aware article generation | AI receives full category tree + article index as context. Must prefer existing categories over creating new ones — wiki organization coherence is critical. | Decided |
+| AI review annotations after merge | After deterministic merge, LLM reviews for semantic issues (contradictions, stale human content). Never modifies content — stores annotations in separate `ai_review_annotations` table referencing section headings. Rendered as collapsible banner + section highlights. | Decided |
 
 ---
 *Last updated: 2026-02-13 after initialization*

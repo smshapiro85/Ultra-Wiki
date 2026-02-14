@@ -202,7 +202,6 @@ async function processCreateArticle(
     slug: string;
     title: string;
     content_markdown: string;
-    technical_view_markdown: string;
     change_summary: string;
     related_files: string[];
     related_db_tables: Array<{
@@ -225,7 +224,6 @@ async function processCreateArticle(
 
   // b. Generate full content if needed
   let contentMarkdown = articlePlan.content_markdown;
-  let technicalViewMarkdown = articlePlan.technical_view_markdown;
 
   if (contentMarkdown.length < 100) {
     const generated = await generateArticle(
@@ -233,7 +231,6 @@ async function processCreateArticle(
       stylePrompt
     );
     contentMarkdown = generated.contentMarkdown;
-    technicalViewMarkdown = generated.technicalViewMarkdown;
   }
 
   // Normalize markdown so diffs against future human edits are clean
@@ -255,7 +252,6 @@ async function processCreateArticle(
       slug,
       contentMarkdown,
       contentJson,
-      technicalViewMarkdown,
       categoryId,
       lastAiGeneratedAt: new Date(),
       hasHumanEdits: false,
@@ -270,7 +266,6 @@ async function processCreateArticle(
     articleId,
     contentMarkdown,
     contentJson,
-    technicalViewMarkdown,
     changeSource: "ai_generated",
     changeSummary: articlePlan.change_summary,
   });
@@ -299,7 +294,6 @@ async function processUpdateArticle(
     slug: string;
     title: string;
     content_markdown: string;
-    technical_view_markdown: string;
     change_summary: string;
     related_files: string[];
     related_db_tables: Array<{
@@ -337,7 +331,6 @@ async function processUpdateArticle(
 
   const articleId = existing.id;
   let contentMarkdown = articlePlan.content_markdown;
-  let technicalViewMarkdown = articlePlan.technical_view_markdown;
 
   // Generate full content if the analysis only provided a stub
   if (contentMarkdown.length < 100) {
@@ -346,7 +339,6 @@ async function processUpdateArticle(
       stylePrompt
     );
     contentMarkdown = generated.contentMarkdown;
-    technicalViewMarkdown = generated.technicalViewMarkdown;
   }
 
   // Normalize markdown so diffs against human edits are clean
@@ -360,7 +352,6 @@ async function processUpdateArticle(
       .set({
         contentMarkdown,
         contentJson: null,
-        technicalViewMarkdown,
         lastAiGeneratedAt: new Date(),
         updatedAt: new Date(),
       })
@@ -370,7 +361,6 @@ async function processUpdateArticle(
       articleId,
       contentMarkdown,
       contentJson: null,
-      technicalViewMarkdown,
       changeSource: "ai_updated",
       changeSummary: articlePlan.change_summary,
     });
@@ -406,7 +396,6 @@ async function processUpdateArticle(
       .set({
         contentMarkdown: resolution.finalMarkdown,
         contentJson: null,
-        technicalViewMarkdown,
         lastAiGeneratedAt: new Date(),
         needsReview: resolution.needsReview,
         updatedAt: new Date(),
@@ -420,7 +409,6 @@ async function processUpdateArticle(
         articleId,
         contentMarkdown: resolution.finalMarkdown,
         contentJson: null,
-        technicalViewMarkdown,
         changeSource: resolution.changeSource,
         changeSummary: articlePlan.change_summary,
       });

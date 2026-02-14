@@ -21,8 +21,6 @@ import { normalizeMarkdown } from "@/lib/content/normalize-markdown";
  * - contentMarkdown: Lossy markdown conversion of the blocks
  * - changeSummary: Optional description of changes
  * - loadedUpdatedAt: ISO timestamp of article.updatedAt when editor loaded
- * - mode: "article" (default) or "technical" -- when "technical", saves to
- *   technicalViewMarkdown instead of contentMarkdown
  *
  * Returns:
  * - 200 { success: true } on success
@@ -47,7 +45,6 @@ export async function POST(
     contentMarkdown: string;
     changeSummary: string | null;
     loadedUpdatedAt: string;
-    mode?: "article" | "technical";
   };
 
   try {
@@ -56,7 +53,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  if (!body.loadedUpdatedAt) {
+  if (!body.loadedUpdatedAt || !body.contentMarkdown) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 }
@@ -64,21 +61,17 @@ export async function POST(
   }
 
   const db = getDb();
-  const saveMode = body.mode || "article";
 
   // Normalize markdown so format matches what the AI pipeline stores.
   // Both sources go through the same remark pipeline, ensuring diffs
   // only show real content changes.
-  const normalizedMarkdown = body.contentMarkdown
-    ? normalizeMarkdown(body.contentMarkdown)
-    : "";
+  const normalizedMarkdown = normalizeMarkdown(body.contentMarkdown);
 
   // Fetch current article for optimistic lock check
   const [article] = await db
     .select({
       id: articles.id,
       contentMarkdown: articles.contentMarkdown,
-      technicalViewMarkdown: articles.technicalViewMarkdown,
       updatedAt: articles.updatedAt,
     })
     .from(articles)
@@ -99,45 +92,6 @@ export async function POST(
   }
 
   const now = new Date();
-
-  // =========================================================================
-  // Technical view mode: save to technicalViewMarkdown only
-  // =========================================================================
-  if (saveMode === "technical") {
-    const techChanged =
-      normalizedMarkdown !== (article.technicalViewMarkdown ?? "");
-
-    await db
-      .update(articles)
-      .set({
-        technicalViewMarkdown: normalizedMarkdown || null,
-        updatedAt: now,
-      })
-      .where(eq(articles.id, id));
-
-    if (techChanged) {
-      await createArticleVersion({
-        articleId: id,
-        contentMarkdown: article.contentMarkdown,
-        technicalViewMarkdown: normalizedMarkdown || undefined,
-        changeSource: "human_edited",
-        changeSummary: body.changeSummary || "Technical view edited",
-        createdBy: session.user.id,
-      });
-    }
-
-    return NextResponse.json({ success: true });
-  }
-
-  // =========================================================================
-  // Article mode (default): existing behavior
-  // =========================================================================
-  if (!body.contentMarkdown) {
-    return NextResponse.json(
-      { error: "Missing required fields" },
-      { status: 400 }
-    );
-  }
 
   // No-op detection: skip version creation if content hasn't changed.
   // This prevents false "human_edited" versions when the user opens the

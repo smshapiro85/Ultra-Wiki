@@ -1,41 +1,28 @@
-import Link from "next/link";
-import { Pencil, FileCode, Database } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { FileCode, Database } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { auth } from "@/lib/auth";
 import {
   getArticleFileLinks,
   getArticleDbTables,
 } from "@/lib/wiki/queries";
 import { getRepoConfig } from "@/lib/github/client";
-import { ArticleContent } from "./article-content";
 import { FileLinkCard } from "./file-link-card";
 import { DbTableCard } from "./db-table-card";
 
 interface TechnicalViewProps {
   articleId: string;
-  articleSlug: string;
-  technicalViewMarkdown: string | null;
 }
 
 /**
  * Server component rendering the Technical View tab content.
  *
  * Displays:
- * - AI-generated technical view markdown (if exists)
- * - Edit button for authenticated users
- * - Related source files section with file link cards
- * - Related database tables section with DB table cards
+ * - Related source files with relevance explanations and GitHub deep links
+ * - Related database tables with column details
  */
-export async function TechnicalView({
-  articleId,
-  articleSlug,
-  technicalViewMarkdown,
-}: TechnicalViewProps) {
-  const [fileLinks, dbTables, session] = await Promise.all([
+export async function TechnicalView({ articleId }: TechnicalViewProps) {
+  const [fileLinks, dbTables] = await Promise.all([
     getArticleFileLinks(articleId),
     getArticleDbTables(articleId),
-    auth(),
   ]);
 
   // Build GitHub deep links
@@ -53,24 +40,7 @@ export async function TechnicalView({
   }
 
   return (
-    <div className="space-y-8">
-      {/* Technical view markdown content */}
-      {technicalViewMarkdown && (
-        <ArticleContent markdown={technicalViewMarkdown} />
-      )}
-
-      {/* Edit button */}
-      {session?.user && (
-        <div>
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/wiki/${articleSlug}/edit?mode=technical`}>
-              <Pencil className="size-4" />
-              Edit Technical View
-            </Link>
-          </Button>
-        </div>
-      )}
-
+    <div className="mt-6 space-y-8">
       {/* Source Files section */}
       <section>
         <h3 className="flex items-center gap-2 text-lg font-semibold mb-3">

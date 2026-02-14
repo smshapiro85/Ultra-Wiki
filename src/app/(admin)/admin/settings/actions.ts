@@ -85,6 +85,7 @@ export async function saveApiKeys(
     { key: SETTING_KEYS.github_api_key, field: "github_api_key" },
     { key: SETTING_KEYS.openrouter_api_key, field: "openrouter_api_key" },
     { key: SETTING_KEYS.openrouter_model, field: "openrouter_model" },
+    { key: SETTING_KEYS.openrouter_reasoning_effort, field: "openrouter_reasoning_effort" },
     { key: SETTING_KEYS.sendgrid_api_key, field: "sendgrid_api_key" },
     { key: SETTING_KEYS.sendgrid_from_email, field: "sendgrid_from_email" },
     { key: SETTING_KEYS.slack_bot_token, field: "slack_bot_token" },

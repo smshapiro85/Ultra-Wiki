@@ -8,13 +8,15 @@ export const articlePlanSchema = z.object({
   title: z.string().describe("Human-readable article title"),
   action: z.enum(["create", "update"]).describe("Whether to create a new article or update an existing one"),
   content_markdown: z.string().describe("Full article body in Markdown (no code blocks, business-focused)"),
-  technical_view_markdown: z.string().describe("Technical view content: related files, DB tables, endpoints"),
   change_summary: z.string().describe("Brief description of what changed and why"),
   related_files: z.array(z.string()).describe("Source file paths related to this article"),
   related_db_tables: z.array(
     z.object({
       table_name: z.string(),
-      columns: z.record(z.string(), z.string()).nullable().describe("Key columns and their descriptions, or null"),
+      columns: z.nullable(z.array(z.object({
+        name: z.string().describe("Column name"),
+        description: z.string().describe("Column description"),
+      }))).describe("Key columns and their descriptions, or null"),
       relevance: z.string().describe("Why this table is relevant to the article"),
     })
   ).describe("Database tables related to this article"),
@@ -40,3 +42,11 @@ export type AnalysisResponse = z.infer<typeof analysisResponseSchema>;
  * Inferred TypeScript type for a single article plan.
  */
 export type ArticlePlan = z.infer<typeof articlePlanSchema>;
+
+/**
+ * Schema for the article generation response (second LLM call).
+ * Used when the analysis step only provided a stub and full content is needed.
+ */
+export const generationResponseSchema = z.object({
+  content_markdown: z.string().describe("Full article body in Markdown (no code blocks, business-focused)"),
+});

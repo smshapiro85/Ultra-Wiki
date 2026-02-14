@@ -8,6 +8,7 @@ export const SETTING_KEYS = {
   github_api_key: "github_api_key",
   openrouter_api_key: "openrouter_api_key",
   openrouter_model: "openrouter_model",
+  openrouter_reasoning_effort: "openrouter_reasoning_effort",
   sync_cron_schedule: "sync_cron_schedule",
   sendgrid_api_key: "sendgrid_api_key",
   sendgrid_from_email: "sendgrid_from_email",

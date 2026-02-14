@@ -33,8 +33,8 @@ export function FileLinkCard({
   return (
     <>
       <Card className="py-4">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-mono">
+        <CardHeader className="overflow-hidden">
+          <CardTitle className="flex items-center gap-2 text-sm font-mono min-w-0">
             <FileCode className="size-4 shrink-0 text-muted-foreground" />
             <span className="truncate">{filePath}</span>
           </CardTitle>

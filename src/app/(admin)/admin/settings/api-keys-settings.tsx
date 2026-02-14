@@ -171,6 +171,25 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
               placeholder="anthropic/claude-sonnet-4-20250514"
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="openrouter_reasoning_effort">Reasoning Effort</Label>
+            <select
+              id="openrouter_reasoning_effort"
+              name="openrouter_reasoning_effort"
+              defaultValue={settings.openrouter_reasoning_effort?.value ?? "none"}
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="none">None (disabled)</option>
+              <option value="minimal">Minimal (~10% of tokens)</option>
+              <option value="low">Low (~20% of tokens)</option>
+              <option value="medium">Medium (~50% of tokens)</option>
+              <option value="high">High (~80% of tokens)</option>
+              <option value="xhigh">Extra High (~95% of tokens)</option>
+            </select>
+            <p className="text-xs text-muted-foreground">
+              Controls thinking depth for reasoning-capable models (GPT-5, o3, Claude 3.7+). No effect on other models.
+            </p>
+          </div>
         </CardContent>
       </Card>
 

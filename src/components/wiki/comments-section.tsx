@@ -115,7 +115,7 @@ export function CommentsSection({
   }
 
   return (
-    <div className="space-y-6 py-4">
+    <div className="mt-6 space-y-6">
       {/* Section header */}
       <div className="flex items-center gap-2">
         <MessageSquare className="size-5" />

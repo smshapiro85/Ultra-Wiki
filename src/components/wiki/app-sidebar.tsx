@@ -12,6 +12,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { CategoryTree } from "@/components/wiki/category-tree";
+import { SidebarToc } from "@/components/wiki/sidebar-toc";
 import { UserMenu } from "@/components/common/user-menu";
 import type { CategoryWithArticles } from "@/lib/wiki/queries";
 
@@ -48,6 +49,8 @@ export function AppSidebar({ categories, user }: AppSidebarProps) {
             <CategoryTree categories={categories} />
           </SidebarGroupContent>
         </SidebarGroup>
+
+        <SidebarToc />
       </SidebarContent>
 
       <SidebarFooter>

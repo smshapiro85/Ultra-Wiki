@@ -14,6 +14,12 @@ const requiredSettings = [
     isSecret: false,
   },
   {
+    key: "openrouter_reasoning_effort",
+    description: "Reasoning effort level for thinking-capable models",
+    value: "none",
+    isSecret: false,
+  },
+  {
     key: "sync_cron_schedule",
     description: "Cron expression for scheduled sync",
     value: "0 9 * * 6",

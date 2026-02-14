@@ -311,6 +311,7 @@ export async function analyzeChanges(
 
     const { experimental_output } = await generateText({
       model,
+      temperature: 0.2,
       output: Output.object({ schema: analysisResponseSchema }),
       messages: [
         {
