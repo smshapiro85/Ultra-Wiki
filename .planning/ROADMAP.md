@@ -154,12 +154,12 @@ Plans:
   3. AI conversations are persisted per user (global and per-article); user can continue, start new, or delete conversations
   4. User receives Slack DM and/or email notifications for @mentions, new comments on articles they have interacted with, AI sync updates to articles they edited, and AI conflict flags -- based on their configured preferences
   5. Admin can configure Slack bot token and SendGrid API key with test buttons that send a test notification
-**Plans**: TBD
+**Plans:** 3 plans
 
 Plans:
-- [ ] 07-01: Global Ask AI chat panel with streaming and conversation persistence
-- [ ] 07-02: Page-level Ask AI with article context assembly
-- [ ] 07-03: Notification service (Slack DM, SendGrid email) with preference-based routing
+- [ ] 07-01-PLAN.md -- Global Ask AI chat panel with streaming markdown, shared chat components, conversation CRUD, header trigger
+- [ ] 07-02-PLAN.md -- Page-level Ask AI with article context assembly and context indicator
+- [ ] 07-03-PLAN.md -- Notification service (Slack DM, SendGrid email) with test buttons and all four trigger points wired
 
 ### Phase 8: AI Prompt Refinement & Category Strategy
 **Goal**: The AI pipeline produces consistent, predictable category structures and well-formatted article content across every run — no drift in how categories are created or how articles are structured
