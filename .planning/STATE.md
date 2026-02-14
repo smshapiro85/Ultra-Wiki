@@ -97,7 +97,7 @@ Recent decisions affecting current work:
 - [03-UAT]: Reasoning effort configurable via admin settings dropdown (none/minimal/low/medium/high/xhigh), passed as reasoning.effort to OpenRouter
 - [04-01]: @plugin syntax for @tailwindcss/typography in Tailwind v4 CSS-first config
 - [04-01]: CategoryTree as client component (interactive Collapsible state), layout remains server component
-- [04-01]: Categories use href="#" in breadcrumbs (no standalone category pages)
+- ~~[04-01]: Categories use href="#" in breadcrumbs (no standalone category pages)~~ -- RESOLVED: 04-04 added /wiki/category/[slug] pages
 - [04-01]: SidebarProvider + AppSidebar + SidebarInset layout pattern for all wiki pages
 - [04-02]: MarkdownAsync named export from react-markdown v10 for async rehype plugin support in RSC
 - [04-02]: Shared slugify function between TOC extraction and heading ID generation ensures anchor links match
@@ -107,6 +107,8 @@ Recent decisions affecting current work:
 - [04-03]: Headline sanitization: strip all HTML except <mark> tags via regex for XSS prevention in search results
 - [04-03]: user_bookmarks uses composite PK (userId, articleId) -- no separate id column needed for junction table
 - [04-03]: actions.ts created fresh with toggleBookmark; Plan 02's regenerateArticle will be added to same file
+- [04-04]: getCategoryBySlug uses three separate queries (category, articles, subcategories) for clarity over joins
+- [04-04]: Breadcrumb segments always use asChild + Link for client-side navigation (matching Home link pattern)
 - [04-05]: BookmarkButton visible to all users; toggleBookmark server action handles auth enforcement
 - [04-05]: Optimistic state flip before server call with revert on error for instant feedback
 
@@ -123,5 +125,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 04-05-PLAN.md -- Bookmark button gap closure. Phase 4 fully complete with gap closures.
-Resume file: .planning/phases/04-wiki-viewer/04-05-SUMMARY.md
+Stopped at: Completed 04-04-PLAN.md -- Breadcrumb links and category page gap closure.
+Resume file: .planning/phases/04-wiki-viewer/04-04-SUMMARY.md
