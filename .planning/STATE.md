@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 5 in progress -- Article Editing & Version History. 3 of 4 plans complete (05-01, 05-02, 05-04). Remaining: 05-03 (version history UI).
+**Current focus:** Phase 5 complete -- Article Editing & Version History. All 4 plans done (editor, image upload, version history, AI review). Ready for Phase 6.
 
 ## Current Position
 
-Phase: 5 of 7 (Article Editing) -- IN PROGRESS
-Plan: 3 of 4 complete in current phase (05-03 remaining)
-Status: Plan 05-02 complete -- image upload with sharp compression, filesystem storage, and editor integration.
-Last activity: 2026-02-14 -- Completed 05-02-PLAN.md (image upload & compression)
+Phase: 5 of 7 (Article Editing) -- COMPLETE
+Plan: 4 of 4 in current phase
+Status: Phase 5 complete -- all plans executed (editor, image upload, version history UI, AI review annotations).
+Last activity: 2026-02-14 -- Completed 05-03-PLAN.md (version history & diff viewer)
 
-Progress: [████████████░] 72%
+Progress: [████████████████░] 79%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 4min
-- Total execution time: 1.01 hours
+- Total execution time: 1.08 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████████░] 72%
 | 02 | 3 | 11min | 4min |
 | 03 | 4 | 13min | 3min |
 | 04 | 5 | 14min | 3min |
-| 05 | 3 | 10min | 3min |
+| 05 | 4 | 14min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 3min, 4min, 2min, 3min, 3min
+- Last 5 plans: 4min, 2min, 3min, 3min, 4min
 - Trend: Stable
 
 *Updated after each plan completion*
@@ -117,6 +117,9 @@ Recent decisions affecting current work:
 - [05-04]: Inline CSS via style tag for annotation-highlight class (self-contained in component)
 - [05-04]: Dynamic import for review module in conflict.ts matching existing pipeline pattern
 - [05-01]: EditorLoader client wrapper for ssr:false dynamic import -- Next.js 16 disallows ssr:false in server components
+- [05-03]: Client-side diff computation via diffLines -- contentMarkdown sent with versions, diffs computed in browser
+- [05-03]: Selection-based UX for version compare/restore -- click cards to toggle, contextual action buttons
+- [05-03]: Typed enum cast for Drizzle inArray on changeSource PgEnum column
 - [05-01]: Draft auto-save to localStorage on every BlockNote onChange event
 - [05-01]: Optimistic locking via ISO timestamp comparison prevents stale saves (409 response)
 - [Phase 05]: uploadFile defined inline in ArticleEditor (self-contained) rather than passed as prop from parent
@@ -134,5 +137,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-14
-Stopped at: Completed 05-02-PLAN.md (image upload & compression). 3 of 4 plans done in Phase 5 (05-03 remaining).
-Resume file: .planning/phases/05-article-editing/05-02-SUMMARY.md
+Stopped at: Completed 05-03-PLAN.md (version history & diff viewer). Phase 5 fully complete -- all 4 plans done.
+Resume file: .planning/phases/05-article-editing/05-03-SUMMARY.md
