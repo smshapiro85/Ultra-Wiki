@@ -1,4 +1,4 @@
-import { eq, and, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
   articles,
@@ -23,9 +23,9 @@ import {
   createArticleVersion,
   getLastAIVersion,
 } from "@/lib/content/version";
-// blocksToMarkdown and markdownToBlocks are dynamically imported at call
-// sites below to avoid pulling @blocknote/server-util into the module graph
-// at evaluation time (causes createContext crash in RSC/Turbopack).
+// BlockNote JSON conversion is deferred to viewer/editor — storing markdown
+// only in the pipeline avoids @blocknote/server-util createContext crash
+// in RSC/Turbopack. contentJson is set to null; converted on first view.
 
 // Re-export ChangeSet from sync for convenience
 export type { ChangeSet } from "@/lib/github/sync";
@@ -204,7 +204,7 @@ async function processCreateArticle(
     related_files: string[];
     related_db_tables: Array<{
       table_name: string;
-      columns: Record<string, string> | null;
+      columns: Array<{ name: string; description: string }> | null;
       relevance: string;
     }>;
     category_suggestion: string;
@@ -233,9 +233,9 @@ async function processCreateArticle(
     technicalViewMarkdown = generated.technicalViewMarkdown;
   }
 
-  // c. Convert markdown to BlockNote JSON
-  const { markdownToBlocks } = await import("@/lib/content/markdown");
-  const contentJson = await markdownToBlocks(contentMarkdown);
+  // c. contentJson left null — BlockNote conversion deferred to viewer/editor
+  //    to avoid @blocknote/server-util createContext crash in RSC/Turbopack.
+  const contentJson = null;
 
   // d. Generate unique slug and insert article
   const slug = await ensureUniqueSlug(
@@ -298,7 +298,7 @@ async function processUpdateArticle(
     related_files: string[];
     related_db_tables: Array<{
       table_name: string;
-      columns: Record<string, string> | null;
+      columns: Array<{ name: string; description: string }> | null;
       relevance: string;
     }>;
     category_suggestion: string;
@@ -345,15 +345,12 @@ async function processUpdateArticle(
 
   // b. Check has_human_edits flag
   if (!existing.hasHumanEdits) {
-    // AI-only article: overwrite directly
-    const { markdownToBlocks } = await import("@/lib/content/markdown");
-    const contentJson = await markdownToBlocks(contentMarkdown);
-
+    // AI-only article: overwrite directly (contentJson deferred to viewer/editor)
     await db
       .update(articles)
       .set({
         contentMarkdown,
-        contentJson,
+        contentJson: null,
         technicalViewMarkdown,
         lastAiGeneratedAt: new Date(),
         updatedAt: new Date(),
@@ -363,7 +360,7 @@ async function processUpdateArticle(
     await createArticleVersion({
       articleId,
       contentMarkdown,
-      contentJson,
+      contentJson: null,
       technicalViewMarkdown,
       changeSource: "ai_updated",
       changeSummary: articlePlan.change_summary,
@@ -375,48 +372,31 @@ async function processUpdateArticle(
     const base = lastAIVersion?.contentMarkdown ?? "";
 
     // ii. Get current article content (human-edited version)
-    let currentMarkdown = existing.contentMarkdown;
+    const currentMarkdown = existing.contentMarkdown;
 
-    // iii. If contentJson exists, prefer converting it to markdown for accuracy
-    if (existing.contentJson) {
-      try {
-        const { blocksToMarkdown } = await import("@/lib/content/markdown");
-        currentMarkdown = await blocksToMarkdown(existing.contentJson);
-      } catch {
-        // Fallback to stored contentMarkdown if conversion fails
-        console.warn(
-          `[pipeline] Failed to convert contentJson to markdown for "${articlePlan.slug}", using stored markdown.`
-        );
-      }
-    }
-
-    // iv. Run three-way merge
+    // iii. Run three-way merge (operates on markdown — no BlockNote needed)
     const mergeResult = mergeArticleContent(
       base,
       currentMarkdown,
       contentMarkdown
     );
 
-    // v. Resolve conflicts
+    // iv. Resolve conflicts (triggerReview generates LLM annotations on clean merge)
     const resolution = await resolveConflict({
       articleId,
       mergeResult,
       currentMarkdown,
       aiProposedMarkdown: contentMarkdown,
       changeSummary: articlePlan.change_summary,
+      triggerReview: true,
     });
 
-    // vi. Update article with resolved content
-    const { markdownToBlocks } = await import("@/lib/content/markdown");
-    const finalContentJson = await markdownToBlocks(
-      resolution.finalMarkdown
-    );
-
+    // v. Update article with resolved content (contentJson deferred)
     await db
       .update(articles)
       .set({
         contentMarkdown: resolution.finalMarkdown,
-        contentJson: finalContentJson,
+        contentJson: null,
         technicalViewMarkdown,
         lastAiGeneratedAt: new Date(),
         needsReview: resolution.needsReview,
@@ -424,13 +404,13 @@ async function processUpdateArticle(
       })
       .where(eq(articles.id, articleId));
 
-    // vii. Create version (only if clean merge -- conflict path already
+    // vi. Create version (only if clean merge -- conflict path already
     // stored a version inside resolveConflict)
     if (!mergeResult.hasConflicts) {
       await createArticleVersion({
         articleId,
         contentMarkdown: resolution.finalMarkdown,
-        contentJson: finalContentJson,
+        contentJson: null,
         technicalViewMarkdown,
         changeSource: resolution.changeSource,
         changeSummary: articlePlan.change_summary,
@@ -485,7 +465,7 @@ async function resolveOrCreateCategory(
   );
   if (byName) return byName.id;
 
-  // Not found -- create a new category
+  // Not found -- create a new category (or find one that was just created)
   const slug = generateSlug(categorySuggestion);
   const name =
     categorySuggestion.charAt(0).toUpperCase() +
@@ -493,12 +473,30 @@ async function resolveOrCreateCategory(
 
   console.log(`[pipeline] Creating new category: "${name}" (${slug})`);
 
-  const [newCategory] = await db
+  // Use onConflictDoNothing in case another article in this batch just created it
+  const inserted = await db
     .insert(categories)
     .values({ name, slug })
+    .onConflictDoNothing()
     .returning({ id: categories.id });
 
-  return newCategory.id;
+  let categoryId: string;
+  if (inserted.length > 0) {
+    categoryId = inserted[0].id;
+  } else {
+    // Already exists (race condition or duplicate in batch) — look it up
+    const [existing] = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(eq(categories.slug, slug))
+      .limit(1);
+    categoryId = existing.id;
+  }
+
+  // Update the in-memory cache so subsequent articles in this pipeline run find it
+  categoryTree.push({ id: categoryId, name, slug });
+
+  return categoryId;
 }
 
 // ---------------------------------------------------------------------------
@@ -550,7 +548,7 @@ async function populateDbTables(
   articleId: string,
   relatedDbTables: Array<{
     table_name: string;
-    columns: Record<string, string> | null;
+    columns: Array<{ name: string; description: string }> | null;
     relevance: string;
   }>
 ): Promise<void> {

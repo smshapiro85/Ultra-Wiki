@@ -39,6 +39,7 @@ export async function resolveConflict(params: {
   currentMarkdown: string;
   aiProposedMarkdown: string;
   changeSummary: string;
+  triggerReview?: boolean;
 }): Promise<ConflictResolution> {
   const {
     articleId,
@@ -77,6 +78,23 @@ export async function resolveConflict(params: {
   }
 
   // CLEAN MERGE PATH: Use the merged content directly.
+
+  // Trigger LLM review for semantic issues after clean merge
+  if (params.triggerReview) {
+    try {
+      const { generateReviewAnnotations } = await import("@/lib/ai/review");
+      await generateReviewAnnotations({
+        articleId,
+        mergedMarkdown: mergeResult.mergedMarkdown,
+        aiProposedMarkdown,
+        humanMarkdown: currentMarkdown,
+        changeSummary,
+      });
+    } catch (err) {
+      console.error("[resolveConflict] Annotation generation failed:", err);
+    }
+  }
+
   return {
     finalMarkdown: mergeResult.mergedMarkdown,
     changeSource: "ai_merged",

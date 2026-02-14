@@ -398,6 +398,35 @@ export const articleImages = pgTable(
   (t) => [index("idx_article_images_article").on(t.articleId)]
 );
 
+export const annotationSeverityEnum = pgEnum("annotation_severity", [
+  "info",
+  "warning",
+  "error",
+]);
+
+export const aiReviewAnnotations = pgTable(
+  "ai_review_annotations",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    articleId: uuid("article_id")
+      .notNull()
+      .references(() => articles.id, { onDelete: "cascade" }),
+    versionId: uuid("version_id").references(() => articleVersions.id, {
+      onDelete: "set null",
+    }),
+    sectionHeading: text("section_heading").notNull(),
+    concern: text("concern").notNull(),
+    severity: annotationSeverityEnum("severity").notNull(),
+    isDismissed: boolean("is_dismissed").default(false).notNull(),
+    dismissedBy: uuid("dismissed_by").references(() => users.id),
+    dismissedAt: timestamp("dismissed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [index("idx_ai_review_annotations_article").on(t.articleId)]
+);
+
 export const siteSettings = pgTable("site_settings", {
   key: text("key").primaryKey(),
   value: text("value").default("").notNull(),
