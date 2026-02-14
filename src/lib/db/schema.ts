@@ -187,6 +187,22 @@ export const articles = pgTable(
   ]
 );
 
+export const userBookmarks = pgTable(
+  "user_bookmarks",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    articleId: uuid("article_id")
+      .notNull()
+      .references(() => articles.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.articleId] })]
+);
+
 export const articleVersions = pgTable(
   "article_versions",
   {

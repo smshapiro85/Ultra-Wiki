@@ -1,5 +1,10 @@
 import { getDb } from "@/lib/db";
-import { articles, categories, articleVersions } from "@/lib/db/schema";
+import {
+  articles,
+  categories,
+  articleVersions,
+  userBookmarks,
+} from "@/lib/db/schema";
 import { eq, desc, sql, and } from "drizzle-orm";
 
 // =============================================================================
@@ -287,4 +292,53 @@ export async function getRecentArticles(limit: number = 10) {
   );
 
   return articlesWithChangeSource;
+}
+
+// =============================================================================
+// getUserBookmarks
+// =============================================================================
+
+export async function getUserBookmarks(userId: string) {
+  const db = getDb();
+
+  const results = await db
+    .select({
+      id: articles.id,
+      title: articles.title,
+      slug: articles.slug,
+      categoryName: categories.name,
+      categorySlug: categories.slug,
+      bookmarkedAt: userBookmarks.createdAt,
+    })
+    .from(userBookmarks)
+    .innerJoin(articles, eq(userBookmarks.articleId, articles.id))
+    .leftJoin(categories, eq(articles.categoryId, categories.id))
+    .where(eq(userBookmarks.userId, userId))
+    .orderBy(desc(userBookmarks.createdAt));
+
+  return results;
+}
+
+// =============================================================================
+// isArticleBookmarked
+// =============================================================================
+
+export async function isArticleBookmarked(
+  userId: string,
+  articleId: string
+): Promise<boolean> {
+  const db = getDb();
+
+  const rows = await db
+    .select({ userId: userBookmarks.userId })
+    .from(userBookmarks)
+    .where(
+      and(
+        eq(userBookmarks.userId, userId),
+        eq(userBookmarks.articleId, articleId)
+      )
+    )
+    .limit(1);
+
+  return rows.length > 0;
 }
