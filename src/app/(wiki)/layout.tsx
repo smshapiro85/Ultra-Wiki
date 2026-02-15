@@ -18,6 +18,7 @@ import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
 import { AskAiGlobalTrigger } from "@/components/chat/ask-ai-global-trigger";
 import { AdminSettingsDropdown } from "@/components/admin/admin-settings-dropdown";
 import { UserMenu } from "@/components/common/user-menu";
+import { CreateArticleModal } from "@/components/wiki/create-article-modal";
 
 export default async function WikiLayout({
   children,
@@ -55,13 +56,20 @@ export default async function WikiLayout({
         <AppSidebar categories={categoryTree} />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
-            <AskAiGlobalTrigger />
-            <div className="ml-auto flex items-center gap-2">
-              <div className="w-64">
+            <div className="flex items-center gap-2">
+              <AskAiGlobalTrigger />
+            </div>
+            <div className="flex-1 flex justify-center">
+              <div className="w-full max-w-xl">
                 <Suspense fallback={<Skeleton className="h-9 w-full" />}>
                   <SearchInput />
                 </Suspense>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {user.role === "admin" && (
+                <CreateArticleModal categories={categoryTree} />
+              )}
               {user.role === "admin" && (
                 <>
                   <Link
