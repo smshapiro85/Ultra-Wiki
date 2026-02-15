@@ -50,7 +50,7 @@ export default async function DocsLayout({
   return (
     <TocProvider>
       <SidebarProvider>
-        <AppSidebar categories={categoryTree} />
+        <AppSidebar categories={categoryTree} isAdmin={user.role === "admin"} />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
             <SidebarTrigger />

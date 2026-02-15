@@ -8,9 +8,7 @@ import { eq } from "drizzle-orm";
 import {
   SidebarProvider,
   SidebarInset,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/wiki/app-sidebar";
 import { AdminSettingsDropdown } from "@/components/admin/admin-settings-dropdown";
 import { UserMenu } from "@/components/common/user-menu";
@@ -55,11 +53,9 @@ export default async function AdminLayout({
   return (
     <TocProvider>
       <SidebarProvider>
-        <AppSidebar categories={categoryTree} />
+        <AppSidebar categories={categoryTree} isAdmin={user.role === "admin"} />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="h-4" />
             <div className="ml-auto flex items-center gap-2">
               <Link
                 href="/docs"
