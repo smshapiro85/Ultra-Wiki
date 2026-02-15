@@ -82,3 +82,11 @@ export function getAskAIPageModel() {
     SETTING_KEYS.ask_ai_page_prompt_reasoning_effort
   );
 }
+
+/** Model for post-analysis article consolidation. Falls back to analysis model if not configured. */
+export function getConsolidationModel() {
+  return createModelFromSettings(
+    SETTING_KEYS.consolidation_prompt_model,
+    SETTING_KEYS.consolidation_prompt_reasoning_effort
+  );
+}

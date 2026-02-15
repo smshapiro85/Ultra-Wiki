@@ -112,6 +112,14 @@ Instead, if a module genuinely needs multiple articles, split by USER WORKFLOW: 
 
 **Rule F: No infrastructure content.** Never create an article — or a section within an article — about how a module is registered, wired up, persisted, or configured at the framework level. This includes: IoC/DI registration, ORM mapping, DbContext setup, entity type configuration, module composition, platform registration, dependency lists, data access patterns, and model mapping. These details are invisible to end users and belong exclusively in the Technical View. If you find yourself writing about how data is stored or how the module is wired up, stop — that content does not belong in the article.
 
+### Platform Patterns to Recognize (CRITICAL)
+
+This codebase is a multi-tenant SaaS platform with recurring patterns. Recognize these patterns and translate them correctly:
+
+**Feature toggles / module enablement.** Modules have a configuration class (e.g., \`ResourceLibraryModuleConfigInit\`) that maps a \`ModuleId\` to a \`SettingTypeId\` (e.g., \`SettingTypeId.EnableResourceLibrary\`). This is a site-level setting that enables or disables the module for a school/site. Translate this into the article as: "The [Feature Name] can be enabled or disabled per site via the [Setting Name] site setting. If disabled, [Feature Name] screens and actions are not available to users on that site." Do NOT describe this as "product availability" or "product capabilities" — describe it as a site setting that administrators control.
+
+**Multi-tenant isolation (SiteInstanceId).** Nearly every module checks \`currentUser.SiteInstanceId != item.SiteInstanceId\` to enforce tenant boundaries. This is standard platform behavior, NOT a noteworthy exception or edge case for any individual module. Do NOT include "cross-site access is blocked" as an exception or edge case — it applies to virtually every module and is not specific to any one feature. Only mention cross-site behavior when a module explicitly supports sharing data across sites (e.g., aggregate reporting, cross-school analytics), which is the exception rather than the rule.
+
 ### Article Title Formatting (CRITICAL -- follow exactly)
 
 When an article title includes the module or feature name as a prefix, you MUST use a colon separator:
@@ -215,6 +223,9 @@ Examples of required translation:
 - "data access layer" -> remove entirely (infrastructure)
 - "model-to-API mapping" -> remove entirely (infrastructure)
 - "request handling patterns" -> remove entirely (infrastructure)
+- "product availability" / "product capabilities" / "product must support" -> translate to site settings: "If the [Feature] site setting is enabled..." or "Administrators can enable [Feature] in site settings"
+- "cross-site access is blocked" / "SiteInstanceId boundary" -> remove (standard multi-tenant behavior, not a noteworthy edge case for individual modules)
+- "module configuration" / "ModuleConfigInit" / "SettingTypeId" -> translate to "site setting that enables or disables this feature"
 
 ### Required Content
 - Plain English explanation of rules
@@ -248,11 +259,13 @@ Break down by role (Administrator, User, etc.):
 - List specific rights or constraints per role
 
 # Configuration & Settings
+- Module enablement: If the module has a feature toggle (e.g., Enable Resource Library), explain that the feature can be enabled or disabled per site via site settings, and what happens when disabled
 - Default Behavior: what happens out of the box with no configuration
 - Per setting: "If enabled, [how behavior changes]"
 
 # Exceptions & Edge Cases
-- Any special logic, overrides, or "unless" scenarios
+- Any special logic, overrides, or "unless" scenarios that are specific to THIS module
+- Do NOT list standard platform behaviors as exceptions (e.g., multi-tenant isolation applies to all modules and is not a module-specific edge case)
 
 ### Example of Correct Tone and Level
 

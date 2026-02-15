@@ -187,6 +187,9 @@ export interface SyncLogEntry {
   filesProcessed: number;
   articlesCreated: number;
   articlesUpdated: number;
+  totalInputTokens: number | null;
+  totalOutputTokens: number | null;
+  estimatedCostUsd: string | null;
   startedAt: Date | null;
   completedAt: Date | null;
   errorMessage: string | null;
@@ -206,6 +209,9 @@ export async function getRecentSyncLogs(): Promise<SyncLogEntry[]> {
       filesProcessed: syncLogs.filesProcessed,
       articlesCreated: syncLogs.articlesCreated,
       articlesUpdated: syncLogs.articlesUpdated,
+      totalInputTokens: syncLogs.totalInputTokens,
+      totalOutputTokens: syncLogs.totalOutputTokens,
+      estimatedCostUsd: syncLogs.estimatedCostUsd,
       startedAt: syncLogs.startedAt,
       completedAt: syncLogs.completedAt,
       errorMessage: syncLogs.errorMessage,

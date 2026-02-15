@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FolderOpen, FileText, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,
@@ -68,7 +69,11 @@ function CategoryNode({
                     <SidebarMenuSubButton
                       asChild
                       isActive={isActive}
-                      className="flex-1"
+                      className={cn(
+                        "flex-1",
+                        isActive &&
+                          "bg-transparent text-sidebar-foreground font-semibold border-l-2 border-sidebar-primary rounded-none hover:bg-sidebar-accent",
+                      )}
                     >
                       <Link href={`/wiki/${article.slug}`}>
                         <FileText className="size-4 shrink-0" />

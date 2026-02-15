@@ -29,6 +29,9 @@ export const SETTING_KEYS = {
   ask_ai_page_prompt: "ask_ai_page_prompt",
   ask_ai_page_prompt_model: "ask_ai_page_prompt_model",
   ask_ai_page_prompt_reasoning_effort: "ask_ai_page_prompt_reasoning_effort",
+  consolidation_prompt: "consolidation_prompt",
+  consolidation_prompt_model: "consolidation_prompt_model",
+  consolidation_prompt_reasoning_effort: "consolidation_prompt_reasoning_effort",
   cached_repo_tree: "cached_repo_tree",
 } as const;
 

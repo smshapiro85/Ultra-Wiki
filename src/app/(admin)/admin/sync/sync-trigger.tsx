@@ -8,14 +8,30 @@ type SyncPhase = "idle" | "running" | "completed" | "error";
 
 interface SyncTriggerProps {
   disabled?: boolean;
+  onSyncStart?: (syncLogId: string) => void;
+  onSyncComplete?: () => void;
+  /** True when the page loaded with an active sync (e.g. after refresh) */
+  initialIsRunning?: boolean;
+  initialSyncLogId?: string;
 }
 
-export function SyncTrigger({ disabled }: SyncTriggerProps) {
-  const [phase, setPhase] = useState<SyncPhase>("idle");
+export function SyncTrigger({
+  disabled,
+  onSyncStart,
+  onSyncComplete,
+  initialIsRunning,
+  initialSyncLogId,
+}: SyncTriggerProps) {
+  const [phase, setPhase] = useState<SyncPhase>(
+    initialIsRunning ? "running" : "idle"
+  );
   const [errorMessage, setErrorMessage] = useState("");
-  const [logs, setLogs] = useState<string[]>([]);
+  const [logs, setLogs] = useState<string[]>(
+    initialIsRunning ? ["Sync in progress (started before page load)..."] : []
+  );
   const logEndRef = useRef<HTMLDivElement>(null);
   const sourceRef = useRef<EventSource | null>(null);
+  const hasNotifiedStart = useRef(false);
 
   // Cleanup EventSource on unmount
   useEffect(() => {
@@ -29,13 +45,50 @@ export function SyncTrigger({ disabled }: SyncTriggerProps) {
     logEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
 
+  // When page loads with a running sync, poll for status updates
+  useEffect(() => {
+    if (!initialIsRunning) return;
+
+    // Notify parent with the initial sync log ID if available
+    if (initialSyncLogId && onSyncStart && !hasNotifiedStart.current) {
+      hasNotifiedStart.current = true;
+      onSyncStart(initialSyncLogId);
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch("/api/admin/sync/status");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.isRunning) {
+          clearInterval(interval);
+          setPhase("completed");
+          setLogs((prev) => [...prev, "Sync completed."]);
+          onSyncComplete?.();
+        }
+      } catch {
+        // Ignore polling errors
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [initialIsRunning, initialSyncLogId, onSyncStart, onSyncComplete]);
+
   const handleSync = useCallback(() => {
     setPhase("running");
     setLogs([]);
     setErrorMessage("");
+    hasNotifiedStart.current = false;
 
     const source = new EventSource("/api/sync/stream");
     sourceRef.current = source;
+
+    source.addEventListener("syncLogId", (e) => {
+      if (!hasNotifiedStart.current) {
+        hasNotifiedStart.current = true;
+        onSyncStart?.(e.data);
+      }
+    });
 
     source.addEventListener("log", (e) => {
       setLogs((prev) => [...prev, e.data]);
@@ -45,6 +98,7 @@ export function SyncTrigger({ disabled }: SyncTriggerProps) {
       source.close();
       sourceRef.current = null;
       setPhase("completed");
+      onSyncComplete?.();
     });
 
     source.addEventListener("error", (e) => {
@@ -53,8 +107,9 @@ export function SyncTrigger({ disabled }: SyncTriggerProps) {
       const message = (e as MessageEvent)?.data || "Sync failed";
       setErrorMessage(message);
       setPhase("error");
+      onSyncComplete?.();
     });
-  }, []);
+  }, [onSyncStart, onSyncComplete]);
 
   const isDisabled = disabled || phase === "running";
 

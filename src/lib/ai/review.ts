@@ -2,6 +2,7 @@ import { generateText, Output, type LanguageModel } from "ai";
 import { z } from "zod/v4";
 import { getDb } from "@/lib/db";
 import { aiReviewAnnotations } from "@/lib/db/schema";
+import type { UsageTracker } from "./usage";
 
 // ---------------------------------------------------------------------------
 // Schema for structured LLM review output
@@ -52,6 +53,7 @@ export async function generateReviewAnnotations(params: {
   humanMarkdown: string;
   changeSummary: string;
   model: LanguageModel;
+  usageTracker?: UsageTracker;
 }): Promise<void> {
   const {
     articleId,
@@ -99,7 +101,7 @@ Rules:
 - If no concerns exist, return an empty annotations array
 - Be concise in your concern descriptions`;
 
-  const { experimental_output } = await generateText({
+  const { experimental_output, usage, providerMetadata } = await generateText({
     model,
     temperature: 0.2,
     output: Output.object({ schema: reviewAnnotationSchema }),
@@ -115,6 +117,8 @@ Rules:
       },
     ],
   });
+
+  params.usageTracker?.add(usage, providerMetadata);
 
   if (!experimental_output || experimental_output.annotations.length === 0) {
     return;

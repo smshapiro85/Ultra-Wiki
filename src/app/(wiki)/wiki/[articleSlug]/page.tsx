@@ -115,7 +115,10 @@ export default async function ArticlePage({
             </Button>
           )}
           {session?.user?.role === "admin" && (
-            <RegenerateButton articleId={article.id} />
+            <RegenerateButton
+              articleId={article.id}
+              hasHumanEdits={article.hasHumanEdits}
+            />
           )}
         </div>
       </div>

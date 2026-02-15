@@ -4,6 +4,7 @@ import { createArticleVersion } from "@/lib/content/version";
 import { getDb } from "@/lib/db";
 import { articles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import type { UsageTracker } from "@/lib/ai/usage";
 
 export interface ConflictResolution {
   /** The final Markdown to store as the article's content */
@@ -42,6 +43,7 @@ export async function resolveConflict(params: {
   changeSummary: string;
   triggerReview?: boolean;
   model?: LanguageModel;
+  usageTracker?: UsageTracker;
 }): Promise<ConflictResolution> {
   const {
     articleId,
@@ -111,6 +113,7 @@ export async function resolveConflict(params: {
         humanMarkdown: currentMarkdown,
         changeSummary,
         model: params.model,
+        usageTracker: params.usageTracker,
       });
     } catch (err) {
       console.error("[resolveConflict] Annotation generation failed:", err);

@@ -70,11 +70,12 @@ export function SortableItem({
       ref={!isDragOverlay ? setNodeRef : undefined}
       style={style}
       className={cn(
-        "group/sortable flex items-center h-8 text-sm rounded-md px-2 select-none",
+        "group/sortable group/item flex items-center h-8 text-sm rounded-md px-2 select-none transition-colors",
         isArticle
-          ? "text-muted-foreground hover:text-foreground"
-          : "font-medium",
-        isActive && "bg-accent text-accent-foreground",
+          ? "text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+          : "font-medium hover:bg-sidebar-accent",
+        isActive &&
+          "text-sidebar-foreground font-semibold border-l-2 border-sidebar-primary rounded-none",
         isOver && !isDragging && "border-t-2 border-primary",
         isDragOverlay && "bg-background shadow-md rounded-md border",
       )}

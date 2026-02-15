@@ -123,6 +123,30 @@ export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="consolidation_prompt">
+              Article Consolidation Prompt
+            </Label>
+            <Textarea
+              id="consolidation_prompt"
+              name="consolidation_prompt"
+              rows={12}
+              defaultValue={settings.consolidation_prompt?.value || ""}
+              placeholder="Prompt for reviewing and merging fragmented articles..."
+            />
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Runs after code analysis to review proposed articles. When multiple
+              articles are generated for the same category, this prompt decides
+              whether to merge them or keep them separate. Uses article content
+              as input (not raw code).
+            </p>
+            <ModelFields
+              modelKey="consolidation_prompt_model"
+              reasoningKey="consolidation_prompt_reasoning_effort"
+              settings={settings}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="file_summary_prompt">File Summary Prompt</Label>
             <Textarea
               id="file_summary_prompt"

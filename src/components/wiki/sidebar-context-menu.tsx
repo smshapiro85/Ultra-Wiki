@@ -10,6 +10,7 @@ import {
   Pencil,
   Trash2,
   ArrowRightLeft,
+  FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -106,6 +107,8 @@ export function CategoryContextMenu({
 
   if (!isAdmin) return null;
 
+  // Note: Uses Ellipsis icon (three dots) as trigger — signals "more actions"
+
   async function handleAddSubcategory() {
     if (!subName.trim()) return;
     setLoading(true);
@@ -179,7 +182,7 @@ export function CategoryContextMenu({
             className="opacity-0 group-hover/item:opacity-100 transition-opacity inline-flex items-center justify-center size-6 rounded-sm hover:bg-accent shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <Plus className="size-4" />
+            <Ellipsis className="size-4" />
             <span className="sr-only">Category actions</span>
           </button>
         </DropdownMenuTrigger>
@@ -426,7 +429,7 @@ export function SubcategoryContextMenu({
             className="opacity-0 group-hover/item:opacity-100 transition-opacity inline-flex items-center justify-center size-6 rounded-sm hover:bg-accent shrink-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <Plus className="size-4" />
+            <Ellipsis className="size-4" />
             <span className="sr-only">Subcategory actions</span>
           </button>
         </DropdownMenuTrigger>
@@ -775,6 +778,88 @@ export function ArticleContextMenu({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  );
+}
+
+// =============================================================================
+// NewCategoryButton — "+ New Category" at the bottom of the sidebar
+// =============================================================================
+
+export function NewCategoryButton({ isAdmin }: { isAdmin: boolean }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  if (!isAdmin) return null;
+
+  async function handleCreate() {
+    if (!name.trim()) return;
+    setLoading(true);
+    const result = await createCategory({ name: name.trim() });
+    setLoading(false);
+    if ("error" in result) {
+      toast.error(result.error);
+    } else {
+      toast.success("Category created");
+      setName("");
+      setOpen(false);
+      router.refresh();
+    }
+  }
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full rounded-md hover:bg-accent"
+      >
+        <Plus className="size-3.5" />
+        New Category
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Category</DialogTitle>
+            <DialogDescription>
+              Create a new top-level category in the sidebar.
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleCreate();
+            }}
+          >
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="new-category-name">Name</Label>
+                <Input
+                  id="new-category-name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Category name"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading || !name.trim()}>
+                {loading ? "Creating..." : "Create"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

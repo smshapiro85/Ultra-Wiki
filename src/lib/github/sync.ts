@@ -37,6 +37,7 @@ export interface SyncResult {
 
 export interface SyncOptions {
   onLog?: (message: string) => void;
+  onSyncLogId?: (syncLogId: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -250,6 +251,9 @@ export async function runSync(
       error: "A sync is already in progress. Please wait for it to complete.",
     };
   }
+
+  // Notify caller of the sync log ID as early as possible
+  options?.onSyncLogId?.(syncLogId);
 
   try {
     // 2. Read included patterns

@@ -449,6 +449,9 @@ export const syncLogs = pgTable("sync_logs", {
   filesProcessed: integer("files_processed").default(0).notNull(),
   articlesCreated: integer("articles_created").default(0).notNull(),
   articlesUpdated: integer("articles_updated").default(0).notNull(),
+  totalInputTokens: integer("total_input_tokens"),
+  totalOutputTokens: integer("total_output_tokens"),
+  estimatedCostUsd: text("estimated_cost_usd"),
   errorMessage: text("error_message"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .defaultNow()

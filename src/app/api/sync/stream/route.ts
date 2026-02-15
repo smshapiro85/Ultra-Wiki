@@ -12,19 +12,27 @@ export async function GET() {
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder();
+      let closed = false;
       const send = (event: string, data: string) => {
-        controller.enqueue(encoder.encode(`event: ${event}\ndata: ${data}\n\n`));
+        if (closed) return;
+        try {
+          controller.enqueue(encoder.encode(`event: ${event}\ndata: ${data}\n\n`));
+        } catch {
+          closed = true;
+        }
       };
 
       try {
         send("log", "Starting sync...");
         await runSync("manual", {
           onLog: (message) => send("log", message),
+          onSyncLogId: (id) => send("syncLogId", id),
         });
         send("done", "complete");
       } catch (error) {
         send("error", error instanceof Error ? error.message : "Sync failed");
       } finally {
+        closed = true;
         controller.close();
       }
     },

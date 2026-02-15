@@ -4,10 +4,7 @@ import { SETTING_KEYS } from "@/lib/settings/constants";
 import { getConsolidationModel } from "./client";
 import { consolidationReviewSchema } from "./schemas";
 import type { AnalysisResponse, ArticlePlan } from "./schemas";
-import {
-  DEFAULT_CONSOLIDATION_PROMPT,
-  buildConsolidationPrompt,
-} from "./prompts";
+import { buildConsolidationPrompt } from "./prompts";
 import type { UsageTracker } from "./usage";
 
 const CONSOLIDATION_CONCURRENCY = 3;
@@ -91,13 +88,18 @@ export async function consolidateArticles(
   ]);
 
   const prompt =
-    consolidationPrompt.status === "fulfilled" && consolidationPrompt.value
-      ? consolidationPrompt.value
-      : DEFAULT_CONSOLIDATION_PROMPT;
+    consolidationPrompt.status === "fulfilled"
+      ? consolidationPrompt.value ?? ""
+      : "";
   const model =
     consolidationModel.status === "fulfilled"
       ? consolidationModel.value
       : analysisModel;
+
+  if (!prompt) {
+    log("Consolidation prompt not configured — skipping consolidation");
+    return response;
+  }
 
   if (consolidationModel.status === "rejected") {
     log("Consolidation model not configured — falling back to analysis model");

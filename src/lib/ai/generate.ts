@@ -1,6 +1,7 @@
 import { generateText, Output, type LanguageModel } from "ai";
 import { buildGenerationPrompt } from "./prompts";
 import { generationResponseSchema, type AnalysisResponse } from "./schemas";
+import type { UsageTracker } from "./usage";
 
 /**
  * Generate full article content for a single article plan item.
@@ -14,7 +15,8 @@ import { generationResponseSchema, type AnalysisResponse } from "./schemas";
 export async function generateArticle(
   articlePlan: AnalysisResponse["articles"][0],
   stylePrompt: string,
-  model: LanguageModel
+  model: LanguageModel,
+  usageTracker?: UsageTracker
 ): Promise<{
   contentMarkdown: string;
 }> {
@@ -28,7 +30,7 @@ export async function generateArticle(
   // Otherwise, generate full content via a second LLM call with structured output
   const prompt = buildGenerationPrompt(articlePlan, stylePrompt);
 
-  const { experimental_output } = await generateText({
+  const { experimental_output, usage, providerMetadata } = await generateText({
     model,
     temperature: 0.2,
     output: Output.object({ schema: generationResponseSchema }),
@@ -44,6 +46,8 @@ export async function generateArticle(
       },
     ],
   });
+
+  usageTracker?.add(usage, providerMetadata);
 
   if (experimental_output) {
     return {

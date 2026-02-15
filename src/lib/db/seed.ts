@@ -5,6 +5,7 @@ import { siteSettings } from "./schema";
 import {
   DEFAULT_ANALYSIS_PROMPT,
   DEFAULT_ARTICLE_STYLE_PROMPT,
+  DEFAULT_CONSOLIDATION_PROMPT,
   DEFAULT_FILE_SUMMARY_PROMPT,
   DEFAULT_ASK_AI_GLOBAL_PROMPT,
   DEFAULT_ASK_AI_PAGE_PROMPT,
@@ -53,12 +54,16 @@ const requiredSettings = [
   { key: "ask_ai_global_prompt_reasoning_effort", description: "Reasoning effort for global Ask AI chat", value: "none", isSecret: false },
   { key: "ask_ai_page_prompt_model", description: "Model for page-level Ask AI chat", value: "", isSecret: false },
   { key: "ask_ai_page_prompt_reasoning_effort", description: "Reasoning effort for page-level Ask AI chat", value: "none", isSecret: false },
+  { key: "consolidation_prompt", description: "Prompt for post-analysis article consolidation review", value: DEFAULT_CONSOLIDATION_PROMPT, isSecret: false },
+  { key: "consolidation_prompt_model", description: "Model for article consolidation review", value: "", isSecret: false },
+  { key: "consolidation_prompt_reasoning_effort", description: "Reasoning effort for consolidation review", value: "none", isSecret: false },
 ];
 
 /** Prompt keys that should be backfilled if currently empty in the DB. */
 const promptDefaults: Record<string, string> = {
   analysis_prompt: DEFAULT_ANALYSIS_PROMPT,
   article_style_prompt: DEFAULT_ARTICLE_STYLE_PROMPT,
+  consolidation_prompt: DEFAULT_CONSOLIDATION_PROMPT,
   ask_ai_global_prompt: DEFAULT_ASK_AI_GLOBAL_PROMPT,
   ask_ai_page_prompt: DEFAULT_ASK_AI_PAGE_PROMPT,
   file_summary_prompt: DEFAULT_FILE_SUMMARY_PROMPT,

@@ -123,6 +123,8 @@ export function SyncHistory({ logs }: SyncHistoryProps) {
           <TableHead>Started</TableHead>
           <TableHead>Duration</TableHead>
           <TableHead className="text-right">Files</TableHead>
+          <TableHead className="text-right">Cost</TableHead>
+          <TableHead className="text-right">Tokens</TableHead>
           <TableHead>Error</TableHead>
         </TableRow>
       </TableHeader>
@@ -149,6 +151,16 @@ export function SyncHistory({ logs }: SyncHistoryProps) {
             </TableCell>
             <TableCell className="text-right text-sm">
               {log.filesProcessed}
+            </TableCell>
+            <TableCell className="text-right text-sm text-zinc-500 dark:text-zinc-400">
+              {log.estimatedCostUsd
+                ? `$${parseFloat(log.estimatedCostUsd).toFixed(4)}`
+                : "-"}
+            </TableCell>
+            <TableCell className="text-right text-sm text-zinc-500 dark:text-zinc-400">
+              {log.totalInputTokens != null && log.totalOutputTokens != null
+                ? `${log.totalInputTokens.toLocaleString()} in / ${log.totalOutputTokens.toLocaleString()} out`
+                : "-"}
             </TableCell>
             <TableCell className="max-w-[200px]">
               {log.errorMessage ? (
