@@ -36,7 +36,7 @@ Progress: [████████████████████] 100% (3
 | 07 | 3 | 12min | 4min |
 | 08 | 4 | 5min | 1min |
 | 09 | 1 | 5min | 5min |
-| 10 | 1/5 | 3min | 3min |
+| 10 | 2/5 | 6min | 3min |
 
 *Updated after each plan completion*
 
@@ -58,9 +58,12 @@ Progress: [████████████████████] 100% (3
 - renameArticle does NOT change slug to keep URLs stable
 - deleteArticle explicitly deletes related records for safety (defensive against missing DB cascades)
 - createCategory uses onConflictDoNothing for slug race condition handling
+- subcategory_suggestion is nullable string (null = no subcategory, preserving default behavior)
+- Max hierarchy depth 2 levels (Category > Subcategory) enforced by prompt rules
+- Subcategory resolution matches by slug AND parentCategoryId to avoid cross-parent collisions
 
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 10-01-PLAN.md (Server Actions and Dependencies)
-Resume file: .planning/phases/10-navigation-and-article-creation/10-02-PLAN.md
+Stopped at: Completed 10-02-PLAN.md (AI Pipeline Subcategory Awareness)
+Resume file: .planning/phases/10-navigation-and-article-creation/10-03-PLAN.md
