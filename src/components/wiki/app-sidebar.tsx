@@ -5,7 +5,6 @@ import { BookOpen } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -23,16 +22,17 @@ interface AppSidebarProps {
 export function AppSidebar({ categories }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
-      <SidebarHeader>
-        <Link
-          href="/"
-          className="flex items-center gap-2 px-2 py-1.5 text-sm font-bold"
-        >
-          <BookOpen className="size-5 shrink-0" />
-          <span className="truncate group-data-[collapsible=icon]:hidden">
-            UltraWiki
-          </span>
-        </Link>
+      <SidebarHeader className="h-14 justify-center border-b border-sidebar-border">
+        <div className="flex items-center">
+          <Link
+            href="/"
+            className="flex flex-1 items-center gap-2.5 px-2 font-bold min-w-0 group-data-[collapsible=icon]:hidden"
+          >
+            <BookOpen className="size-6 shrink-0" />
+            <span className="truncate text-base">UltraWiki</span>
+          </Link>
+          <SidebarTrigger />
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
@@ -46,9 +46,6 @@ export function AppSidebar({ categories }: AppSidebarProps) {
         <SidebarToc />
       </SidebarContent>
 
-      <SidebarFooter>
-        <SidebarTrigger className="w-full justify-start" />
-      </SidebarFooter>
     </Sidebar>
   );
 }
