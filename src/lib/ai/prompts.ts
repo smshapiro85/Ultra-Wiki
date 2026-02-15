@@ -89,15 +89,26 @@ Source code repositories follow naming conventions that identify logical modules
 
 You MUST follow these rules when deciding how many articles to create:
 
-**Rule A: Prefer comprehensive articles.** Default to ONE article per module or functional area. A single well-organized article with clear section headings is almost always better than multiple small articles. An article covering an entire module (e.g., "Communities") with sections for management, membership, notifications, and permissions is preferable to 12 separate articles splitting each concern.
+**Rule A: Prefer comprehensive articles.** Default to ONE article per module or functional area. A single well-organized article with clear section headings is almost always better than multiple small articles. An article covering an entire module (e.g., "Communities") with sections for management, membership, notifications, and permissions is preferable to 12 separate articles splitting each concern. If the entire module's business rules, permissions, and workflows can fit in a single article under 6,000 characters, it MUST be a single article. Simple modules (e.g., a resource library, a settings page, a notification preferences screen) should almost never need more than one article.
 
 **Rule B: Maximum 3 articles per module.** When a module is genuinely large and covers distinct workflows with different user roles and configurations, you may split into at most 2-3 articles. Each split article must cover a clearly distinct user workflow (not a code-level concern). For example, "Communities" might warrant separate articles for "Community Management" and "Community Membership" if they involve different roles and settings -- but NOT separate articles for "Validators", "Handlers", and "Emails" (those are code-level splits, not user-facing).
 
 **Rule C: Never split along code boundaries.** Do not create separate articles for handlers vs. validators vs. emails vs. configuration. These are implementation details. Group by user-facing feature or workflow instead.
 
+Common code-architecture splits to AVOID as article boundaries:
+- "Read Side" vs "Write Side" (CQRS pattern) -- these are code layers, not user workflows
+- "Commands" vs "Queries" vs "Handlers" -- these are implementation patterns
+- "Data Access" vs "Business Logic" vs "API Layer" -- these are architecture layers
+- "Module Registration" vs "Configuration" vs "Mapping" -- these are infrastructure concerns
+- "Models" vs "Services" vs "Controllers" -- these are code organization, not features
+
+Instead, if a module genuinely needs multiple articles, split by USER WORKFLOW: e.g., "Resource Library: Managing Resources" and "Resource Library: Student Access" -- never "Resource Library: Read Side" and "Resource Library: Write Side."
+
 **Rule D: Anti-fragmentation check.** Before returning results, review your proposed articles. If any two articles cover the same module and could be combined into a single article under 8,000 characters, combine them. Short articles (under 2,000 characters) should almost always be merged into a related larger article rather than standing alone.
 
 **Rule E: Merge overlapping content.** If two proposed articles would cover overlapping topics (e.g., "Activity Notifications" and "Activity Notification Emails"), merge them into one article. Overlapping articles confuse readers.
+
+**Rule F: No infrastructure articles.** Never create an article about how a module is registered, wired up, or configured at the framework/platform level. Topics like IoC/DI registration, ORM mapping, DbContext setup, entity type configuration, module composition, and platform registration are invisible to end users and belong exclusively in the Technical View (the related_files and related_db_tables fields). If the only content for a proposed article would be infrastructure plumbing, do not create that article -- fold any relevant business context into the main module article instead.
 
 ### Article Title Formatting (CRITICAL -- follow exactly)
 
@@ -121,6 +132,8 @@ Rules:
 2. Use the exact module or category name as it appears in the codebase folder or existing category (e.g., if the folder is \`TT.Communities/\`, use "Communities", not "Community")
 3. If the article title does not need a module prefix (e.g., it IS the module overview), a standalone name is fine (e.g., "Communities" by itself)
 4. When updating an existing article, preserve its current title format unless it violates these rules
+5. Titles must use plain business language. Never include architecture or code terms in titles: "Read Side", "Write Side", "IoC", "EF Core", "DTOs", "Commands", "Queries", "Handlers", "State Resolution", "Mapping", "Validation", "DbContext"
+6. Keep titles short and descriptive. Avoid long parenthetical subtitles. GOOD: "Resource Library: File Uploads". BAD: "Resource Library: Read Side (Queries, Authorization, API DTOs & Criteria)"
 
 ### Category Strategy (CRITICAL -- follow exactly)
 
@@ -164,6 +177,12 @@ Examples of required translation:
 - Code: \`IsSettingEnabled(Setting.BlockStudent)\` -> Business: "If the 'Block Student' site setting is enabled..."
 - Code: \`ng-if="!showStatus"\` -> Business: "The status is hidden from view..."
 - Code: \`return null;\` -> Business: "The action is blocked / Nothing happens."
+- Architecture: "Read Side queries" -> Business: "Browsing and viewing resources"
+- Architecture: "Write Side command handlers" -> Business: "Creating, updating, and deleting resources"
+- Architecture: "State Resolution" -> Business: "What actions each user role can perform"
+- Architecture: "EF Core DbContext / entity mapping" -> Do not mention at all (infrastructure)
+- Architecture: "IoC registration / DI wiring" -> Do not mention at all (infrastructure)
+- Architecture: "API DTOs and criteria" -> Do not mention at all (implementation detail)
 
 ### Forbidden (never include)
 - No tables (use bullet lists instead)
@@ -174,6 +193,7 @@ Examples of required translation:
 - No class/method names (e.g., \`JobService.cs\`, \`ToggleApproval\`)
 - No line numbers
 - No API endpoints or DB table names in the main article body (these belong in the Technical View)
+- No software architecture jargon in headings or body text. This includes: "Read Side", "Write Side", "Commands", "Queries", "Handlers", "State Resolution", "IoC", "Dependency Injection", "EF Core", "DbContext", "Entity Configuration", "DTOs", "API Models", "Module Composition", "Platform Registration", "CQRS", "Repository Pattern", "Data Access Layer", "Command Handler", "Query Service", "Criteria objects". Translate these into business language: e.g., "Browsing and Viewing" instead of "Read Side", "Creating and Managing" instead of "Write Side", "What Users Can Do" instead of "State Resolution"
 
 ### Required Content
 - Plain English explanation of rules

@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** PROJECT COMPLETE. All 9 phases executed (33 plans).
+**Current focus:** Phase 10 added — Navigation and Article Creation
 
 ## Current Position
 
@@ -46,6 +46,11 @@ Progress: [████████████████████] 100% (3
 - `docs/application-guide.md` — Comprehensive 18-section guide covering architecture, setup, and all features
 - `docs/ai-pipeline.md` — Reviewed and updated pipeline deep-dive with category strategy and article style rules
 - `docs/ultrawiki-spec.md` — Updated to v1.0.0, reflecting as-built state (per-prompt models, cron instead of pgboss, raw fetch for notifications, implementation checklist marked complete)
+
+## Accumulated Context
+
+### Roadmap Evolution
+- Phase 10 added: Navigation and Article Creation
 
 ## Session Continuity
 
