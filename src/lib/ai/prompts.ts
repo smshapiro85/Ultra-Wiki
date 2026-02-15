@@ -87,9 +87,11 @@ Source code repositories follow naming conventions that identify logical modules
 
 ### Article Scope and Consolidation (CRITICAL)
 
+Before creating multiple articles for a single module, ask: "Would a QA engineer or product manager need to look at these separately, or would they expect to find everything about this module in one place?" If the answer is one place, use one article. A module like Resource Library (folders, files, URLs, permissions, visibility) is one article. A module like Jobs that has distinct hiring workflows, approval chains, and student application flows might justify 2-3 articles.
+
 You MUST follow these rules when deciding how many articles to create:
 
-**Rule A: Prefer comprehensive articles.** Default to ONE article per module or functional area. A single well-organized article with clear section headings is almost always better than multiple small articles. An article covering an entire module (e.g., "Communities") with sections for management, membership, notifications, and permissions is preferable to 12 separate articles splitting each concern. If the entire module's business rules, permissions, and workflows can fit in a single article under 6,000 characters, it MUST be a single article. Simple modules (e.g., a resource library, a settings page, a notification preferences screen) should almost never need more than one article.
+**Rule A: One article per module by default.** You MUST create exactly ONE article per module or functional area unless the module meets the explicit splitting criteria in Rule B. A single well-organized article with clear section headings is almost always better than multiple small articles. An article covering an entire module (e.g., "Communities") with sections for management, membership, notifications, and permissions is preferable to 12 separate articles splitting each concern. If the entire module's business rules, permissions, and workflows can fit in a single article under 6,000 characters, it MUST be a single article. Simple modules (e.g., a resource library, a settings page, a notification preferences screen) should almost never need more than one article.
 
 **Rule B: Maximum 3 articles per module.** When a module is genuinely large and covers distinct workflows with different user roles and configurations, you may split into at most 2-3 articles. Each split article must cover a clearly distinct user workflow (not a code-level concern). For example, "Communities" might warrant separate articles for "Community Management" and "Community Membership" if they involve different roles and settings -- but NOT separate articles for "Validators", "Handlers", and "Emails" (those are code-level splits, not user-facing).
 
@@ -108,7 +110,7 @@ Instead, if a module genuinely needs multiple articles, split by USER WORKFLOW: 
 
 **Rule E: Merge overlapping content.** If two proposed articles would cover overlapping topics (e.g., "Activity Notifications" and "Activity Notification Emails"), merge them into one article. Overlapping articles confuse readers.
 
-**Rule F: No infrastructure articles.** Never create an article about how a module is registered, wired up, or configured at the framework/platform level. Topics like IoC/DI registration, ORM mapping, DbContext setup, entity type configuration, module composition, and platform registration are invisible to end users and belong exclusively in the Technical View (the related_files and related_db_tables fields). If the only content for a proposed article would be infrastructure plumbing, do not create that article -- fold any relevant business context into the main module article instead.
+**Rule F: No infrastructure content.** Never create an article — or a section within an article — about how a module is registered, wired up, persisted, or configured at the framework level. This includes: IoC/DI registration, ORM mapping, DbContext setup, entity type configuration, module composition, platform registration, dependency lists, data access patterns, and model mapping. These details are invisible to end users and belong exclusively in the Technical View. If you find yourself writing about how data is stored or how the module is wired up, stop — that content does not belong in the article.
 
 ### Article Title Formatting (CRITICAL -- follow exactly)
 
@@ -133,7 +135,7 @@ Rules:
 3. If the article title does not need a module prefix (e.g., it IS the module overview), a standalone name is fine (e.g., "Communities" by itself)
 4. When updating an existing article, preserve its current title format unless it violates these rules
 5. Titles must use plain business language. Never include architecture or code terms in titles: "Read Side", "Write Side", "IoC", "EF Core", "DTOs", "Commands", "Queries", "Handlers", "State Resolution", "Mapping", "Validation", "DbContext"
-6. Keep titles short and descriptive. Avoid long parenthetical subtitles. GOOD: "Resource Library: File Uploads". BAD: "Resource Library: Read Side (Queries, Authorization, API DTOs & Criteria)"
+6. NEVER use parentheses in article titles. Titles should be short, plain-language descriptions. GOOD: "Resource Library", "Resource Library: Managing Resources", "Resource Library: Student Access". BAD: "Resource Library: Read-Side (Queries, API Models, Authorization, Downloads)"
 
 ### Category Strategy (CRITICAL -- follow exactly)
 
@@ -148,11 +150,15 @@ You MUST follow these rules when assigning articles to categories:
 - Pluralization (if existing categories use singular nouns, use singular)
 - Naming style (if existing categories are short labels like "Authentication", don't create verbose names like "User Authentication and Authorization Module")
 
-**Rule 4: Flat over nested.** Prefer top-level categories unless there is an existing parent-child pattern that clearly fits. Do not create subcategory hierarchies speculatively.
+**Rule 4: Flat over nested.** Prefer articles directly in categories unless the category has grown large (8+ articles) with clearly distinct sub-topics. Subcategories are supported (max depth 2) but should not be created speculatively.
 
 **Rule 5: No generic categories.** NEVER use generic category names like "Modules", "Features", "Components", or "Services". Always use the actual functional name: "Communities" not "Modules", "Resource Library" not "Features". If you find yourself wanting to use a generic name, you are doing it wrong -- use the specific module or feature name instead.
 
 **Rule 6: Stable assignments.** If an article already exists in a category, do NOT move it to a different category during an update -- even if a "better" category exists. Only move articles when explicitly requested. Category stability is more important than perfect organization.
+
+**Rule 7: Subcategory creation.** Only create subcategories when a category has 8+ articles covering distinct sub-topics. Subcategories group related articles within a category. Maximum depth is 2 levels (Category > Subcategory). Never create a subcategory with fewer than 3 articles planned for it. When suggesting a subcategory, set \`subcategory_suggestion\` to the subcategory slug.
+
+**Rule 8: Subcategory naming.** Subcategory names should be short topic labels (e.g., "Authentication", "Settings", "Permissions"), NOT full phrases. They describe a sub-topic within the parent category. Match the naming style of existing subcategories if any exist.
 
 ### CRITICAL: Handling Human-Edited Articles
 For articles flagged as human-edited, you MUST:
@@ -194,6 +200,21 @@ Examples of required translation:
 - No line numbers
 - No API endpoints or DB table names in the main article body (these belong in the Technical View)
 - No software architecture jargon in headings or body text. This includes: "Read Side", "Write Side", "Commands", "Queries", "Handlers", "State Resolution", "IoC", "Dependency Injection", "EF Core", "DbContext", "Entity Configuration", "DTOs", "API Models", "Module Composition", "Platform Registration", "CQRS", "Repository Pattern", "Data Access Layer", "Command Handler", "Query Service", "Criteria objects". Translate these into business language: e.g., "Browsing and Viewing" instead of "Read Side", "Creating and Managing" instead of "Write Side", "What Users Can Do" instead of "State Resolution"
+- No "Technical View" sections in article content. Technical details (query inputs, authorization layers, data model internals, state models) belong in the separate Technical View tab, not in the article body. The article body is purely for business rules, workflows, and permissions
+
+### Jargon That Sounds Neutral But Isn't (translate or remove)
+- "site-scoped" -> "each school/site has its own" or "isolated per school"
+- "persisted" / "persistence model" -> remove (don't explain how data is stored)
+- "entity" / "entity type" -> "item" or "record" or just use the domain name
+- "computed state" -> "what the user is allowed to do" or remove
+- "authorization layer" -> "access rules" or "permission checks"
+- "enforced at the authorization layer" -> "blocked by access rules"
+- "state resolution" / "state resolver" -> "the system determines allowed actions based on role"
+- "module registration" / "dependency registration" -> remove entirely (infrastructure)
+- "child collection of mappings" -> "linked to" or "assigned to"
+- "data access layer" -> remove entirely (infrastructure)
+- "model-to-API mapping" -> remove entirely (infrastructure)
+- "request handling patterns" -> remove entirely (infrastructure)
 
 ### Required Content
 - Plain English explanation of rules
@@ -231,7 +252,17 @@ Break down by role (Administrator, User, etc.):
 - Per setting: "If enabled, [how behavior changes]"
 
 # Exceptions & Edge Cases
-- Any special logic, overrides, or "unless" scenarios`;
+- Any special logic, overrides, or "unless" scenarios
+
+### Example of Correct Tone and Level
+
+For a module that lets schools host resources (files, URLs, folders) targeted to student groups, a well-written overview section would read:
+
+"Resource Library allows schools to organize and share content with students. Resources can be files (like PDFs or videos), links to external websites, or folders that group related items together. Folders can be nested inside other folders to create a hierarchy.
+
+Each resource can optionally be targeted to specific Student Groups. If a resource has no Student Group assignments, it is visible to all users with access. If it does have assignments, only students in those groups can see it. Administrators can always see all resources regardless of Student Group targeting."
+
+Notice: no mention of "site-scoped entities," "persistence models," "state resolution," or "authorization layers." Just clear, direct explanation of what the feature does and who can use it.`;
 
 /**
  * Build the full analysis prompt from context.
@@ -246,12 +277,35 @@ export function buildAnalysisPrompt(ctx: PromptContext): string {
 
   const categoryTree =
     ctx.existingCategories.length > 0
-      ? ctx.existingCategories
-          .map(
-            (c) =>
-              `- ${c.parentName ? `${c.parentName} > ` : ""}${c.name} (slug: ${c.slug})`
-          )
-          .join("\n")
+      ? (() => {
+          // Render root categories first, then indent children under their parents
+          const roots = ctx.existingCategories.filter((c) => !c.parentName);
+          const children = ctx.existingCategories.filter((c) => c.parentName);
+          const lines: string[] = [];
+          for (const root of roots) {
+            lines.push(`- ${root.name} (slug: ${root.slug})`);
+            // Find children of this root
+            for (const child of children) {
+              if (child.parentName === root.name) {
+                lines.push(`  - ${child.name} (slug: ${child.slug}) [subcategory of ${root.name}]`);
+              }
+            }
+          }
+          // Include any children whose parent is not in roots (edge case)
+          const renderedChildSlugs = new Set(
+            roots.flatMap((root) =>
+              children
+                .filter((child) => child.parentName === root.name)
+                .map((child) => child.slug)
+            )
+          );
+          for (const child of children) {
+            if (!renderedChildSlugs.has(child.slug)) {
+              lines.push(`  - ${child.name} (slug: ${child.slug}) [subcategory of ${child.parentName}]`);
+            }
+          }
+          return lines.join("\n");
+        })()
       : "(No categories yet)";
 
   const articleIndex =
@@ -379,6 +433,93 @@ This is a rich, focused context. Use all of it to give accurate, specific answer
 6. Be concise but thorough. This user is looking at a specific article and wants specific answers, not general overviews.
 
 7. Use plain language. Translate technical details into business concepts when explaining to non-technical team members. For example, instead of "the ng-if directive hides the element," say "the status is hidden from view when..."`;
+
+// =============================================================================
+// Consolidation Prompt
+// =============================================================================
+
+/**
+ * Default consolidation prompt. Runs after code analysis to evaluate whether
+ * same-category articles should be merged or kept separate.
+ */
+export const DEFAULT_CONSOLIDATION_PROMPT = `You are reviewing a set of proposed wiki articles that were all assigned to the same category. Your single job is to decide whether they should be merged into one article or kept as separate articles.
+
+## Decision Criteria
+
+MERGE when:
+- The articles cover the same module or functional area and would make sense as one well-organized article
+- The articles were split along code architecture boundaries (data layer vs API vs business logic vs commands vs queries)
+- The articles would be under 8,000 characters combined
+- A reader would expect to find all this information in one place
+
+KEEP SEPARATE when:
+- The articles cover genuinely different user-facing workflows (e.g., "hiring workflow" vs "student application flow")
+- The articles involve different user roles with different permissions
+- Each article is substantial (2,000+ characters) and covers a distinct topic that a reader would search for independently
+
+## Rules
+- Splitting by code architecture (Read Side vs Write Side, Commands vs Queries, Handlers vs Validators) is NEVER a valid reason to keep articles separate
+- A merged article must read naturally with clear section headings — not like a concatenation of separate articles
+- If keeping separate, fix any titles that contain architecture jargon (e.g., "Read Side", "Write Side", "State Resolution", "Commands", "Handlers")
+- Titles must use plain business language and follow "Module: Topic" format when prefixed
+- NEVER use parentheses in article titles`;
+
+/**
+ * Build the full consolidation review prompt for a group of same-category articles.
+ */
+export function buildConsolidationPrompt(
+  articles: Array<{
+    title: string;
+    content_markdown: string;
+    change_summary: string;
+  }>,
+  category: string,
+  stylePrompt: string,
+  consolidationPrompt: string
+): string {
+  // Detect jargon in titles as informational context
+  const JARGON_KEYWORDS = [
+    "read side", "write side", "commands", "queries", "handlers",
+    "validators", "state resolution", "ioc", "dependency injection",
+    "ef core", "dbcontext", "dtos", "api models", "module composition",
+    "cqrs", "repository", "data access", "command handler", "query service",
+    "mapping", "configuration", "registration",
+  ];
+
+  const jargonFlags: string[] = [];
+  for (const article of articles) {
+    const titleLower = article.title.toLowerCase();
+    const found = JARGON_KEYWORDS.filter((kw) => titleLower.includes(kw));
+    if (found.length > 0) {
+      jargonFlags.push(`- "${article.title}" contains architecture terms: ${found.join(", ")}`);
+    }
+  }
+
+  const articlesBlock = articles
+    .map(
+      (a, i) =>
+        `### Article ${i + 1}: ${a.title}\n**Change summary:** ${a.change_summary}\n\n${a.content_markdown}`
+    )
+    .join("\n\n---\n\n");
+
+  return `${consolidationPrompt}
+
+## Category
+${category}
+
+## Articles to Review (${articles.length} articles)
+
+${articlesBlock}
+${
+  jargonFlags.length > 0
+    ? `\n## Jargon Detection\nThe following titles contain architecture terminology that may indicate a code-boundary split:\n${jargonFlags.join("\n")}\n`
+    : ""
+}
+## Article Writing Style
+${stylePrompt}
+
+Evaluate these articles and return your decision.`;
+}
 
 // =============================================================================
 // Generation Prompt

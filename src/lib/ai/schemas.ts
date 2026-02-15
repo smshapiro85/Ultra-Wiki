@@ -21,6 +21,9 @@ export const articlePlanSchema = z.object({
     })
   ).describe("Database tables related to this article"),
   category_suggestion: z.string().describe("Slug of the suggested category (prefer existing categories)"),
+  subcategory_suggestion: z.string().nullable().describe(
+    "Slug of the suggested subcategory within the category, or null if article should be directly in the category. Only suggest subcategories when the category has 8+ articles covering distinct sub-topics."
+  ),
   conflicts_with_human_edits: z.array(z.string()).describe("Descriptions of conflicts with human-edited content, if any"),
 });
 
@@ -49,4 +52,21 @@ export type ArticlePlan = z.infer<typeof articlePlanSchema>;
  */
 export const generationResponseSchema = z.object({
   content_markdown: z.string().describe("Full article body in Markdown (no code blocks, business-focused)"),
+});
+
+/**
+ * Schema for the consolidation review response.
+ * Used when the post-analysis step evaluates whether same-category articles
+ * should be merged or kept separate.
+ */
+export const consolidationReviewSchema = z.object({
+  decision: z.enum(["merge", "keep_separate"])
+    .describe("Whether to merge these articles into one or keep them separate"),
+  reasoning: z.string()
+    .describe("Brief explanation of why this decision was made"),
+  articles: z.array(z.object({
+    title: z.string().describe("Article title (plain business language, no jargon)"),
+    content_markdown: z.string().describe("Full article content in Markdown"),
+    change_summary: z.string().describe("Brief description of what this article covers"),
+  })).describe("If merge: array with 1 merged article. If keep_separate: original articles with any title/content fixes applied."),
 });
