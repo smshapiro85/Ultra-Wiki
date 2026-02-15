@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 10 of 10 (Navigation and Article Creation)
-Plan: 2 of 5 in current phase (2 complete)
+Plan: 3 of 5 in current phase (3 complete)
 Status: Executing Phase 10
-Last activity: 2026-02-15 -- Completed 10-02 (AI Pipeline Subcategory Awareness)
+Last activity: 2026-02-15 -- Completed 10-03 (Header Redesign and Create Article Modal)
 
-Progress: [████████████████████] 100% (33/33 plans across phases 1-9) + Phase 10: [████████            ] 40% (2/5 plans)
+Progress: [████████████████████] 100% (33/33 plans across phases 1-9) + Phase 10: [████████████        ] 60% (3/5 plans)
 
 ## Performance Metrics
 
@@ -36,7 +36,7 @@ Progress: [████████████████████] 100% (3
 | 07 | 3 | 12min | 4min |
 | 08 | 4 | 5min | 1min |
 | 09 | 1 | 5min | 5min |
-| 10 | 2/5 | 6min | 3min |
+| 10 | 3/5 | 9min | 3min |
 
 *Updated after each plan completion*
 
@@ -61,9 +61,11 @@ Progress: [████████████████████] 100% (3
 - subcategory_suggestion is nullable string (null = no subcategory, preserving default behavior)
 - Max hierarchy depth 2 levels (Category > Subcategory) enforced by prompt rules
 - Subcategory resolution matches by slug AND parentCategoryId to avoid cross-parent collisions
+- Inline category/subcategory creation in modal uses button outside Radix SelectContent to avoid auto-close
+- Header layout: 3-section flexbox (left AskAi, center search max-w-xl, right actions+user)
 
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 10-02-PLAN.md (AI Pipeline Subcategory Awareness)
-Resume file: .planning/phases/10-navigation-and-article-creation/10-03-PLAN.md
+Stopped at: Completed 10-03-PLAN.md (Header Redesign and Create Article Modal)
+Resume file: .planning/phases/10-navigation-and-article-creation/10-04-PLAN.md
