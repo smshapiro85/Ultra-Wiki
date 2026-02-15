@@ -12,6 +12,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { CategoryTree } from "@/components/wiki/category-tree";
+import { SortableSidebar } from "@/components/wiki/sortable-sidebar";
 import { SidebarToc } from "@/components/wiki/sidebar-toc";
 import type { CategoryWithArticles } from "@/lib/wiki/queries";
 
@@ -40,7 +41,11 @@ export function AppSidebar({ categories, isAdmin }: AppSidebarProps) {
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <CategoryTree categories={categories} isAdmin={isAdmin} />
+            {isAdmin ? (
+              <SortableSidebar categories={categories} isAdmin={isAdmin} />
+            ) : (
+              <CategoryTree categories={categories} isAdmin={false} />
+            )}
           </SidebarGroupContent>
         </SidebarGroup>
 
