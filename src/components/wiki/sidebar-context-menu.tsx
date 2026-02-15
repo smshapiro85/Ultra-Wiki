@@ -786,9 +786,9 @@ export function ArticleContextMenu({
 // NewCategoryButton — "+ New Category" at the bottom of the sidebar
 // =============================================================================
 
-export function NewCategoryButton({ isAdmin }: { isAdmin: boolean }) {
+export function NavigationGroupMenu({ isAdmin }: { isAdmin: boolean }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -804,22 +804,31 @@ export function NewCategoryButton({ isAdmin }: { isAdmin: boolean }) {
     } else {
       toast.success("Category created");
       setName("");
-      setOpen(false);
+      setDialogOpen(false);
       router.refresh();
     }
   }
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors w-full rounded-md hover:bg-accent"
-      >
-        <Plus className="size-3.5" />
-        New Category
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="absolute top-1/2 -translate-y-1/2 right-1 flex aspect-square w-5 items-center justify-center rounded-md p-0 opacity-0 transition-opacity hover:bg-sidebar-accent group-hover/nav:opacity-100 group-data-[collapsible=icon]:hidden"
+          >
+            <Ellipsis className="size-4" />
+            <span className="sr-only">Navigation actions</span>
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="right" align="start">
+          <DropdownMenuItem onSelect={() => setDialogOpen(true)}>
+            <FolderOpen className="size-4" />
+            New Category
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>New Category</DialogTitle>
@@ -849,7 +858,7 @@ export function NewCategoryButton({ isAdmin }: { isAdmin: boolean }) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setOpen(false)}
+                onClick={() => setDialogOpen(false)}
               >
                 Cancel
               </Button>

@@ -52,6 +52,7 @@ Progress: [████████████████████] 100% (3
 
 ### Roadmap Evolution
 - Phase 10 added: Navigation and Article Creation
+- Phase 11 added: Add Review To Articles Too
 
 ### Phase 10 Decisions
 - Slug generation for categories/articles reuses pipeline.ts pattern for consistency

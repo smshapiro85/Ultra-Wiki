@@ -14,7 +14,7 @@ import {
 import { CategoryTree } from "@/components/wiki/category-tree";
 import { SortableSidebar } from "@/components/wiki/sortable-sidebar";
 import { SidebarToc } from "@/components/wiki/sidebar-toc";
-import { NewCategoryButton } from "@/components/wiki/sidebar-context-menu";
+import { NavigationGroupMenu } from "@/components/wiki/sidebar-context-menu";
 import type { CategoryWithArticles } from "@/lib/wiki/queries";
 
 interface AppSidebarProps {
@@ -40,14 +40,16 @@ export function AppSidebar({ categories, isAdmin }: AppSidebarProps) {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <div className="group/nav relative">
+            <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+            <NavigationGroupMenu isAdmin={isAdmin} />
+          </div>
           <SidebarGroupContent>
             {isAdmin ? (
               <SortableSidebar categories={categories} isAdmin={isAdmin} />
             ) : (
               <CategoryTree categories={categories} isAdmin={false} />
             )}
-            <NewCategoryButton isAdmin={isAdmin} />
           </SidebarGroupContent>
         </SidebarGroup>
 

@@ -11,7 +11,6 @@ import {
   useSensor,
   type DragStartEvent,
   type DragEndEvent,
-  type DragOverEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -40,6 +39,8 @@ interface SortableSidebarProps {
 
 // =============================================================================
 // flattenTree - Convert hierarchical data to a flat array for DnD
+// Includes 1px "gap" items at the end of each category/subcategory for
+// "after last article" drop targets.
 // =============================================================================
 
 function flattenTree(categories: CategoryWithArticles[]): FlattenedItem[] {
@@ -107,7 +108,31 @@ function flattenTree(categories: CategoryWithArticles[]): FlattenedItem[] {
           sortOrder: article.sortOrder ?? 0,
         });
       }
+
+      // Gap at end of subcategory's articles
+      result.push({
+        id: `gap-${child.id}`,
+        parentId: child.id,
+        depth: 2,
+        type: "gap",
+        name: "",
+        slug: "",
+        collapsed: false,
+        sortOrder: 99999,
+      });
     }
+
+    // Gap at end of category's direct children (articles + subcategories)
+    result.push({
+      id: `gap-${cat.id}`,
+      parentId: cat.id,
+      depth: 1,
+      type: "gap",
+      name: "",
+      slug: "",
+      collapsed: false,
+      sortOrder: 99999,
+    });
   }
 
   return result;
@@ -128,7 +153,7 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
 
   // Re-flatten when categories prop changes (e.g., after server revalidation)
   useEffect(() => {
-    setItems((prev) => {
+    setItems(() => {
       const newItems = flattenTree(categories);
       // Preserve collapsed state
       return newItems.map((item) => ({
@@ -153,8 +178,7 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
       // Root categories are always visible
       if (item.depth === 0) return true;
       // Check if any ancestor is collapsed
-      let current = item;
-      let parentId = current.parentId;
+      let parentId = item.parentId;
       while (parentId) {
         if (collapsed.has(parentId)) return false;
         const parent = items.find((i) => i.id === parentId);
@@ -189,12 +213,6 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
     previousItemsRef.current = [...items];
   }
 
-  function handleDragOver(event: DragOverEvent) {
-    // We handle most logic in onDragEnd.
-    // onDragOver could be used for real-time visual feedback, but
-    // for simplicity we rely on dnd-kit's built-in overlay + isOver states.
-  }
-
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     setActiveId(null);
@@ -206,59 +224,51 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
 
     if (!activeItem || !overItem) return;
 
-    // === Depth enforcement ===
-    // Categories can only be at depth 0 (root level)
-    if (activeItem.type === "category" && overItem.depth !== 0) {
-      return;
-    }
-    // Subcategories cannot be nested inside other subcategories (max depth 2)
-    if (activeItem.type === "subcategory" && overItem.type === "subcategory" && overItem.depth >= 1) {
-      // Subcategory dragged over another subcategory at depth 1 -> would create depth 2 subcategory -> reject
-      return;
-    }
+    // Gap items can't be dragged
+    if (activeItem.type === "gap") return;
 
-    // Determine the new parentId for the active item
+    // === Determine new parent and validate ===
     let newParentId: string | null = null;
 
     if (activeItem.type === "category") {
-      // Categories stay at root
+      // Categories can only reorder among other categories
+      if (overItem.type !== "category") return;
       newParentId = null;
     } else if (activeItem.type === "subcategory") {
-      // Subcategories must be under a category (depth 0)
       if (overItem.type === "category") {
         newParentId = overItem.id;
       } else if (overItem.parentId) {
-        // Find the root category parent
         const parent = items.find((i) => i.id === overItem.parentId);
         if (parent && parent.type === "category") {
           newParentId = parent.id;
         } else if (parent) {
-          // overItem is under a subcategory, find the root
           const grandparent = items.find((i) => i.id === parent.parentId);
           if (grandparent && grandparent.type === "category") {
             newParentId = grandparent.id;
           }
         }
       }
-      if (!newParentId) return; // Cannot determine valid parent
-    } else {
-      // Articles can go under categories or subcategories
-      if (overItem.type === "category" || overItem.type === "subcategory") {
-        newParentId = overItem.id;
-      } else if (overItem.parentId) {
-        // Drop near another article -> same parent
+      if (!newParentId) return;
+    } else if (activeItem.type === "article") {
+      // Articles can be dropped on articles or gap items (NOT on categories/subcategories)
+      if (overItem.type === "category" || overItem.type === "subcategory") return;
+
+      if (overItem.type === "gap") {
+        // Gap: place at end of that category/subcategory
+        newParentId = overItem.parentId;
+      } else if (overItem.type === "article") {
+        // Article: place at the over article's position (same parent)
         newParentId = overItem.parentId;
       }
       if (!newParentId) return;
     }
 
-    // Compute new ordering using arrayMove on visible items
+    // Compute new ordering
     const oldIndex = visibleItems.findIndex((i) => i.id === active.id);
     const newIndex = visibleItems.findIndex((i) => i.id === over.id);
 
     if (oldIndex === -1 || newIndex === -1) return;
 
-    // Apply the move
     const newVisibleItems = arrayMove(visibleItems, oldIndex, newIndex);
 
     // Update the active item's parentId
@@ -287,6 +297,7 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
     setItems(newItems);
 
     // Build updates array: all siblings sharing the same parent as the moved item
+    // (excluding gap items)
     const affectedItems = newItems.filter(
       (item) =>
         item.parentId === newParentId &&
@@ -314,7 +325,6 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
       sortOrder: number;
     }> = [];
 
-    // Group affected items by their parentId and compute new sortOrders
     const seen = new Set<string>();
     for (const item of allAffected) {
       if (seen.has(item.id)) continue;
@@ -325,7 +335,6 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
       );
       siblings.forEach((sibling, idx) => {
         if (!seen.has(sibling.id) || sibling.id === item.id) {
-          // Map type: subcategory -> category for the server action
           const serverType: "category" | "article" =
             sibling.type === "article" ? "article" : "category";
 
@@ -348,7 +357,6 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
     const result = await reorderSidebarItems(uniqueUpdates);
 
     if ("error" in result) {
-      // Revert on failure
       setItems(previousItemsRef.current);
       toast.error(result.error);
     } else {
@@ -363,10 +371,11 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
 
   // Find the active item for the drag overlay
   const activeItem = activeId ? items.find((i) => i.id === activeId) : null;
+  const activeDragType = activeItem?.type ?? null;
 
   // Build context menu for an item
   function getContextMenu(item: FlattenedItem): React.ReactNode {
-    if (!isAdmin) return null;
+    if (!isAdmin || item.type === "gap") return null;
 
     if (item.type === "category") {
       return (
@@ -401,7 +410,6 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
     >
@@ -409,7 +417,7 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
         items={visibleItemIds}
         strategy={verticalListSortingStrategy}
       >
-        <div className="flex flex-col gap-0.5" role="tree">
+        <div className="flex flex-col" role="tree">
           {visibleItems.map((item) => (
             <SortableItem
               key={item.id}
@@ -422,19 +430,17 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
                   : undefined
               }
               contextMenu={getContextMenu(item)}
+              activeDragType={activeDragType}
             />
           ))}
         </div>
       </SortableContext>
 
-      <DragOverlay>
+      <DragOverlay dropAnimation={null}>
         {activeItem ? (
-          <SortableItem
-            item={activeItem}
-            isAdmin={isAdmin}
-            isCollapsed={false}
-            isDragOverlay
-          />
+          <div className="pointer-events-none translate-x-4 translate-y-2 text-sm text-foreground/50">
+            {activeItem.name}
+          </div>
         ) : null}
       </DragOverlay>
     </DndContext>

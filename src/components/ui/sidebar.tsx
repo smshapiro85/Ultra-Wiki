@@ -48,6 +48,7 @@ type SidebarContextProps = {
   setWidth: (width: number) => void
   isResizing: boolean
   setIsResizing: (resizing: boolean) => void
+  hasHydrated: boolean
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -78,8 +79,9 @@ function SidebarProvider({
   const [openMobile, setOpenMobile] = React.useState(false)
   const [width, setWidthState] = React.useState(SIDEBAR_WIDTH_DEFAULT_PX)
   const [isResizing, setIsResizing] = React.useState(false)
+  const [hasHydrated, setHasHydrated] = React.useState(false)
 
-  // Read persisted width from cookie on mount
+  // Read persisted width from cookie on mount (no transition)
   React.useEffect(() => {
     const match = document.cookie.match(
       new RegExp(`${SIDEBAR_WIDTH_COOKIE_NAME}=(\\d+)`)
@@ -90,6 +92,8 @@ function SidebarProvider({
         setWidthState(w)
       }
     }
+    // Allow transitions after the initial width is applied
+    requestAnimationFrame(() => setHasHydrated(true))
   }, [])
 
   const setWidth = React.useCallback((w: number) => {
@@ -155,8 +159,9 @@ function SidebarProvider({
       setWidth,
       isResizing,
       setIsResizing,
+      hasHydrated,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, width, setWidth, isResizing]
+    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, width, setWidth, isResizing, hasHydrated]
   )
 
   return (
@@ -196,7 +201,8 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset"
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
-  const { isMobile, state, openMobile, setOpenMobile, setWidth, isResizing, setIsResizing } = useSidebar()
+  const { isMobile, state, openMobile, setOpenMobile, setWidth, isResizing, setIsResizing, hasHydrated } = useSidebar()
+  const suppressTransition = !hasHydrated || isResizing
 
   const handleResizeStart = React.useCallback(
     (e: React.MouseEvent) => {
@@ -283,7 +289,7 @@ function Sidebar({
           variant === "floating" || variant === "inset"
             ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
-          isResizing && "!transition-none"
+          suppressTransition && "!transition-none"
         )}
       />
       <div
@@ -297,7 +303,7 @@ function Sidebar({
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
-          isResizing && "!transition-none",
+          suppressTransition && "!transition-none",
           className
         )}
         {...props}

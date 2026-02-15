@@ -233,3 +233,12 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. AI Prompt Refinement & Category Strategy | 4/4 | ✓ Complete | 2026-02-14 |
 | 9. Documentation | 0/1 | ○ Not started | -- |
 | 10. Navigation & Article Creation | 0/5 | ○ Not started | -- |
+
+### Phase 11: Add Review To Articles Too
+
+**Goal:** [To be planned]
+**Depends on:** Phase 10
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 11 to break down)

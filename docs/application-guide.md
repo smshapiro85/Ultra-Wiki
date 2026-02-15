@@ -38,18 +38,19 @@ Internal teams working on a large monolith application lack a living, accurate s
 
 **Ultra Wiki** is a self-hosted, AI-augmented internal wiki that:
 
-- **Automatically generates and updates** wiki articles by analyzing the monolith's source code from GitHub
-- **Allows human editing, commenting, and annotation** on top of AI-generated content
-- **Preserves user contributions** when AI updates articles based on code changes
-- **Provides a technical view** linking articles to their underlying source files and database tables
-- **Offers an "Ask AI" feature** at both the global app level and per-article level for on-the-spot questions
+- **Automatically generates and updates documentation:** Creates and refreshes wiki articles from folders and files you specify in the monolith pulled from GitHub
+- **AI + human co-existence, by design:** Humans can edit, comment, and annotate alongside AI-generated content, and user edits are first-class citizens that are never silently overwritten
+- **Scheduled, code-driven refresh:** On a predefined schedule, AI re-updates articles when code changes, and any updates that require changes in documentation are flagged for review
+- **Developer view for deeper traceability:** Dive from any article into the related source files and database tables, providing engineering-friendly context
+- **Full version history, built in:** Every change is tracked so you can compare versions, view diffs, and restore prior versions when needed
+- **Ask AI anywhere:** Global app-level and per-article Q&A for quick, contextual answers
 
 ### Key Principles
 
+- **Human-first, AI-assisted:** AI accelerates drafting and ongoing updates, but human edits are prioritized, preserved, and never silently overwritten
+- **Privacy-first AI:** No training on data and no data retention when AI services are used
 - **Open-source first:** Use highly-adopted, well-starred open-source libraries and tools wherever possible
-- **Single-tenant:** Built for one company on a private server; not a commercial product
 - **Markdown-native:** All content stored as raw Markdown in the database — no proprietary formats
-- **AI + Human coexistence:** User edits are first-class citizens and are never silently overwritten
 
 ### Target Users
 
