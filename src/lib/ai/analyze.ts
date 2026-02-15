@@ -12,6 +12,7 @@ import { withRetry } from "@/lib/github/retry";
 import { analysisResponseSchema, type AnalysisResponse } from "./schemas";
 import { buildAnalysisPrompt, type PromptContext } from "./prompts";
 import type { PlanResponse } from "./plan";
+import type { UsageTracker } from "./usage";
 
 // ---------------------------------------------------------------------------
 // File Content Fetching
@@ -112,7 +113,7 @@ export async function fetchFileContents(
  * Returns categories sorted by sortOrder.
  */
 export async function getFullCategoryTree(): Promise<
-  Array<{ id: string; name: string; slug: string; parentName?: string }>
+  Array<{ id: string; name: string; slug: string; parentName?: string; parentCategoryId?: string | null }>
 > {
   const db = getDb();
 
@@ -147,6 +148,7 @@ export async function getFullCategoryTree(): Promise<
     id: c.id,
     name: c.name,
     slug: c.slug,
+    parentCategoryId: c.parentCategoryId ?? null,
     ...(c.parentCategoryId
       ? { parentName: categoryMap.get(c.parentCategoryId) }
       : {}),
@@ -361,7 +363,8 @@ export async function analyzeChanges(
   }>,
   analysisPrompt: string,
   articleStylePrompt: string,
-  model: LanguageModel
+  model: LanguageModel,
+  usageTracker?: UsageTracker
 ): Promise<AnalysisResponse> {
   const batches = batchFiles(fileContents);
 
@@ -378,7 +381,7 @@ export async function analyzeChanges(
 
     const prompt = buildAnalysisPrompt(ctx);
 
-    const { experimental_output } = await generateText({
+    const { experimental_output, usage, providerMetadata } = await generateText({
       model,
       temperature: 0.2,
       output: Output.object({ schema: analysisResponseSchema }),
@@ -394,6 +397,8 @@ export async function analyzeChanges(
         },
       ],
     });
+
+    usageTracker?.add(usage, providerMetadata);
 
     if (experimental_output) {
       responses.push(experimental_output);
@@ -565,7 +570,8 @@ export async function analyzeGroup(
   articleStylePrompt: string,
   model: LanguageModel,
   sharedContextSummaries?: Array<{ path: string; summary: string }>,
-  groupArticleLinks?: Map<string, Array<{ slug: string; title: string }>>
+  groupArticleLinks?: Map<string, Array<{ slug: string; title: string }>>,
+  usageTracker?: UsageTracker
 ): Promise<AnalysisResponse> {
   const group = fullPlan.groups.find((g) => g.id === groupId);
   if (!group) {
@@ -595,7 +601,7 @@ export async function analyzeGroup(
       groupArticleLinks
     );
 
-    const { experimental_output } = await generateText({
+    const { experimental_output, usage, providerMetadata } = await generateText({
       model,
       temperature: 0.2,
       output: Output.object({ schema: analysisResponseSchema }),
@@ -611,6 +617,8 @@ export async function analyzeGroup(
         },
       ],
     });
+
+    usageTracker?.add(usage, providerMetadata);
 
     if (experimental_output) {
       responses.push(experimental_output);

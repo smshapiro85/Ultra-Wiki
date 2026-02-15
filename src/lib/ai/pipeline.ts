@@ -11,6 +11,8 @@ import {
 } from "@/lib/db/schema";
 import { getSetting } from "@/lib/settings";
 import { SETTING_KEYS } from "@/lib/settings/constants";
+import { SyncUsageTracker } from "./usage";
+import type { UsageTracker } from "./usage";
 import {
   fetchFileContents,
   analyzeChanges,
@@ -25,6 +27,7 @@ import type { ExpandedPlan } from "@/lib/ai/plan";
 import type { AnalysisResponse } from "@/lib/ai/schemas";
 import { generateArticle } from "@/lib/ai/generate";
 import { getAnalysisModel, getFileSummaryModel } from "@/lib/ai/client";
+import { consolidateArticles } from "@/lib/ai/consolidate";
 import { mergeArticleContent } from "@/lib/merge/three-way";
 import { resolveConflict } from "@/lib/merge/conflict";
 import {
@@ -87,7 +90,8 @@ async function ensureUniqueSlug(slug: string): Promise<string> {
 const MULTI_STAGE_FILE_THRESHOLD = 25;
 const MULTI_STAGE_CHAR_THRESHOLD = 50_000;
 const STAGE1_CONCURRENCY = 5;
-const STAGE3_CONCURRENCY = 2;
+const STAGE3_CONCURRENCY = 5;
+const ARTICLE_CONCURRENCY = 5;
 
 // ---------------------------------------------------------------------------
 // Multi-Stage Pipeline: Decision
@@ -121,7 +125,8 @@ export function needsMultiStagePipeline(
  */
 async function batchSummarizeFiles(
   fileContents: Array<{ path: string; content: string }>,
-  onLog?: (message: string) => void
+  onLog?: (message: string) => void,
+  usageTracker?: UsageTracker
 ): Promise<Array<{ path: string; summary: string }>> {
   const log = onLog ?? ((msg: string) => console.log(`[pipeline] ${msg}`));
   log(`Stage 1: Summarizing ${fileContents.length} files...`);
@@ -156,6 +161,7 @@ async function batchSummarizeFiles(
           model,
           prompt: buildFileSummaryPrompt(file.path, file.content, customPrompt),
         });
+        usageTracker?.add(result.usage, result.providerMetadata);
         const summary = result.text.trim().slice(0, 500);
 
         // Save to DB
@@ -210,12 +216,13 @@ async function runMultiStagePipeline(
   analysisPrompt: string,
   articleStylePrompt: string,
   model: Awaited<ReturnType<typeof getAnalysisModel>>,
-  onLog?: (message: string) => void
+  onLog?: (message: string) => void,
+  usageTracker?: UsageTracker
 ): Promise<AnalysisResponse> {
   const log = onLog ?? ((msg: string) => console.log(`[pipeline] ${msg}`));
 
   // --- Stage 1: Summarize files ---
-  const fileSummaries = await batchSummarizeFiles(fileContents, onLog);
+  const fileSummaries = await batchSummarizeFiles(fileContents, onLog, usageTracker);
 
   // --- Pre-Stage 2: Resolve existing article-file links ---
   log("Resolving existing article-file links...");
@@ -231,7 +238,8 @@ async function runMultiStagePipeline(
     categoryTree,
     articleIndex,
     model,
-    articleLinksMap
+    articleLinksMap,
+    usageTracker
   );
   log(
     `Stage 2 complete: ${plan.groups.length} groups created, ${plan.sharedContextFiles.length} shared context files`
@@ -318,7 +326,8 @@ async function runMultiStagePipeline(
           articleStylePrompt,
           model,
           sharedContextSummaries,
-          groupArticleLinks.size > 0 ? groupArticleLinks : undefined
+          groupArticleLinks.size > 0 ? groupArticleLinks : undefined,
+          usageTracker
         );
       })
     );
@@ -364,62 +373,20 @@ async function runMultiStagePipeline(
 
 /**
  * Generate short AI summaries for changed source files.
- * Uses the separate summary model (fast/cheap) for 1-2 sentence descriptions.
- * Non-fatal: if summary model is not configured, logs a warning and returns.
+ * Delegates to batchSummarizeFiles for parallel processing (concurrency 5).
+ * Non-fatal: if summary model is not configured, batchSummarizeFiles falls
+ * back to path-based summaries.
  */
 async function generateFileSummaries(
-  changedFilePaths: string[]
+  changedFilePaths: string[],
+  usageTracker?: UsageTracker
 ): Promise<void> {
   if (changedFilePaths.length === 0) return;
 
-  // Dynamic import to avoid build-time issues
-  let model;
-  try {
-    const { getFileSummaryModel } = await import("@/lib/ai/client");
-    model = await getFileSummaryModel();
-  } catch (error) {
-    console.warn(
-      "[pipeline] Summary model not configured, skipping file summaries:",
-      error instanceof Error ? error.message : String(error)
-    );
-    return;
-  }
-
-  const { generateText } = await import("ai");
-  const { buildFileSummaryPrompt } = await import("@/lib/ai/prompts");
-
-  const customPrompt =
-    (await getSetting(SETTING_KEYS.file_summary_prompt)) ?? "";
-
-  // Fetch file contents for the changed paths
   const fileContents = await fetchFileContents(changedFilePaths);
+  if (fileContents.length === 0) return;
 
-  let count = 0;
-  const db = getDb();
-
-  for (const file of fileContents) {
-    try {
-      const result = await generateText({
-        model,
-        prompt: buildFileSummaryPrompt(file.path, file.content, customPrompt),
-      });
-
-      await db
-        .update(githubFiles)
-        .set({ aiSummary: result.text.trim().slice(0, 500) })
-        .where(eq(githubFiles.filePath, file.path));
-
-      count++;
-    } catch (error) {
-      console.error(
-        `[pipeline] Failed to generate summary for "${file.path}":`,
-        error instanceof Error ? error.message : String(error)
-      );
-      // Continue with remaining files
-    }
-  }
-
-  console.log(`[pipeline] Generated ${count} file summaries`);
+  await batchSummarizeFiles(fileContents, undefined, usageTracker);
 }
 
 // ---------------------------------------------------------------------------
@@ -473,6 +440,7 @@ export async function runAIPipeline(
   // 5. Run AI analysis — branch between fast path and multi-stage pipeline
   const useMultiStage = needsMultiStagePipeline(fileContents);
   const pipelineLog = options?.onLog;
+  const usageTracker = new SyncUsageTracker();
   let analysisResponse: AnalysisResponse;
 
   if (useMultiStage) {
@@ -486,7 +454,8 @@ export async function runAIPipeline(
       analysisPrompt ?? "",
       articleStylePrompt ?? "",
       analysisModel,
-      pipelineLog
+      pipelineLog,
+      usageTracker
     );
     // Stage 1 already generated and saved file summaries — skip step 6.5
   } else {
@@ -496,7 +465,23 @@ export async function runAIPipeline(
       articleIndex,
       analysisPrompt ?? "",
       articleStylePrompt ?? "",
-      analysisModel
+      analysisModel,
+      usageTracker
+    );
+  }
+
+  // 5.5. Consolidate articles (LLM-reviewed enforcement of consolidation rules)
+  const preConsolidationCount = analysisResponse.articles.length;
+  analysisResponse = await consolidateArticles(
+    analysisResponse,
+    analysisModel,
+    articleStylePrompt ?? "",
+    pipelineLog,
+    usageTracker
+  );
+  if (analysisResponse.articles.length !== preConsolidationCount) {
+    pipelineLog?.(
+      `Consolidated ${preConsolidationCount} -> ${analysisResponse.articles.length} articles`
     );
   }
 
@@ -505,38 +490,53 @@ export async function runAIPipeline(
   let articlesUpdated = 0;
   const errors: string[] = [];
 
-  for (const articlePlan of analysisResponse.articles) {
-    try {
-      if (articlePlan.action === "create") {
-        await processCreateArticle(
-          articlePlan,
-          categoryTree,
-          articleStylePrompt ?? "",
-          analysisModel
-        );
-        articlesCreated++;
-      } else {
-        // action === "update"
-        const wasCreated = await processUpdateArticle(
-          articlePlan,
-          categoryTree,
-          articleStylePrompt ?? "",
-          analysisModel
-        );
-        if (wasCreated) {
+  for (let i = 0; i < analysisResponse.articles.length; i += ARTICLE_CONCURRENCY) {
+    const chunk = analysisResponse.articles.slice(i, i + ARTICLE_CONCURRENCY);
+
+    const chunkResults = await Promise.allSettled(
+      chunk.map(async (articlePlan) => {
+        if (articlePlan.action === "create") {
+          await processCreateArticle(
+            articlePlan,
+            categoryTree,
+            articleStylePrompt ?? "",
+            analysisModel,
+            usageTracker
+          );
+          return "created" as const;
+        } else {
+          const wasCreated = await processUpdateArticle(
+            articlePlan,
+            categoryTree,
+            articleStylePrompt ?? "",
+            analysisModel,
+            usageTracker
+          );
+          return wasCreated ? ("created" as const) : ("updated" as const);
+        }
+      })
+    );
+
+    for (let j = 0; j < chunkResults.length; j++) {
+      const result = chunkResults[j];
+      if (result.status === "fulfilled") {
+        if (result.value === "created") {
           articlesCreated++;
         } else {
           articlesUpdated++;
         }
+      } else {
+        const articlePlan = chunk[j];
+        const msg =
+          result.reason instanceof Error
+            ? result.reason.message
+            : String(result.reason);
+        console.error(
+          `[pipeline] Failed to process article "${articlePlan.slug}":`,
+          msg
+        );
+        errors.push(`${articlePlan.slug}: ${msg}`);
       }
-    } catch (error) {
-      const msg =
-        error instanceof Error ? error.message : String(error);
-      console.error(
-        `[pipeline] Failed to process article "${articlePlan.slug}":`,
-        msg
-      );
-      errors.push(`${articlePlan.slug}: ${msg}`);
     }
   }
 
@@ -544,18 +544,23 @@ export async function runAIPipeline(
   // Skip if multi-stage pipeline already generated summaries in Stage 1
   if (!useMultiStage) {
     try {
-      await generateFileSummaries(changedFilePaths);
+      await generateFileSummaries(changedFilePaths, usageTracker);
     } catch (error) {
       console.error("[pipeline] File summary generation error:", error);
       // Non-fatal -- summaries are supplementary
     }
   }
 
-  // 7. Update sync_logs with article counts
+  // 7. Update sync_logs with article counts and usage
   const db = getDb();
   const updateFields: Record<string, unknown> = {
     articlesCreated,
     articlesUpdated,
+    totalInputTokens: usageTracker.totalInputTokens,
+    totalOutputTokens: usageTracker.totalOutputTokens,
+    estimatedCostUsd: usageTracker.estimatedCostUsd > 0
+      ? usageTracker.estimatedCostUsd.toFixed(6)
+      : null,
   };
   if (errors.length > 0) {
     // Append pipeline errors to any existing error message
@@ -597,17 +602,20 @@ async function processCreateArticle(
       relevance: string;
     }>;
     category_suggestion: string;
+    subcategory_suggestion?: string | null;
   },
-  categoryTree: Array<{ id: string; name: string; slug: string }>,
+  categoryTree: Array<{ id: string; name: string; slug: string; parentCategoryId?: string | null }>,
   stylePrompt: string,
-  model: LanguageModel
+  model: LanguageModel,
+  usageTracker?: UsageTracker
 ): Promise<void> {
   const db = getDb();
 
-  // a. Resolve or create category
+  // a. Resolve or create category (with optional subcategory)
   const categoryId = await resolveOrCreateCategory(
     articlePlan.category_suggestion,
-    categoryTree
+    categoryTree,
+    articlePlan.subcategory_suggestion
   );
 
   // b. Generate full content if needed
@@ -617,7 +625,8 @@ async function processCreateArticle(
     const generated = await generateArticle(
       articlePlan as Parameters<typeof generateArticle>[0],
       stylePrompt,
-      model
+      model,
+      usageTracker
     );
     contentMarkdown = generated.contentMarkdown;
   }
@@ -691,10 +700,12 @@ async function processUpdateArticle(
       relevance: string;
     }>;
     category_suggestion: string;
+    subcategory_suggestion?: string | null;
   },
-  categoryTree: Array<{ id: string; name: string; slug: string }>,
+  categoryTree: Array<{ id: string; name: string; slug: string; parentCategoryId?: string | null }>,
   stylePrompt: string,
-  model: LanguageModel
+  model: LanguageModel,
+  usageTracker?: UsageTracker
 ): Promise<boolean> {
   const db = getDb();
 
@@ -715,7 +726,7 @@ async function processUpdateArticle(
     console.warn(
       `[pipeline] Article "${articlePlan.slug}" not found for update, creating instead.`
     );
-    await processCreateArticle(articlePlan, categoryTree, stylePrompt, model);
+    await processCreateArticle(articlePlan, categoryTree, stylePrompt, model, usageTracker);
     return true;
   }
 
@@ -727,7 +738,8 @@ async function processUpdateArticle(
     const generated = await generateArticle(
       articlePlan as Parameters<typeof generateArticle>[0],
       stylePrompt,
-      model
+      model,
+      usageTracker
     );
     contentMarkdown = generated.contentMarkdown;
   }
@@ -780,6 +792,7 @@ async function processUpdateArticle(
       changeSummary: articlePlan.change_summary,
       triggerReview: true,
       model,
+      usageTracker,
     });
 
     // v. Update article with resolved content (contentJson deferred)
@@ -848,7 +861,8 @@ async function processUpdateArticle(
  */
 async function resolveOrCreateCategory(
   categorySuggestion: string,
-  categoryTree: Array<{ id: string; name: string; slug: string }>
+  categoryTree: Array<{ id: string; name: string; slug: string; parentCategoryId?: string | null }>,
+  subcategorySuggestion?: string | null
 ): Promise<string | null> {
   if (!categorySuggestion) return null;
 
@@ -858,46 +872,105 @@ async function resolveOrCreateCategory(
   const bySlug = categoryTree.find(
     (c) => c.slug === categorySuggestion.toLowerCase()
   );
-  if (bySlug) return bySlug.id;
+  let parentId: string | undefined;
+  if (bySlug) {
+    parentId = bySlug.id;
+  }
 
-  // Try matching by name (case-insensitive)
-  const byName = categoryTree.find(
-    (c) => c.name.toLowerCase() === categorySuggestion.toLowerCase()
+  if (!parentId) {
+    // Try matching by name (case-insensitive)
+    const byName = categoryTree.find(
+      (c) => c.name.toLowerCase() === categorySuggestion.toLowerCase()
+    );
+    if (byName) {
+      parentId = byName.id;
+    }
+  }
+
+  if (!parentId) {
+    // Not found -- create a new category (or find one that was just created)
+    const slug = generateSlug(categorySuggestion);
+    const name =
+      categorySuggestion.charAt(0).toUpperCase() +
+      categorySuggestion.slice(1);
+
+    console.log(`[pipeline] Creating new category: "${name}" (${slug})`);
+
+    // Use onConflictDoNothing in case another article in this batch just created it
+    const inserted = await db
+      .insert(categories)
+      .values({ name, slug })
+      .onConflictDoNothing()
+      .returning({ id: categories.id });
+
+    if (inserted.length > 0) {
+      parentId = inserted[0].id;
+    } else {
+      // Already exists (race condition or duplicate in batch) — look it up
+      const [existing] = await db
+        .select({ id: categories.id })
+        .from(categories)
+        .where(eq(categories.slug, slug))
+        .limit(1);
+      parentId = existing.id;
+    }
+
+    // Update the in-memory cache so subsequent articles in this pipeline run find it
+    categoryTree.push({ id: parentId, name, slug, parentCategoryId: null });
+  }
+
+  // If no subcategory suggestion, return the parent category ID (existing behavior)
+  if (!subcategorySuggestion) return parentId;
+
+  // Subcategory handling: look for existing subcategory under this parent
+  const subSlug = subcategorySuggestion.toLowerCase();
+  const existingSub = categoryTree.find(
+    (c) => c.slug === subSlug && c.parentCategoryId === parentId
   );
-  if (byName) return byName.id;
+  if (existingSub) return existingSub.id;
 
-  // Not found -- create a new category (or find one that was just created)
-  const slug = generateSlug(categorySuggestion);
-  const name =
-    categorySuggestion.charAt(0).toUpperCase() +
-    categorySuggestion.slice(1);
+  // Create the subcategory
+  const newSubSlug = generateSlug(subcategorySuggestion);
+  const newSubName =
+    subcategorySuggestion.charAt(0).toUpperCase() +
+    subcategorySuggestion.slice(1);
 
-  console.log(`[pipeline] Creating new category: "${name}" (${slug})`);
+  console.log(
+    `[pipeline] Creating new subcategory: "${newSubName}" (${newSubSlug}) under parent ${parentId}`
+  );
 
-  // Use onConflictDoNothing in case another article in this batch just created it
-  const inserted = await db
+  const insertedSub = await db
     .insert(categories)
-    .values({ name, slug })
+    .values({
+      name: newSubName,
+      slug: newSubSlug,
+      parentCategoryId: parentId,
+    })
     .onConflictDoNothing()
     .returning({ id: categories.id });
 
-  let categoryId: string;
-  if (inserted.length > 0) {
-    categoryId = inserted[0].id;
+  let subId: string;
+  if (insertedSub.length > 0) {
+    subId = insertedSub[0].id;
   } else {
-    // Already exists (race condition or duplicate in batch) — look it up
-    const [existing] = await db
+    // Already exists — look it up
+    const [existingSubRow] = await db
       .select({ id: categories.id })
       .from(categories)
-      .where(eq(categories.slug, slug))
+      .where(eq(categories.slug, newSubSlug))
       .limit(1);
-    categoryId = existing.id;
+    subId = existingSubRow.id;
   }
 
-  // Update the in-memory cache so subsequent articles in this pipeline run find it
-  categoryTree.push({ id: categoryId, name, slug });
+  // Update the in-memory cache
+  categoryTree.push({
+    id: subId,
+    name: newSubName,
+    slug: newSubSlug,
+    parentCategoryId: parentId,
+  });
 
-  return categoryId;
+  return subId;
 }
 
 // ---------------------------------------------------------------------------

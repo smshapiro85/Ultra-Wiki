@@ -1,5 +1,6 @@
 import { z } from "zod/v4";
 import { generateText, Output, type LanguageModel } from "ai";
+import type { UsageTracker } from "./usage";
 
 // ---------------------------------------------------------------------------
 // Schema — original (used by analyze.ts type import)
@@ -376,12 +377,33 @@ export function buildPlanningPrompt(
 
   const categorySection =
     categoryTree.length > 0
-      ? categoryTree
-          .map(
-            (c) =>
-              `- ${c.parentName ? `${c.parentName} > ` : ""}${c.name} (slug: ${c.slug})`
-          )
-          .join("\n")
+      ? (() => {
+          const roots = categoryTree.filter((c) => !c.parentName);
+          const children = categoryTree.filter((c) => c.parentName);
+          const lines: string[] = [];
+          for (const root of roots) {
+            lines.push(`- ${root.name} (slug: ${root.slug})`);
+            for (const child of children) {
+              if (child.parentName === root.name) {
+                lines.push(`  - ${child.name} (slug: ${child.slug}) [subcategory of ${root.name}]`);
+              }
+            }
+          }
+          // Include children whose parent is not in roots (edge case)
+          const renderedChildSlugs = new Set(
+            roots.flatMap((root) =>
+              children
+                .filter((child) => child.parentName === root.name)
+                .map((child) => child.slug)
+            )
+          );
+          for (const child of children) {
+            if (!renderedChildSlugs.has(child.slug)) {
+              lines.push(`  - ${child.name} (slug: ${child.slug}) [subcategory of ${child.parentName}]`);
+            }
+          }
+          return lines.join("\n");
+        })()
       : "(No categories yet)";
 
   const articleSection =
@@ -423,6 +445,8 @@ ${articleSection}
 
 8. **Kebab-case IDs.** Group IDs must be kebab-case (e.g. "user-authentication", "job-management").
 
+9. **Subcategory awareness.** If the existing category tree shows subcategories (indented under a parent), propose articles into the appropriate subcategory when it fits. Do not create new subcategories in the planning stage — that decision is made during analysis.
+
 Return a JSON plan with groups, shared_context_patterns, and a brief rationale for the overall strategy.`;
 }
 
@@ -445,7 +469,8 @@ export async function planGroups(
     hasHumanEdits: boolean;
   }>,
   model: LanguageModel,
-  articleLinksMap?: ArticleLinksMap
+  articleLinksMap?: ArticleLinksMap,
+  usageTracker?: UsageTracker
 ): Promise<ExpandedPlan> {
   const linksMap = articleLinksMap ?? new Map();
 
@@ -458,7 +483,7 @@ export async function planGroups(
     articleIndex
   );
 
-  const { experimental_output } = await generateText({
+  const { experimental_output, usage, providerMetadata } = await generateText({
     model,
     temperature: 0.2,
     output: Output.object({ schema: rawPlanResponseSchema }),
@@ -474,6 +499,8 @@ export async function planGroups(
       },
     ],
   });
+
+  usageTracker?.add(usage, providerMetadata);
 
   if (!experimental_output) {
     return {
