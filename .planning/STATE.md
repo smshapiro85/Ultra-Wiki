@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 Phase: 10 of 10 (Navigation and Article Creation)
-Plan: 3 of 5 in current phase (3 complete)
+Plan: 4 of 5 in current phase (4 complete)
 Status: Executing Phase 10
-Last activity: 2026-02-15 -- Completed 10-03 (Header Redesign and Create Article Modal)
+Last activity: 2026-02-15 -- Completed 10-04 (Sidebar Context Menus)
 
-Progress: [████████████████████] 100% (33/33 plans across phases 1-9) + Phase 10: [████████████        ] 60% (3/5 plans)
+Progress: [████████████████████] 100% (33/33 plans across phases 1-9) + Phase 10: [████████████████    ] 80% (4/5 plans)
 
 ## Performance Metrics
 
@@ -36,7 +36,7 @@ Progress: [████████████████████] 100% (3
 | 07 | 3 | 12min | 4min |
 | 08 | 4 | 5min | 1min |
 | 09 | 1 | 5min | 5min |
-| 10 | 3/5 | 9min | 3min |
+| 10 | 4/5 | 12min | 3min |
 
 *Updated after each plan completion*
 
@@ -63,9 +63,11 @@ Progress: [████████████████████] 100% (3
 - Subcategory resolution matches by slug AND parentCategoryId to avoid cross-parent collisions
 - Inline category/subcategory creation in modal uses button outside Radix SelectContent to avoid auto-close
 - Header layout: 3-section flexbox (left AskAi, center search max-w-xl, right actions+user)
+- Categories/subcategories use Plus icon trigger; articles use Ellipsis trigger for context menus
+- Article delete uses AlertDialog confirmation; category/subcategory delete relies on server-side article guard
 
 ## Session Continuity
 
 Last session: 2026-02-15
-Stopped at: Completed 10-03-PLAN.md (Header Redesign and Create Article Modal)
-Resume file: .planning/phases/10-navigation-and-article-creation/10-04-PLAN.md
+Stopped at: Completed 10-04-PLAN.md (Sidebar Context Menus)
+Resume file: .planning/phases/10-navigation-and-article-creation/10-05-PLAN.md
