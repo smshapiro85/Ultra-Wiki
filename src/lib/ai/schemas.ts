@@ -5,7 +5,7 @@ import { z } from "zod/v4";
  */
 export const articlePlanSchema = z.object({
   slug: z.string().describe("URL-safe slug for the article (existing or new)"),
-  title: z.string().describe("Human-readable article title"),
+  title: z.string().describe("Human-readable article title. When prefixed with a module/category name, use colon format: 'Module: Topic' (e.g., 'Communities: Member Management')"),
   action: z.enum(["create", "update"]).describe("Whether to create a new article or update an existing one"),
   content_markdown: z.string().describe("Full article body in Markdown (no code blocks, business-focused)"),
   change_summary: z.string().describe("Brief description of what changed and why"),

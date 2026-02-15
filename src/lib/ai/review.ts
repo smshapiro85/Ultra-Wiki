@@ -1,6 +1,5 @@
-import { generateText, Output } from "ai";
+import { generateText, Output, type LanguageModel } from "ai";
 import { z } from "zod/v4";
-import { getAIModel } from "@/lib/ai/client";
 import { getDb } from "@/lib/db";
 import { aiReviewAnnotations } from "@/lib/db/schema";
 
@@ -52,6 +51,7 @@ export async function generateReviewAnnotations(params: {
   aiProposedMarkdown: string;
   humanMarkdown: string;
   changeSummary: string;
+  model: LanguageModel;
 }): Promise<void> {
   const {
     articleId,
@@ -60,9 +60,8 @@ export async function generateReviewAnnotations(params: {
     aiProposedMarkdown,
     humanMarkdown,
     changeSummary,
+    model,
   } = params;
-
-  const model = await getAIModel();
 
   const prompt = `You are reviewing a wiki article after an automated three-way merge of AI-generated content with human edits.
 

@@ -1,3 +1,4 @@
+import type { LanguageModel } from "ai";
 import { type MergeResult } from "./three-way";
 import { createArticleVersion } from "@/lib/content/version";
 import { getDb } from "@/lib/db";
@@ -40,6 +41,7 @@ export async function resolveConflict(params: {
   aiProposedMarkdown: string;
   changeSummary: string;
   triggerReview?: boolean;
+  model?: LanguageModel;
 }): Promise<ConflictResolution> {
   const {
     articleId,
@@ -99,7 +101,7 @@ export async function resolveConflict(params: {
   // CLEAN MERGE PATH: Use the merged content directly.
 
   // Trigger LLM review for semantic issues after clean merge
-  if (params.triggerReview) {
+  if (params.triggerReview && params.model) {
     try {
       const { generateReviewAnnotations } = await import("@/lib/ai/review");
       await generateReviewAnnotations({
@@ -108,6 +110,7 @@ export async function resolveConflict(params: {
         aiProposedMarkdown,
         humanMarkdown: currentMarkdown,
         changeSummary,
+        model: params.model,
       });
     } catch (err) {
       console.error("[resolveConflict] Annotation generation failed:", err);

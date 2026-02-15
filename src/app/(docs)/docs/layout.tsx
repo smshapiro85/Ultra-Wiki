@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { CircleHelp } from "lucide-react";
@@ -9,24 +8,23 @@ import { eq } from "drizzle-orm";
 import {
   SidebarProvider,
   SidebarInset,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/wiki/app-sidebar";
-import { SearchInput } from "@/components/wiki/search-input";
-import { TocProvider } from "@/components/wiki/toc-context";
-import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
-import { AskAiGlobalTrigger } from "@/components/chat/ask-ai-global-trigger";
 import { AdminSettingsDropdown } from "@/components/admin/admin-settings-dropdown";
 import { UserMenu } from "@/components/common/user-menu";
+import { TocProvider } from "@/components/wiki/toc-context";
+import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
 
-export default async function WikiLayout({
+export default async function DocsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const session = await auth();
 
-  if (!session?.user?.id) {
+  if (!session?.user) {
     redirect("/login");
   }
 
@@ -55,25 +53,17 @@ export default async function WikiLayout({
         <AppSidebar categories={categoryTree} />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
-            <AskAiGlobalTrigger />
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="h-4" />
             <div className="ml-auto flex items-center gap-2">
-              <div className="w-64">
-                <Suspense fallback={<Skeleton className="h-9 w-full" />}>
-                  <SearchInput />
-                </Suspense>
-              </div>
-              {user.role === "admin" && (
-                <>
-                  <Link
-                    href="/docs"
-                    className="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                    title="Help & Docs"
-                  >
-                    <CircleHelp className="size-5" />
-                  </Link>
-                  <AdminSettingsDropdown />
-                </>
-              )}
+              <Link
+                href="/docs"
+                className="flex items-center justify-center rounded-md p-2 text-foreground bg-accent"
+                title="Help & Docs"
+              >
+                <CircleHelp className="size-5" />
+              </Link>
+              {user.role === "admin" && <AdminSettingsDropdown />}
               <UserMenu user={user} />
             </div>
           </header>

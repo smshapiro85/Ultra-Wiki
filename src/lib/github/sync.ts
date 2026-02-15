@@ -308,7 +308,9 @@ export async function runSync(
       log?.(`Running AI analysis on ${changedFilePaths.length} files...`);
       try {
         const { runAIPipeline } = await import("@/lib/ai/pipeline");
-        aiStats = await runAIPipeline(syncLogId, changedFilePaths);
+        aiStats = await runAIPipeline(syncLogId, changedFilePaths, {
+          onLog: log,
+        });
         log?.(
           `AI analysis complete: ${aiStats.articlesCreated} articles created, ${aiStats.articlesUpdated} updated`
         );

@@ -221,7 +221,7 @@ function TreeNodeItem({
               includedSet={includedSet}
               onToggle={onToggle}
               depth={depth + 1}
-              defaultExpanded={defaultExpanded}
+              defaultExpanded={false}
             />
           ))}
         </div>

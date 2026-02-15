@@ -6,22 +6,62 @@ import { Tabs as TabsPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+// Context to pass slide direction from Tabs root to TabsContent children
+const SlideDirectionContext = React.createContext<"left" | "right" | null>(null)
+
 function Tabs({
   className,
   orientation = "horizontal",
+  onValueChange,
+  defaultValue,
+  value,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [direction, setDirection] = React.useState<"left" | "right" | null>(
+    null
+  )
+  const prevValueRef = React.useRef<string | undefined>(
+    (value ?? defaultValue) as string | undefined
+  )
+
+  const handleValueChange = React.useCallback(
+    (newValue: string) => {
+      const root = ref.current
+      if (root && prevValueRef.current != null) {
+        const triggers = Array.from(
+          root.querySelectorAll<HTMLElement>('[data-slot="tabs-trigger"]')
+        )
+        const values = triggers.map((t) => t.getAttribute("data-tab-value"))
+        const prevIdx = values.indexOf(prevValueRef.current)
+        const newIdx = values.indexOf(newValue)
+        if (prevIdx >= 0 && newIdx >= 0) {
+          setDirection(newIdx > prevIdx ? "left" : "right")
+        }
+      }
+      prevValueRef.current = newValue
+      onValueChange?.(newValue)
+    },
+    [onValueChange]
+  )
+
   return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      data-orientation={orientation}
-      orientation={orientation}
-      className={cn(
-        "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
-        className
-      )}
-      {...props}
-    />
+    <SlideDirectionContext.Provider value={direction}>
+      <TabsPrimitive.Root
+        {...props}
+        ref={ref}
+        data-slot="tabs"
+        data-orientation={orientation}
+        orientation={orientation}
+        defaultValue={defaultValue}
+        value={value}
+        onValueChange={handleValueChange}
+        className={cn(
+          "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
+          className
+        )}
+      />
+    </SlideDirectionContext.Provider>
   )
 }
 
@@ -58,11 +98,14 @@ function TabsList({
 
 function TabsTrigger({
   className,
+  value,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
+      data-tab-value={value}
+      value={value}
       className={cn(
         "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring text-foreground/60 hover:text-foreground dark:text-muted-foreground dark:hover:text-foreground relative inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-4 py-1 text-sm font-medium whitespace-nowrap transition-all group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 group-data-[variant=default]/tabs-list:data-[state=active]:shadow-sm group-data-[variant=line]/tabs-list:data-[state=active]:shadow-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         "group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:border-transparent dark:group-data-[variant=line]/tabs-list:data-[state=active]:bg-transparent",
@@ -79,10 +122,17 @@ function TabsContent({
   className,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Content>) {
+  const direction = React.useContext(SlideDirectionContext)
+
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      className={cn(
+        "flex-1 outline-none",
+        direction === "left" && "data-[state=active]:animate-tab-slide-left",
+        direction === "right" && "data-[state=active]:animate-tab-slide-right",
+        className
+      )}
       {...props}
     />
   )

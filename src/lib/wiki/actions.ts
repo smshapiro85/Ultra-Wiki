@@ -138,9 +138,12 @@ export async function regenerateArticle(
       );
     }
 
-    // 5. Get article style prompt
-    const stylePrompt =
-      (await getSetting(SETTING_KEYS.article_style_prompt)) ?? "";
+    // 5. Get article style prompt + model
+    const { getAnalysisModel } = await import("@/lib/ai/client");
+    const [stylePrompt, analysisModel] = await Promise.all([
+      getSetting(SETTING_KEYS.article_style_prompt),
+      getAnalysisModel(),
+    ]);
 
     // 6. Generate new content (dynamic import)
     const { generateArticle } = await import("@/lib/ai/generate");
@@ -156,7 +159,8 @@ export async function regenerateArticle(
         category_suggestion: "",
         conflicts_with_human_edits: [],
       },
-      stylePrompt
+      stylePrompt ?? "",
+      analysisModel
     );
 
     // 7. Apply content based on merge strategy

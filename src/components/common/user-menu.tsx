@@ -35,37 +35,29 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 rounded-md px-2 py-1 outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-ring">
+        <button className="flex items-center rounded-full outline-none hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring">
           <Avatar className="h-8 w-8">
             <AvatarImage src={avatarSrc} alt={user.name ?? "User"} referrerPolicy="no-referrer" />
             <AvatarFallback className="text-xs">{initials}</AvatarFallback>
           </Avatar>
-          <span className="hidden text-sm text-zinc-700 dark:text-zinc-300 sm:inline">
-            {user.name}
-          </span>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-64">
         <div className="px-2 py-1.5">
-          <p className="text-sm font-medium">{user.name}</p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          <p className="truncate text-sm font-medium">{user.name}</p>
+          <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
             {user.email}
           </p>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/profile">Profile</Link>
+          <Link href="/profile">Account Settings</Link>
         </DropdownMenuItem>
-        {user.role === "admin" && (
-          <DropdownMenuItem asChild>
-            <Link href="/admin/users">Admin</Link>
-          </DropdownMenuItem>
-        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut({ callbackUrl: "/login" })}
         >
-          Sign Out
+          Log Out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

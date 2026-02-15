@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   Card,
   CardContent,
@@ -5,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FileTree } from "./file-tree";
 import { SyncTrigger } from "./sync-trigger";
 import { SyncHistory } from "./sync-history";
@@ -21,9 +23,32 @@ function formatDate(date: Date | undefined): string {
   });
 }
 
+async function FileTreeLoader() {
+  const fileTreeData = await loadFileTree();
+  return (
+    <FileTree
+      tree={fileTreeData.tree}
+      initialIncludedPaths={fileTreeData.includedPaths}
+      error={fileTreeData.error}
+    />
+  );
+}
+
+function FileTreeSkeleton() {
+  return (
+    <div className="space-y-2">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-2" style={{ paddingLeft: `${(i % 3) * 16}px` }}>
+          <Skeleton className="h-4 w-4 rounded" />
+          <Skeleton className="h-4" style={{ width: `${100 + (i * 20) % 120}px` }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default async function SyncPage() {
-  const [fileTreeData, syncLogs, activeSync] = await Promise.all([
-    loadFileTree(),
+  const [syncLogs, activeSync] = await Promise.all([
     getRecentSyncLogs(),
     getActiveSyncStatus(),
   ]);
@@ -71,11 +96,9 @@ export default async function SyncPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <FileTree
-              tree={fileTreeData.tree}
-              initialIncludedPaths={fileTreeData.includedPaths}
-              error={fileTreeData.error}
-            />
+            <Suspense fallback={<FileTreeSkeleton />}>
+              <FileTreeLoader />
+            </Suspense>
           </CardContent>
         </Card>
 

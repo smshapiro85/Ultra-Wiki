@@ -217,7 +217,9 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
       <Card>
         <CardHeader>
           <CardTitle>OpenRouter</CardTitle>
-          <CardDescription>AI model provider for content generation</CardDescription>
+          <CardDescription>
+            AI model provider. Model selection is configured per-prompt in the AI Prompts tab.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -234,48 +236,6 @@ export function ApiKeysSettings({ settings }: ApiKeysSettingsProps) {
               type="openrouter"
               inputRef={openrouterKeyRef}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="openrouter_model">Model Name</Label>
-            <Input
-              id="openrouter_model"
-              name="openrouter_model"
-              type="text"
-              defaultValue={settings.openrouter_model?.value ?? ""}
-              placeholder="anthropic/claude-sonnet-4-20250514"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="openrouter_reasoning_effort">Reasoning Effort</Label>
-            <select
-              id="openrouter_reasoning_effort"
-              name="openrouter_reasoning_effort"
-              defaultValue={settings.openrouter_reasoning_effort?.value ?? "none"}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-            >
-              <option value="none">None (disabled)</option>
-              <option value="minimal">Minimal (~10% of tokens)</option>
-              <option value="low">Low (~20% of tokens)</option>
-              <option value="medium">Medium (~50% of tokens)</option>
-              <option value="high">High (~80% of tokens)</option>
-              <option value="xhigh">Extra High (~95% of tokens)</option>
-            </select>
-            <p className="text-xs text-muted-foreground">
-              Controls thinking depth for reasoning-capable models (GPT-5, o3, Claude 3.7+). No effect on other models.
-            </p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="openrouter_summary_model">Summary Model</Label>
-            <Input
-              id="openrouter_summary_model"
-              name="openrouter_summary_model"
-              type="text"
-              defaultValue={settings.openrouter_summary_model?.value ?? ""}
-              placeholder="google/gemini-2.0-flash-001"
-            />
-            <p className="text-xs text-muted-foreground">
-              Fast model for short outputs like file summaries. Uses the same API key as the primary model.
-            </p>
           </div>
         </CardContent>
       </Card>

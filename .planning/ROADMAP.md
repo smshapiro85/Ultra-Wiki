@@ -2,7 +2,7 @@
 
 ## Overview
 
-CodeWiki delivers an AI-augmented internal wiki that auto-generates documentation from source code while preserving human edits. The roadmap progresses from infrastructure and auth, through code sync and AI processing (the core differentiator), to the wiki viewer, editing, collaboration features, and interactive AI. Seven phases deliver 77 v1 requirements in dependency order, each producing a verifiable vertical slice.
+CodeWiki delivers an AI-augmented internal wiki that auto-generates documentation from source code while preserving human edits. The roadmap progresses from infrastructure and auth, through code sync and AI processing (the core differentiator), to the wiki viewer, editing, collaboration features, interactive AI, and finally comprehensive documentation. Nine phases deliver the complete v1 application in dependency order, each producing a verifiable vertical slice.
 
 ## Phases
 
@@ -20,6 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 6: Technical View, Comments & Mentions** - Source file/DB table linking, threaded comments, @mentions
 - [x] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
 - [x] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
+- [ ] **Phase 9: Documentation** - Comprehensive application documentation, codebase audit against all phases, developer-facing guide
 
 ## Phase Details
 
@@ -179,10 +180,24 @@ Plans:
 - [x] 08-03-PLAN.md -- Show default prompt text in admin settings AI Prompts textareas (not blank when unconfigured)
 - [x] 08-04-PLAN.md -- Sync page: live log panel via SSE during manual sync, file tree expand/collapse all + default collapsed + search filter
 
+### Phase 9: Documentation
+**Goal**: Produce comprehensive application documentation that serves as the single reference for understanding how Ultra Wiki works, verified against the actual codebase
+**Depends on**: All prior phases (documents the complete application)
+**Requirements**: Derived from project completion — documentation for maintainability and onboarding
+**Success Criteria** (what must be TRUE):
+  1. A comprehensive `docs/application-guide.md` exists covering every major feature built across all 8 phases
+  2. Each section is verified against the actual codebase — it documents what was built, not just what was planned
+  3. The document includes architecture overview, getting started guide, and all user/admin features
+  4. A new developer can read this document and understand the application's purpose, structure, setup, and feature set
+**Plans:** 1 plan
+
+Plans:
+- [ ] 09-01-PLAN.md -- Codebase audit against all 8 phases, review and update existing docs (ai-pipeline.md, ultrawiki-spec.md), write comprehensive docs/application-guide.md covering architecture, setup, and all features
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
@@ -194,3 +209,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 | 6. Technical View, Comments & Mentions | 3/3 | ✓ Complete | 2026-02-14 |
 | 7. Ask AI & Notifications | 3/3 | ✓ Complete | 2026-02-14 |
 | 8. AI Prompt Refinement & Category Strategy | 4/4 | ✓ Complete | 2026-02-14 |
+| 9. Documentation | 0/1 | ○ Not started | — |

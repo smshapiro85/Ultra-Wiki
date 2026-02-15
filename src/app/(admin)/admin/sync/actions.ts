@@ -7,11 +7,10 @@ import { getDb } from "@/lib/db";
 import { excludedPaths, syncLogs } from "@/lib/db/schema";
 import { getSetting } from "@/lib/settings";
 import { SETTING_KEYS } from "@/lib/settings/constants";
-import { getOctokit, getRepoConfig } from "@/lib/github/client";
 import {
-  fetchRepoTree,
   buildTreeStructure,
   type TreeNode,
+  type TreeFile,
 } from "@/lib/github/tree";
 import { runSync } from "@/lib/github/sync";
 
@@ -38,27 +37,20 @@ export async function loadFileTree(): Promise<{
 }> {
   await requireAdmin();
 
-  const repoUrl = await getSetting(SETTING_KEYS.github_repo_url);
-  const apiKey = await getSetting(SETTING_KEYS.github_api_key);
-
-  if (!repoUrl || !apiKey) {
-    return {
-      tree: [],
-      includedPaths: [],
-      error:
-        "Configure your GitHub repository URL and API key in Settings to browse the file tree.",
-    };
-  }
-
   try {
-    const octokit = await getOctokit();
-    const config = await getRepoConfig();
-    const rawTree = await fetchRepoTree(
-      octokit,
-      config.owner,
-      config.repo,
-      config.branch
-    );
+    // Read the cached tree snapshot stored during the last sync
+    const cachedJson = await getSetting(SETTING_KEYS.cached_repo_tree);
+
+    if (!cachedJson) {
+      return {
+        tree: [],
+        includedPaths: [],
+        error:
+          "No repository data yet. Run a sync first to fetch the file tree from GitHub.",
+      };
+    }
+
+    const rawTree: TreeFile[] = JSON.parse(cachedJson);
     const tree = buildTreeStructure(rawTree);
 
     // Load included patterns from excludedPaths table (repurposed as included paths)

@@ -10,24 +10,17 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { CategoryTree } from "@/components/wiki/category-tree";
 import { SidebarToc } from "@/components/wiki/sidebar-toc";
-import { UserMenu } from "@/components/common/user-menu";
 import type { CategoryWithArticles } from "@/lib/wiki/queries";
 
 interface AppSidebarProps {
   categories: CategoryWithArticles[];
-  user: {
-    name: string | null;
-    email: string | null;
-    image: string | null;
-    avatarUrl: string | null;
-    role: string;
-  };
 }
 
-export function AppSidebar({ categories, user }: AppSidebarProps) {
+export function AppSidebar({ categories }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -54,9 +47,7 @@ export function AppSidebar({ categories, user }: AppSidebarProps) {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:justify-center">
-          <UserMenu user={user} />
-        </div>
+        <SidebarTrigger className="w-full justify-start" />
       </SidebarFooter>
     </Sidebar>
   );

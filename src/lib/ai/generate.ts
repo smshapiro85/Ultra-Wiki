@@ -1,5 +1,4 @@
-import { generateText, Output } from "ai";
-import { getAIModel } from "./client";
+import { generateText, Output, type LanguageModel } from "ai";
 import { buildGenerationPrompt } from "./prompts";
 import { generationResponseSchema, type AnalysisResponse } from "./schemas";
 
@@ -14,7 +13,8 @@ import { generationResponseSchema, type AnalysisResponse } from "./schemas";
  */
 export async function generateArticle(
   articlePlan: AnalysisResponse["articles"][0],
-  stylePrompt: string
+  stylePrompt: string,
+  model: LanguageModel
 ): Promise<{
   contentMarkdown: string;
 }> {
@@ -26,7 +26,6 @@ export async function generateArticle(
   }
 
   // Otherwise, generate full content via a second LLM call with structured output
-  const model = await getAIModel();
   const prompt = buildGenerationPrompt(articlePlan, stylePrompt);
 
   const { experimental_output } = await generateText({

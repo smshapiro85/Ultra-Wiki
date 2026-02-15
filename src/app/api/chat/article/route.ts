@@ -7,16 +7,13 @@ import {
   aiConversations,
   aiConversationMessages,
 } from "@/lib/db/schema";
-import { getAIModel } from "@/lib/ai/client";
+import { getAskAIPageModel } from "@/lib/ai/client";
 import {
   getArticleFileLinks,
   getArticleDbTables,
 } from "@/lib/wiki/queries";
 import { getSetting } from "@/lib/settings";
 import { SETTING_KEYS } from "@/lib/settings/constants";
-
-const DEFAULT_PAGE_PROMPT =
-  "You are a helpful assistant for CodeWiki. Answer questions about the article and its related source code. Use the provided context to give accurate, specific answers.";
 
 const MAX_CONTEXT_CHARS = 32000;
 
@@ -191,7 +188,7 @@ export async function POST(req: Request) {
 
   // Load system prompt
   const customPrompt = await getSetting(SETTING_KEYS.ask_ai_page_prompt);
-  const systemPrompt = customPrompt || DEFAULT_PAGE_PROMPT;
+  const systemPrompt = customPrompt || "";
 
   // Build article context
   const { contextText, contextInfo } = await buildArticleContext(articleId);
@@ -201,15 +198,13 @@ export async function POST(req: Request) {
     : systemPrompt;
 
   // Stream the AI response
-  const model = await getAIModel();
+  const model = await getAskAIPageModel();
   const result = streamText({
     model,
     system: fullSystemPrompt,
     messages: await convertToModelMessages(priorMessages),
     abortSignal: req.signal,
   });
-
-  result.consumeStream();
 
   const response = result.toUIMessageStreamResponse({
     onFinish: async ({ messages: allMessages }) => {

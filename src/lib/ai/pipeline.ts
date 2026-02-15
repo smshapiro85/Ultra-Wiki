@@ -1,3 +1,4 @@
+import type { LanguageModel } from "ai";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import {
@@ -13,10 +14,17 @@ import { SETTING_KEYS } from "@/lib/settings/constants";
 import {
   fetchFileContents,
   analyzeChanges,
+  analyzeGroup,
+  mergeResponses,
   getFullCategoryTree,
   getArticleIndex,
+  resolveExistingArticleLinks,
 } from "@/lib/ai/analyze";
+import { planGroups } from "@/lib/ai/plan";
+import type { ExpandedPlan } from "@/lib/ai/plan";
+import type { AnalysisResponse } from "@/lib/ai/schemas";
 import { generateArticle } from "@/lib/ai/generate";
+import { getAnalysisModel, getFileSummaryModel } from "@/lib/ai/client";
 import { mergeArticleContent } from "@/lib/merge/three-way";
 import { resolveConflict } from "@/lib/merge/conflict";
 import {
@@ -73,6 +81,284 @@ async function ensureUniqueSlug(slug: string): Promise<string> {
 }
 
 // ---------------------------------------------------------------------------
+// Multi-Stage Pipeline Constants
+// ---------------------------------------------------------------------------
+
+const MULTI_STAGE_FILE_THRESHOLD = 25;
+const MULTI_STAGE_CHAR_THRESHOLD = 50_000;
+const STAGE1_CONCURRENCY = 5;
+const STAGE3_CONCURRENCY = 2;
+
+// ---------------------------------------------------------------------------
+// Multi-Stage Pipeline: Decision
+// ---------------------------------------------------------------------------
+
+/**
+ * Determine if the file set is large enough to warrant the 3-stage pipeline.
+ * Fast path: <=25 files AND <=50K total chars runs the existing single-call path.
+ */
+export function needsMultiStagePipeline(
+  fileContents: Array<{ path: string; content: string }>
+): boolean {
+  if (fileContents.length > MULTI_STAGE_FILE_THRESHOLD) return true;
+  const totalChars = fileContents.reduce(
+    (sum, f) => sum + f.content.length,
+    0
+  );
+  return totalChars > MULTI_STAGE_CHAR_THRESHOLD;
+}
+
+// ---------------------------------------------------------------------------
+// Multi-Stage Pipeline: Stage 1 — Batch Summarize
+// ---------------------------------------------------------------------------
+
+/**
+ * Stage 1: Generate summaries for all files using the fast/cheap summary model.
+ *
+ * Runs with concurrency 5 via Promise.allSettled. Saves each summary to
+ * githubFiles.aiSummary AND returns {path, summary}[].
+ * Falls back to "Source file at <path>" if the summary model is not configured.
+ */
+async function batchSummarizeFiles(
+  fileContents: Array<{ path: string; content: string }>,
+  onLog?: (message: string) => void
+): Promise<Array<{ path: string; summary: string }>> {
+  const log = onLog ?? ((msg: string) => console.log(`[pipeline] ${msg}`));
+  log(`Stage 1: Summarizing ${fileContents.length} files...`);
+
+  let model;
+  try {
+    model = await getFileSummaryModel();
+  } catch {
+    log("Stage 1: Summary model not configured, using path-based fallback");
+    return fileContents.map((f) => ({
+      path: f.path,
+      summary: `Source file at ${f.path}`,
+    }));
+  }
+
+  const { generateText } = await import("ai");
+  const { buildFileSummaryPrompt } = await import("@/lib/ai/prompts");
+  const customPrompt =
+    (await getSetting(SETTING_KEYS.file_summary_prompt)) ?? "";
+
+  const db = getDb();
+  const results: Array<{ path: string; summary: string }> = [];
+  const total = fileContents.length;
+
+  // Process in chunks of STAGE1_CONCURRENCY
+  for (let i = 0; i < fileContents.length; i += STAGE1_CONCURRENCY) {
+    const chunk = fileContents.slice(i, i + STAGE1_CONCURRENCY);
+
+    const chunkResults = await Promise.allSettled(
+      chunk.map(async (file) => {
+        const result = await generateText({
+          model,
+          prompt: buildFileSummaryPrompt(file.path, file.content, customPrompt),
+        });
+        const summary = result.text.trim().slice(0, 500);
+
+        // Save to DB
+        await db
+          .update(githubFiles)
+          .set({ aiSummary: summary })
+          .where(eq(githubFiles.filePath, file.path));
+
+        return { path: file.path, summary };
+      })
+    );
+
+    for (let j = 0; j < chunkResults.length; j++) {
+      const result = chunkResults[j];
+      if (result.status === "fulfilled") {
+        results.push(result.value);
+      } else {
+        // Fallback for failed summaries
+        const filePath = chunk[j].path;
+        console.warn(
+          `[pipeline] Stage 1: Failed to summarize "${filePath}":`,
+          result.reason instanceof Error
+            ? result.reason.message
+            : String(result.reason)
+        );
+        results.push({ path: filePath, summary: `Source file at ${filePath}` });
+      }
+    }
+
+    log(`Stage 1: Summarized ${results.length}/${total} files`);
+  }
+
+  log(`Stage 1 complete: ${results.length} file summaries generated`);
+  return results;
+}
+
+// ---------------------------------------------------------------------------
+// Multi-Stage Pipeline: Orchestrator
+// ---------------------------------------------------------------------------
+
+/**
+ * Run the 3-stage multi-stage pipeline for large file sets.
+ *
+ * Stage 1: Summarize all files (cheap/fast model, concurrency 5)
+ * Stage 2: Plan groups (analysis model, 1 LLM call)
+ * Stage 3: Analyze each group (analysis model, concurrency 2)
+ */
+async function runMultiStagePipeline(
+  fileContents: Array<{ path: string; content: string }>,
+  categoryTree: Awaited<ReturnType<typeof getFullCategoryTree>>,
+  articleIndex: Awaited<ReturnType<typeof getArticleIndex>>,
+  analysisPrompt: string,
+  articleStylePrompt: string,
+  model: Awaited<ReturnType<typeof getAnalysisModel>>,
+  onLog?: (message: string) => void
+): Promise<AnalysisResponse> {
+  const log = onLog ?? ((msg: string) => console.log(`[pipeline] ${msg}`));
+
+  // --- Stage 1: Summarize files ---
+  const fileSummaries = await batchSummarizeFiles(fileContents, onLog);
+
+  // --- Pre-Stage 2: Resolve existing article-file links ---
+  log("Resolving existing article-file links...");
+  const articleLinksMap = await resolveExistingArticleLinks(
+    fileContents.map((f) => f.path)
+  );
+  log(`Found article links for ${articleLinksMap.size} files`);
+
+  // --- Stage 2: Plan groups ---
+  log("Stage 2: Planning file groups...");
+  const plan: ExpandedPlan = await planGroups(
+    fileSummaries,
+    categoryTree,
+    articleIndex,
+    model,
+    articleLinksMap
+  );
+  log(
+    `Stage 2 complete: ${plan.groups.length} groups created, ${plan.sharedContextFiles.length} shared context files`
+  );
+
+  // Warn about unassigned files (accounting for shared context)
+  const assignedFiles = new Set([
+    ...plan.groups.flatMap((g) => g.files),
+    ...plan.sharedContextFiles,
+  ]);
+  const unassigned = fileContents.filter((f) => !assignedFiles.has(f.path));
+  if (unassigned.length > 0) {
+    log(
+      `Stage 2: Warning — ${unassigned.length} files not assigned to any group or shared context`
+    );
+  }
+
+  // Build lookups for file contents and summaries by path
+  const fileContentMap = new Map(
+    fileContents.map((f) => [f.path, f])
+  );
+  const fileSummaryMap = new Map(
+    fileSummaries.map((f) => [f.path, f])
+  );
+
+  // Build shared context summaries for Stage 3 injection
+  const sharedContextSummaries = plan.sharedContextFiles
+    .map((path) => fileSummaryMap.get(path))
+    .filter(
+      (f): f is { path: string; summary: string } => f !== undefined
+    );
+
+  // --- Stage 3: Analyze each group (concurrency limited) ---
+  log(
+    `Stage 3: Analyzing ${plan.groups.length} groups...`
+  );
+
+  const groupResponses: AnalysisResponse[] = [];
+  let groupsDone = 0;
+
+  for (let i = 0; i < plan.groups.length; i += STAGE3_CONCURRENCY) {
+    const groupChunk = plan.groups.slice(i, i + STAGE3_CONCURRENCY);
+
+    const chunkResults = await Promise.allSettled(
+      groupChunk.map((group) => {
+        const groupFiles = group.files
+          .map((path) => fileContentMap.get(path))
+          .filter(
+            (f): f is { path: string; content: string } => f !== undefined
+          );
+
+        if (groupFiles.length === 0) {
+          log(
+            `Stage 3: Group "${group.id}" has no resolvable files, skipping`
+          );
+          return Promise.resolve({
+            articles: [],
+            summary: `Group ${group.id} had no resolvable files.`,
+          } as AnalysisResponse);
+        }
+
+        // Build per-group article links subset
+        const groupArticleLinks = new Map<
+          string,
+          Array<{ slug: string; title: string }>
+        >();
+        for (const filePath of group.files) {
+          const links = articleLinksMap.get(filePath);
+          if (links) {
+            groupArticleLinks.set(
+              filePath,
+              links.map((l) => ({ slug: l.slug, title: l.title }))
+            );
+          }
+        }
+
+        return analyzeGroup(
+          groupFiles,
+          plan,
+          group.id,
+          categoryTree,
+          articleIndex,
+          analysisPrompt,
+          articleStylePrompt,
+          model,
+          sharedContextSummaries,
+          groupArticleLinks.size > 0 ? groupArticleLinks : undefined
+        );
+      })
+    );
+
+    for (const result of chunkResults) {
+      groupsDone++;
+      if (result.status === "fulfilled") {
+        groupResponses.push(result.value);
+        log(
+          `Stage 3: Group ${groupsDone}/${plan.groups.length} complete (${result.value.articles.length} articles)`
+        );
+      } else {
+        log(
+          `Stage 3: Group ${groupsDone}/${plan.groups.length} failed`
+        );
+        console.error(
+          "[pipeline] Stage 3: Group analysis failed:",
+          result.reason instanceof Error
+            ? result.reason.message
+            : String(result.reason)
+        );
+      }
+    }
+  }
+
+  if (groupResponses.length === 0) {
+    return {
+      articles: [],
+      summary: "Multi-stage pipeline produced no results.",
+    };
+  }
+
+  const merged = mergeResponses(groupResponses);
+  log(
+    `Stage 3 complete: ${merged.articles.length} articles from ${groupResponses.length} groups`
+  );
+  return merged;
+}
+
+// ---------------------------------------------------------------------------
 // File Summary Generation
 // ---------------------------------------------------------------------------
 
@@ -89,8 +375,8 @@ async function generateFileSummaries(
   // Dynamic import to avoid build-time issues
   let model;
   try {
-    const { getSummaryModel } = await import("@/lib/ai/client");
-    model = await getSummaryModel();
+    const { getFileSummaryModel } = await import("@/lib/ai/client");
+    model = await getFileSummaryModel();
   } catch (error) {
     console.warn(
       "[pipeline] Summary model not configured, skipping file summaries:",
@@ -156,7 +442,8 @@ async function generateFileSummaries(
  */
 export async function runAIPipeline(
   syncLogId: string,
-  changedFilePaths: string[]
+  changedFilePaths: string[],
+  options?: { onLog?: (message: string) => void }
 ): Promise<{ articlesCreated: number; articlesUpdated: number }> {
   // 1. Early exit
   if (changedFilePaths.length === 0) {
@@ -175,20 +462,43 @@ export async function runAIPipeline(
     getArticleIndex(),
   ]);
 
-  // 4. Read configured prompts (empty string fallback is fine)
-  const [analysisPrompt, articleStylePrompt] = await Promise.all([
-    getSetting(SETTING_KEYS.analysis_prompt),
-    getSetting(SETTING_KEYS.article_style_prompt),
-  ]);
+  // 4. Read configured prompts + create model in parallel
+  const [analysisPrompt, articleStylePrompt, analysisModel] =
+    await Promise.all([
+      getSetting(SETTING_KEYS.analysis_prompt),
+      getSetting(SETTING_KEYS.article_style_prompt),
+      getAnalysisModel(),
+    ]);
 
-  // 5. Run AI analysis
-  const analysisResponse = await analyzeChanges(
-    fileContents,
-    categoryTree,
-    articleIndex,
-    analysisPrompt ?? "",
-    articleStylePrompt ?? ""
-  );
+  // 5. Run AI analysis — branch between fast path and multi-stage pipeline
+  const useMultiStage = needsMultiStagePipeline(fileContents);
+  const pipelineLog = options?.onLog;
+  let analysisResponse: AnalysisResponse;
+
+  if (useMultiStage) {
+    pipelineLog?.(
+      `Using 3-stage pipeline for ${fileContents.length} files`
+    );
+    analysisResponse = await runMultiStagePipeline(
+      fileContents,
+      categoryTree,
+      articleIndex,
+      analysisPrompt ?? "",
+      articleStylePrompt ?? "",
+      analysisModel,
+      pipelineLog
+    );
+    // Stage 1 already generated and saved file summaries — skip step 6.5
+  } else {
+    analysisResponse = await analyzeChanges(
+      fileContents,
+      categoryTree,
+      articleIndex,
+      analysisPrompt ?? "",
+      articleStylePrompt ?? "",
+      analysisModel
+    );
+  }
 
   // 6. Process each article
   let articlesCreated = 0;
@@ -201,7 +511,8 @@ export async function runAIPipeline(
         await processCreateArticle(
           articlePlan,
           categoryTree,
-          articleStylePrompt ?? ""
+          articleStylePrompt ?? "",
+          analysisModel
         );
         articlesCreated++;
       } else {
@@ -209,7 +520,8 @@ export async function runAIPipeline(
         const wasCreated = await processUpdateArticle(
           articlePlan,
           categoryTree,
-          articleStylePrompt ?? ""
+          articleStylePrompt ?? "",
+          analysisModel
         );
         if (wasCreated) {
           articlesCreated++;
@@ -229,11 +541,14 @@ export async function runAIPipeline(
   }
 
   // 6.5. Generate file summaries for changed files (non-blocking)
-  try {
-    await generateFileSummaries(changedFilePaths);
-  } catch (error) {
-    console.error("[pipeline] File summary generation error:", error);
-    // Non-fatal -- summaries are supplementary
+  // Skip if multi-stage pipeline already generated summaries in Stage 1
+  if (!useMultiStage) {
+    try {
+      await generateFileSummaries(changedFilePaths);
+    } catch (error) {
+      console.error("[pipeline] File summary generation error:", error);
+      // Non-fatal -- summaries are supplementary
+    }
   }
 
   // 7. Update sync_logs with article counts
@@ -284,7 +599,8 @@ async function processCreateArticle(
     category_suggestion: string;
   },
   categoryTree: Array<{ id: string; name: string; slug: string }>,
-  stylePrompt: string
+  stylePrompt: string,
+  model: LanguageModel
 ): Promise<void> {
   const db = getDb();
 
@@ -300,7 +616,8 @@ async function processCreateArticle(
   if (contentMarkdown.length < 100) {
     const generated = await generateArticle(
       articlePlan as Parameters<typeof generateArticle>[0],
-      stylePrompt
+      stylePrompt,
+      model
     );
     contentMarkdown = generated.contentMarkdown;
   }
@@ -376,7 +693,8 @@ async function processUpdateArticle(
     category_suggestion: string;
   },
   categoryTree: Array<{ id: string; name: string; slug: string }>,
-  stylePrompt: string
+  stylePrompt: string,
+  model: LanguageModel
 ): Promise<boolean> {
   const db = getDb();
 
@@ -397,7 +715,7 @@ async function processUpdateArticle(
     console.warn(
       `[pipeline] Article "${articlePlan.slug}" not found for update, creating instead.`
     );
-    await processCreateArticle(articlePlan, categoryTree, stylePrompt);
+    await processCreateArticle(articlePlan, categoryTree, stylePrompt, model);
     return true;
   }
 
@@ -408,7 +726,8 @@ async function processUpdateArticle(
   if (contentMarkdown.length < 100) {
     const generated = await generateArticle(
       articlePlan as Parameters<typeof generateArticle>[0],
-      stylePrompt
+      stylePrompt,
+      model
     );
     contentMarkdown = generated.contentMarkdown;
   }
@@ -460,6 +779,7 @@ async function processUpdateArticle(
       aiProposedMarkdown: contentMarkdown,
       changeSummary: articlePlan.change_summary,
       triggerReview: true,
+      model,
     });
 
     // v. Update article with resolved content (contentJson deferred)

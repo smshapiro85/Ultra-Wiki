@@ -1,8 +1,22 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { auth, signOut } from "@/lib/auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import { CircleHelp } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { getDb } from "@/lib/db";
+import { users } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import {
+  SidebarProvider,
+  SidebarInset,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import { AppSidebar } from "@/components/wiki/app-sidebar";
+import { AdminSettingsDropdown } from "@/components/admin/admin-settings-dropdown";
+import { UserMenu } from "@/components/common/user-menu";
+import { AdminNav } from "@/components/admin/admin-nav";
+import { TocProvider } from "@/components/wiki/toc-context";
+import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
 
 export default async function AdminLayout({
   children,
@@ -19,89 +33,52 @@ export default async function AdminLayout({
     redirect("/");
   }
 
-  const initials = session.user.name
-    ? session.user.name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-    : "U";
+  const db = getDb();
+  const [user] = await db
+    .select({
+      name: users.name,
+      email: users.email,
+      image: users.image,
+      avatarUrl: users.avatarUrl,
+      role: users.role,
+    })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1);
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const categoryTree = await getCategoryTreeWithArticles();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950">
-      <nav className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-          <div className="flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-lg font-bold text-zinc-900 dark:text-zinc-100"
-            >
-              UltraWiki
-            </Link>
-            <div className="flex items-center gap-1 rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
-              Admin
+    <TocProvider>
+      <SidebarProvider>
+        <AppSidebar categories={categoryTree} />
+        <SidebarInset>
+          <header className="flex h-14 items-center gap-2 border-b px-4">
+            <SidebarTrigger />
+            <Separator orientation="vertical" className="h-4" />
+            <div className="ml-auto flex items-center gap-2">
+              <Link
+                href="/docs"
+                className="flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                title="Help & Docs"
+              >
+                <CircleHelp className="size-5" />
+              </Link>
+              <AdminSettingsDropdown />
+              <UserMenu user={user} />
             </div>
-            <Link
-              href="/admin/settings"
-              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              Settings
-            </Link>
-            <Link
-              href="/admin/sync"
-              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              Sync
-            </Link>
-            <Link
-              href="/admin/users"
-              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              Users
-            </Link>
-            <Link
-              href="/admin/review-queue"
-              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-            >
-              Review Queue
-            </Link>
+          </header>
+          <div className="border-b px-6 pt-6 pb-0">
+            <h1 className="mb-4 text-2xl font-bold tracking-tight">Admin Configuration</h1>
+            <AdminNav />
           </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={session.user.image ?? undefined}
-                  alt={session.user.name ?? "User"}
-                />
-                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-              </Avatar>
-              <span className="hidden text-sm text-zinc-700 dark:text-zinc-300 sm:inline">
-                {session.user.name}
-              </span>
-            </div>
-
-            <Link href="/">
-              <Button variant="ghost" size="sm">
-                Back to Wiki
-              </Button>
-            </Link>
-
-            <form
-              action={async () => {
-                "use server";
-                await signOut({ redirectTo: "/login" });
-              }}
-            >
-              <Button type="submit" variant="ghost" size="sm">
-                Sign Out
-              </Button>
-            </form>
-          </div>
-        </div>
-      </nav>
-
-      <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
-    </div>
+          <main className="flex-1 p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </TocProvider>
   );
 }
