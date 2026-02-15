@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 ## Current Position
 
-Phase: 9 of 9 (Documentation) — COMPLETE
-Plan: 1 of 1 in current phase (1 complete)
-Status: All 33 plans across 9 phases complete.
-Last activity: 2026-02-14 -- Completed Phase 9 (Documentation)
+Phase: 10 of 10 (Navigation and Article Creation)
+Plan: 2 of 5 in current phase (2 complete)
+Status: Executing Phase 10
+Last activity: 2026-02-15 -- Completed 10-02 (AI Pipeline Subcategory Awareness)
 
-Progress: [████████████████████] 100% (33/33 plans across 9 phases)
+Progress: [████████████████████] 100% (33/33 plans across phases 1-9) + Phase 10: [████████            ] 40% (2/5 plans)
 
 ## Performance Metrics
 
@@ -36,6 +36,7 @@ Progress: [████████████████████] 100% (3
 | 07 | 3 | 12min | 4min |
 | 08 | 4 | 5min | 1min |
 | 09 | 1 | 5min | 5min |
+| 10 | 1/5 | 3min | 3min |
 
 *Updated after each plan completion*
 
@@ -52,8 +53,14 @@ Progress: [████████████████████] 100% (3
 ### Roadmap Evolution
 - Phase 10 added: Navigation and Article Creation
 
+### Phase 10 Decisions
+- Slug generation for categories/articles reuses pipeline.ts pattern for consistency
+- renameArticle does NOT change slug to keep URLs stable
+- deleteArticle explicitly deletes related records for safety (defensive against missing DB cascades)
+- createCategory uses onConflictDoNothing for slug race condition handling
+
 ## Session Continuity
 
-Last session: 2026-02-14
-Stopped at: Project complete. All 9 phases executed.
-Resume file: N/A — project complete
+Last session: 2026-02-15
+Stopped at: Completed 10-01-PLAN.md (Server Actions and Dependencies)
+Resume file: .planning/phases/10-navigation-and-article-creation/10-02-PLAN.md
