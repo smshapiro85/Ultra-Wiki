@@ -35,6 +35,7 @@ import type { CategoryWithArticles } from "@/lib/wiki/queries";
 interface SortableSidebarProps {
   categories: CategoryWithArticles[];
   isAdmin: boolean;
+  reviewCounts?: Record<string, number>;
 }
 
 // =============================================================================
@@ -142,7 +143,7 @@ function flattenTree(categories: CategoryWithArticles[]): FlattenedItem[] {
 // SortableSidebar Component
 // =============================================================================
 
-export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
+export function SortableSidebar({ categories, isAdmin, reviewCounts }: SortableSidebarProps) {
   const router = useRouter();
   const [items, setItems] = useState<FlattenedItem[]>(() =>
     flattenTree(categories),
@@ -407,6 +408,7 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
 
   return (
     <DndContext
+      id="sortable-sidebar"
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
@@ -431,6 +433,7 @@ export function SortableSidebar({ categories, isAdmin }: SortableSidebarProps) {
               }
               contextMenu={getContextMenu(item)}
               activeDragType={activeDragType}
+              reviewCount={item.type === "article" && isAdmin ? (reviewCounts?.[item.id] ?? 0) : 0}
             />
           ))}
         </div>

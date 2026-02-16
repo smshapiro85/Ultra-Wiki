@@ -25,6 +25,8 @@ interface SortableItemProps {
   contextMenu?: React.ReactNode;
   /** The type of the item currently being dragged (null if no drag) */
   activeDragType?: "category" | "subcategory" | "article" | "gap" | null;
+  /** Review item count for this article (0 = no badge) */
+  reviewCount?: number;
 }
 
 export function SortableItem({
@@ -34,6 +36,7 @@ export function SortableItem({
   onToggleCollapse,
   contextMenu,
   activeDragType,
+  reviewCount = 0,
 }: SortableItemProps) {
   const pathname = usePathname();
   const {
@@ -166,9 +169,16 @@ export function SortableItem({
         <span className="truncate flex-1">{item.name}</span>
       )}
 
+      {/* Review count badge */}
+      {isArticle && reviewCount > 0 && (
+        <span className="shrink-0 flex items-center justify-center size-5 rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
+          {reviewCount}
+        </span>
+      )}
+
       {/* Context menu */}
       {contextMenu && (
-        <div className="shrink-0 ml-auto">{contextMenu}</div>
+        <div className="shrink-0">{contextMenu}</div>
       )}
     </div>
   );
