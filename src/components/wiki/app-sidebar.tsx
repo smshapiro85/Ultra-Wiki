@@ -20,9 +20,10 @@ import type { CategoryWithArticles } from "@/lib/wiki/queries";
 interface AppSidebarProps {
   categories: CategoryWithArticles[];
   isAdmin: boolean;
+  reviewCounts?: Record<string, number>;
 }
 
-export function AppSidebar({ categories, isAdmin }: AppSidebarProps) {
+export function AppSidebar({ categories, isAdmin, reviewCounts }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="h-14 justify-center border-b border-sidebar-border">
@@ -46,9 +47,9 @@ export function AppSidebar({ categories, isAdmin }: AppSidebarProps) {
           </div>
           <SidebarGroupContent>
             {isAdmin ? (
-              <SortableSidebar categories={categories} isAdmin={isAdmin} />
+              <SortableSidebar categories={categories} isAdmin={isAdmin} reviewCounts={reviewCounts} />
             ) : (
-              <CategoryTree categories={categories} isAdmin={false} />
+              <CategoryTree categories={categories} isAdmin={false} reviewCounts={reviewCounts} />
             )}
           </SidebarGroupContent>
         </SidebarGroup>

@@ -15,7 +15,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AppSidebar } from "@/components/wiki/app-sidebar";
 import { SearchInput } from "@/components/wiki/search-input";
 import { TocProvider } from "@/components/wiki/toc-context";
-import { getCategoryTreeWithArticles } from "@/lib/wiki/queries";
+import { getCategoryTreeWithArticles, getReviewCountsByArticle } from "@/lib/wiki/queries";
 import { AskAiGlobalTrigger } from "@/components/chat/ask-ai-global-trigger";
 import { AdminSettingsDropdown } from "@/components/admin/admin-settings-dropdown";
 import { UserMenu } from "@/components/common/user-menu";
@@ -49,14 +49,19 @@ export default async function WikiLayout({
     redirect("/login");
   }
 
-  const categoryTree = await getCategoryTreeWithArticles();
+  const isAdmin = user.role === "admin";
+  const [categoryTree, reviewCountsMap] = await Promise.all([
+    getCategoryTreeWithArticles(),
+    isAdmin ? getReviewCountsByArticle() : Promise.resolve(new Map<string, number>()),
+  ]);
+  const reviewCounts: Record<string, number> = Object.fromEntries(reviewCountsMap);
   const cookieStore = await cookies();
   const sidebarWidth = Number(cookieStore.get("sidebar_width")?.value) || undefined;
 
   return (
     <TocProvider>
       <SidebarProvider defaultWidth={sidebarWidth}>
-        <AppSidebar categories={categoryTree} isAdmin={user.role === "admin"} />
+        <AppSidebar categories={categoryTree} isAdmin={isAdmin} reviewCounts={reviewCounts} />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
             <div className="flex items-center gap-2">
