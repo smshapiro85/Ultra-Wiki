@@ -156,10 +156,19 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    @apply border-border outline-ring/50;
+  }
+  html {
+    scrollbar-gutter: stable;
+  }
+  /* Radix UI adds overflow:hidden + padding-right to body when
+     dialogs/dropdowns open. Since we use scrollbar-gutter: stable,
+     the extra padding causes a layout shift. Neutralize it. */
+  body[data-scroll-locked] {
+    scrollbar-gutter: stable !important;
+    padding-right: 0 !important;
+    margin-right: 0 !important;
   }
   body {
-    @apply bg-background text-foreground;
     @apply bg-background text-foreground;
   }
 }

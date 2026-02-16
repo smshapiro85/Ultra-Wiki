@@ -618,7 +618,7 @@ export function ArticleContextMenu({
     } else {
       toast.success("Article deleted");
       setDeleteOpen(false);
-      router.refresh();
+      router.push("/");
     }
   }
 

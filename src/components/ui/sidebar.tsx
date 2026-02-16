@@ -64,6 +64,7 @@ function useSidebar() {
 
 function SidebarProvider({
   defaultOpen = true,
+  defaultWidth,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
@@ -72,27 +73,24 @@ function SidebarProvider({
   ...props
 }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean
+  defaultWidth?: number
   open?: boolean
   onOpenChange?: (open: boolean) => void
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
-  const [width, setWidthState] = React.useState(SIDEBAR_WIDTH_DEFAULT_PX)
+  const [width, setWidthState] = React.useState(
+    defaultWidth != null &&
+      defaultWidth >= SIDEBAR_WIDTH_MIN_PX &&
+      defaultWidth <= SIDEBAR_WIDTH_MAX_PX
+      ? defaultWidth
+      : SIDEBAR_WIDTH_DEFAULT_PX
+  )
   const [isResizing, setIsResizing] = React.useState(false)
   const [hasHydrated, setHasHydrated] = React.useState(false)
 
-  // Read persisted width from cookie on mount (no transition)
+  // Allow transitions after initial paint
   React.useEffect(() => {
-    const match = document.cookie.match(
-      new RegExp(`${SIDEBAR_WIDTH_COOKIE_NAME}=(\\d+)`)
-    )
-    if (match) {
-      const w = Number(match[1])
-      if (w >= SIDEBAR_WIDTH_MIN_PX && w <= SIDEBAR_WIDTH_MAX_PX) {
-        setWidthState(w)
-      }
-    }
-    // Allow transitions after the initial width is applied
     requestAnimationFrame(() => setHasHydrated(true))
   }, [])
 

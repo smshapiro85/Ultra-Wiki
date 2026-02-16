@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { CircleHelp } from "lucide-react";
 import { auth } from "@/lib/auth";
@@ -49,10 +50,12 @@ export default async function WikiLayout({
   }
 
   const categoryTree = await getCategoryTreeWithArticles();
+  const cookieStore = await cookies();
+  const sidebarWidth = Number(cookieStore.get("sidebar_width")?.value) || undefined;
 
   return (
     <TocProvider>
-      <SidebarProvider>
+      <SidebarProvider defaultWidth={sidebarWidth}>
         <AppSidebar categories={categoryTree} isAdmin={user.role === "admin"} />
         <SidebarInset>
           <header className="flex h-14 items-center gap-2 border-b px-4">
