@@ -550,6 +550,27 @@ export async function getArticleDbTables(
 }
 
 // =============================================================================
+// getArticleCommentCount
+// =============================================================================
+
+/**
+ * Get the total number of comments (including replies) for an article.
+ * Used by the article page to display count in the Comments tab label.
+ */
+export async function getArticleCommentCount(
+  articleId: string
+): Promise<number> {
+  const db = getDb();
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(comments)
+    .where(eq(comments.articleId, articleId));
+
+  return Number(result[0].count);
+}
+
+// =============================================================================
 // getArticleComments
 // =============================================================================
 
@@ -672,6 +693,45 @@ export async function getReviewQueueItems(): Promise<ReviewQueueItem[]> {
   `);
 
   return results.rows as unknown as ReviewQueueItem[];
+}
+
+// =============================================================================
+// getReviewCountsByArticle
+// =============================================================================
+
+/**
+ * Batch query returning review item counts per article.
+ * Count = (needsReview ? 1 : 0) + active (non-dismissed) annotation count.
+ * Only returns articles with count > 0. Used for sidebar badges.
+ */
+export async function getReviewCountsByArticle(): Promise<
+  Map<string, number>
+> {
+  const db = getDb();
+
+  const results = await db.execute(sql`
+    SELECT
+      a.id AS "articleId",
+      (CASE WHEN a.needs_review THEN 1 ELSE 0 END +
+       COALESCE(ann.count, 0))::int AS "reviewCount"
+    FROM articles a
+    LEFT JOIN (
+      SELECT article_id, COUNT(*) AS count
+      FROM ai_review_annotations
+      WHERE is_dismissed = false
+      GROUP BY article_id
+    ) ann ON a.id = ann.article_id
+    WHERE a.needs_review = true OR ann.count > 0
+  `);
+
+  const map = new Map<string, number>();
+  for (const row of results.rows as Array<{
+    articleId: string;
+    reviewCount: number;
+  }>) {
+    map.set(row.articleId, row.reviewCount);
+  }
+  return map;
 }
 
 // =============================================================================
