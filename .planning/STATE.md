@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 10 added — Navigation and Article Creation
+**Current focus:** Phase 11 — Add Review To Articles Too
 
 ## Current Position
 
-Phase: 10 of 10 (Navigation and Article Creation)
-Plan: 4 of 5 in current phase (4 complete)
-Status: Executing Phase 10
-Last activity: 2026-02-15 -- Completed 10-04 (Sidebar Context Menus)
+Phase: 11 of 11 (Add Review To Articles Too — IN PROGRESS)
+Plan: 1 of 2 in Phase 11 (Plan 01 complete)
+Status: Plan 11-01 complete, Plan 11-02 pending
+Last activity: 2026-02-16 -- Completed 11-01 (article review queue tab and comment counts)
 
-Progress: [████████████████████] 100% (33/33 plans across phases 1-9) + Phase 10: [████████████████    ] 80% (4/5 plans)
+Progress: [████████████████████] 97% (38/39 plans across phases 1-11)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33
+- Total plans completed: 38
 - Average duration: 3min
-- Total execution time: ~1.7 hours
+- Total execution time: ~1.85 hours
 
 **By Phase:**
 
@@ -36,7 +36,8 @@ Progress: [████████████████████] 100% (3
 | 07 | 3 | 12min | 4min |
 | 08 | 4 | 5min | 1min |
 | 09 | 1 | 5min | 5min |
-| 10 | 4/5 | 12min | 3min |
+| 10 | 4/4 | 12min | 3min |
+| 11 | 1/2 | 3min | 3min |
 
 *Updated after each plan completion*
 
@@ -67,8 +68,14 @@ Progress: [████████████████████] 100% (3
 - Categories/subcategories use Plus icon trigger; articles use Ellipsis trigger for context menus
 - Article delete uses AlertDialog confirmation; category/subcategory delete relies on server-side article guard
 
+### Phase 11 Decisions
+- Review count = (needsReview ? 1 : 0) + annotationCount for consistent counting
+- ArticleReviewQueue is simpler article-scoped view without admin search/filter/sort controls
+- Comment count and review count fetched server-side to avoid tab label layout flash
+- Non-admin users get undefined for reviewQueueContent so Review Queue tab never renders
+
 ## Session Continuity
 
-Last session: 2026-02-15
-Stopped at: Completed 10-04-PLAN.md (Sidebar Context Menus)
-Resume file: .planning/phases/10-navigation-and-article-creation/10-05-PLAN.md
+Last session: 2026-02-16
+Stopped at: Completed 11-01-PLAN.md (article review queue tab and comment counts)
+Next: Plan 11-02 — Sidebar review badges
