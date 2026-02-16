@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core value:** AI-generated wiki articles stay automatically in sync with the codebase while never silently overwriting human contributions
-**Current focus:** Phase 11 — Add Review To Articles Too
+**Current focus:** Phase 11 complete — All phases done
 
 ## Current Position
 
-Phase: 11 of 11 (Add Review To Articles Too — IN PROGRESS)
-Plan: 1 of 2 in Phase 11 (Plan 01 complete)
-Status: Plan 11-01 complete, Plan 11-02 pending
-Last activity: 2026-02-16 -- Completed 11-01 (article review queue tab and comment counts)
+Phase: 11 of 11 (Add Review To Articles Too — COMPLETE)
+Plan: 2 of 2 in Phase 11 (all complete)
+Status: Phase 11 complete, all phases done
+Last activity: 2026-02-16 -- Completed 11-02 (sidebar review badges)
 
-Progress: [████████████████████] 97% (38/39 plans across phases 1-11)
+Progress: [████████████████████] 100% (39/39 plans across phases 1-11)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
+- Total plans completed: 39
 - Average duration: 3min
-- Total execution time: ~1.85 hours
+- Total execution time: ~1.9 hours
 
 **By Phase:**
 
@@ -37,7 +37,7 @@ Progress: [████████████████████] 97% (38
 | 08 | 4 | 5min | 1min |
 | 09 | 1 | 5min | 5min |
 | 10 | 4/4 | 12min | 3min |
-| 11 | 1/2 | 3min | 3min |
+| 11 | 2/2 | 7min | 4min |
 
 *Updated after each plan completion*
 
@@ -73,9 +73,12 @@ Progress: [████████████████████] 97% (38
 - ArticleReviewQueue is simpler article-scoped view without admin search/filter/sort controls
 - Comment count and review count fetched server-side to avoid tab label layout flash
 - Non-admin users get undefined for reviewQueueContent so Review Queue tab never renders
+- Map to Record<string, number> via Object.fromEntries for server-to-client serialization
+- Badge uses bg-muted text-muted-foreground for subtle appearance in both light and dark modes
+- Removed ml-auto from context menu div; flex-1 on article name handles right-alignment naturally
 
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 11-01-PLAN.md (article review queue tab and comment counts)
-Next: Plan 11-02 — Sidebar review badges
+Stopped at: Completed 11-02-PLAN.md (sidebar review badges) -- Phase 11 complete, all phases done
+Next: All planned phases complete
