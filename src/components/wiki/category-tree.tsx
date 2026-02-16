@@ -29,6 +29,7 @@ interface CategoryNodeProps {
   isAdmin: boolean;
   allCategories: CategoryWithArticles[];
   isSubcategory?: boolean;
+  reviewCounts?: Record<string, number>;
 }
 
 function CategoryNode({
@@ -36,6 +37,7 @@ function CategoryNode({
   isAdmin,
   allCategories,
   isSubcategory = false,
+  reviewCounts,
 }: CategoryNodeProps) {
   const pathname = usePathname();
 
@@ -80,6 +82,11 @@ function CategoryNode({
                         <span className="truncate">{article.title}</span>
                       </Link>
                     </SidebarMenuSubButton>
+                    {(reviewCounts?.[article.id] ?? 0) > 0 && (
+                      <span className="shrink-0 flex items-center justify-center size-5 rounded-full bg-muted text-[10px] font-medium text-muted-foreground">
+                        {reviewCounts![article.id]}
+                      </span>
+                    )}
                     <ArticleContextMenu
                       article={article}
                       categories={allCategories}
@@ -96,6 +103,7 @@ function CategoryNode({
                 isAdmin={isAdmin}
                 allCategories={allCategories}
                 isSubcategory
+                reviewCounts={reviewCounts}
               />
             ))}
           </SidebarMenuSub>
@@ -105,12 +113,13 @@ function CategoryNode({
   );
 }
 
-interface CategoryTreeProps {
+export interface CategoryTreeProps {
   categories: CategoryWithArticles[];
   isAdmin: boolean;
+  reviewCounts?: Record<string, number>;
 }
 
-export function CategoryTree({ categories, isAdmin }: CategoryTreeProps) {
+export function CategoryTree({ categories, isAdmin, reviewCounts }: CategoryTreeProps) {
   if (categories.length === 0) {
     return (
       <div className="px-4 py-3 text-sm text-muted-foreground">
@@ -127,6 +136,7 @@ export function CategoryTree({ categories, isAdmin }: CategoryTreeProps) {
           category={category}
           isAdmin={isAdmin}
           allCategories={categories}
+          reviewCounts={reviewCounts}
         />
       ))}
     </SidebarMenu>

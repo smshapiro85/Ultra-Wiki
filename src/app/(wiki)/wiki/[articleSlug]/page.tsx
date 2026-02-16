@@ -11,6 +11,7 @@ import {
   getCategoryChain,
   isArticleBookmarked,
   getActiveAnnotationCount,
+  getArticleCommentCount,
   getArticleFileLinks,
   getArticleDbTables,
 } from "@/lib/wiki/queries";
@@ -26,6 +27,7 @@ import { AnnotationBanner } from "@/components/wiki/annotation-banner";
 import { VersionHistory } from "@/components/wiki/version-history";
 import { TechnicalView } from "@/components/wiki/technical-view";
 import { CommentsSection } from "@/components/wiki/comments-section";
+import { ArticleReviewQueue } from "@/components/wiki/article-review-queue";
 import { AskAiPageTrigger } from "@/components/chat/ask-ai-page-trigger";
 
 /**
@@ -79,15 +81,20 @@ export default async function ArticlePage({
   // Check session for admin access
   const session = await auth();
 
-  // Check if current user has bookmarked this article and get annotation count + file/table counts for Ask AI
-  const [bookmarked, annotationCount, fileLinks, dbTables] = await Promise.all([
+  // Check if current user has bookmarked this article and get annotation count, comment count, file/table counts for Ask AI
+  const [bookmarked, annotationCount, commentCount, fileLinks, dbTables] = await Promise.all([
     session?.user?.id
       ? isArticleBookmarked(session.user.id, article.id)
       : Promise.resolve(false),
     getActiveAnnotationCount(article.id),
+    getArticleCommentCount(article.id),
     getArticleFileLinks(article.id),
     getArticleDbTables(article.id),
   ]);
+
+  // Compute review count for tab label and determine admin status
+  const reviewCount = (article.needsReview ? 1 : 0) + annotationCount;
+  const isAdmin = session?.user?.role === "admin";
 
   return (
     <div>
@@ -176,6 +183,16 @@ export default async function ArticlePage({
               Sign in to view and post comments.
             </p>
           )
+        }
+        commentCount={commentCount}
+        reviewCount={isAdmin ? reviewCount : undefined}
+        reviewQueueContent={
+          isAdmin ? (
+            <ArticleReviewQueue
+              articleId={article.id}
+              needsReview={article.needsReview}
+            />
+          ) : undefined
         }
         historyContent={
           <VersionHistory
