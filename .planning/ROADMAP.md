@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
 - [ ] **Phase 9: Documentation** - Comprehensive application documentation, codebase audit against all phases, developer-facing guide
 - [x] **Phase 10: Navigation and Article Creation** - Subcategories, manual article creation, sidebar context menus, AI pipeline subcategory awareness
-- [ ] **Phase 11: Add Review To Articles Too** - Article-level review queue tab, comment counts, sidebar review badges
+- [x] **Phase 11: Add Review To Articles Too** - Article-level review queue tab, comment counts, sidebar review badges
 
 ## Phase Details
 
@@ -230,8 +230,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md -- Article-level Review Queue tab (admin-only) and comment count on Comments tab label
-- [ ] 11-02-PLAN.md -- Sidebar review item count badges for admin users (batch query)
+- [x] 11-01-PLAN.md -- Article-level Review Queue tab (admin-only) and comment count on Comments tab label
+- [x] 11-02-PLAN.md -- Sidebar review item count badges for admin users (batch query)
 
 ## Progress
 
@@ -250,4 +250,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. AI Prompt Refinement & Category Strategy | 4/4 | ✓ Complete | 2026-02-14 |
 | 9. Documentation | 0/1 | ○ Not started | -- |
 | 10. Navigation & Article Creation | 4/4 | ✓ Complete | 2026-02-16 |
-| 11. Add Review To Articles Too | 0/2 | ○ Not started | -- |
+| 11. Add Review To Articles Too | 2/2 | ✓ Complete | 2026-02-16 |
