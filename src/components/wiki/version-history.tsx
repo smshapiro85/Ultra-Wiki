@@ -279,17 +279,25 @@ export function VersionHistory({ articleId, articleSlug }: VersionHistoryProps) 
                     )}
                   </div>
                   <div className="flex items-center gap-2 shrink-0 mt-1">
-                    <button
-                      type="button"
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
                         setPreviewVersion(version);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          setPreviewVersion(version);
+                        }
                       }}
                       className="shrink-0 p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
                       title="Preview this version"
                     >
                       <Eye className="size-4" />
-                    </button>
+                    </div>
                     <div
                       className={`size-5 rounded-full border-2 transition-colors ${
                         isSelected

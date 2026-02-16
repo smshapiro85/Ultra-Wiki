@@ -146,7 +146,7 @@ export function ArticleReviewQueue({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="mt-6 flex items-center justify-center py-12">
         <Loader2 className="size-5 animate-spin text-muted-foreground" />
       </div>
     );
@@ -155,7 +155,7 @@ export function ArticleReviewQueue({
   // Empty state
   if (!needsReview && annotations.length === 0) {
     return (
-      <Card>
+      <Card className="mt-6">
         <CardContent className="py-12 text-center">
           <p className="text-sm text-muted-foreground">No review items</p>
         </CardContent>
@@ -164,7 +164,7 @@ export function ArticleReviewQueue({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="mt-6 space-y-3">
       {/* Merge conflict card */}
       {needsReview && (
         <Card className="border-orange-200 dark:border-orange-800">

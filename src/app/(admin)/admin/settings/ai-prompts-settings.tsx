@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 import { saveAiPrompts } from "./actions";
 import { Input } from "@/components/ui/input";
@@ -70,15 +70,20 @@ function ModelFields({
 }
 
 export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
-  const [state, formAction, isPending] = useActionState(saveAiPrompts, null);
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state?.success) {
-      toast.success("AI prompts saved");
-    } else if (state?.error) {
-      toast.error(state.error);
-    }
-  }, [state]);
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startTransition(async () => {
+      const result = await saveAiPrompts(null, formData);
+      if (result?.success) {
+        toast.success("AI prompts saved");
+      } else if (result?.error) {
+        toast.error(result.error);
+      }
+    });
+  }
 
   return (
     <Card>
@@ -86,7 +91,7 @@ export function AiPromptsSettings({ settings }: AiPromptsSettingsProps) {
         <CardTitle>AI Prompts</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="analysis_prompt">Code Analysis Prompt</Label>
             <Textarea

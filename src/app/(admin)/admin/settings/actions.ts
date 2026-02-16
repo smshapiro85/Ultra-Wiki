@@ -97,7 +97,7 @@ export async function saveApiKeys(
       await setSetting(key, value);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath("/admin/api-keys");
     return { success: true };
   } catch (error) {
     console.error("Failed to save API keys:", error);
@@ -138,7 +138,7 @@ export async function saveAiPrompts(
       await setSetting(key, value);
     }
 
-    revalidatePath("/admin/settings");
+    revalidatePath("/admin/ai-prompts");
     return { success: true };
   } catch (error) {
     console.error("Failed to save AI prompts:", error);
