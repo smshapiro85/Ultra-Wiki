@@ -21,7 +21,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Ask AI & Notifications** - Global and page-level AI chat, Slack/email notifications
 - [x] **Phase 8: AI Prompt Refinement & Category Strategy** - Consistent category creation rules, article content formatting, prompt hardening against run-to-run drift
 - [ ] **Phase 9: Documentation** - Comprehensive application documentation, codebase audit against all phases, developer-facing guide
-- [ ] **Phase 10: Navigation and Article Creation** - Subcategories, drag-and-drop sidebar, manual article creation, AI pipeline subcategory awareness
+- [x] **Phase 10: Navigation and Article Creation** - Subcategories, manual article creation, sidebar context menus, AI pipeline subcategory awareness
+- [ ] **Phase 11: Add Review To Articles Too** - Article-level review queue tab, comment counts, sidebar review badges
 
 ## Phase Details
 
@@ -196,30 +197,46 @@ Plans:
 - [ ] 09-01-PLAN.md -- Codebase audit against all 8 phases, review and update existing docs (ai-pipeline.md, ultrawiki-spec.md), write comprehensive docs/application-guide.md covering architecture, setup, and all features
 
 ### Phase 10: Navigation and Article Creation
-**Goal**: Admins can organize the wiki with 2-level subcategories, drag-and-drop sidebar management, manual article creation, and the AI pipeline understands subcategories
+**Goal**: Admins can organize the wiki with 2-level subcategories, sidebar context menus, manual article creation, and the AI pipeline understands subcategories
 **Depends on**: Phase 9
-**Requirements**: Post-v1 enhancement — subcategory support, drag-and-drop organization, manual article creation, AI subcategory awareness
+**Requirements**: Post-v1 enhancement — subcategory support, sidebar management, manual article creation, AI subcategory awareness
 **Success Criteria** (what must be TRUE):
   1. Categories support 2-level nesting (Category > Subcategory > Articles) with mixed content allowed
-  2. Admin can drag and drop categories, subcategories, and articles to reorder and reparent, with immediate auto-save
-  3. Admin can create articles manually via a header button and modal with cascading category/subcategory picker
-  4. Sidebar items have hover context menus for inline management (add, rename, delete, move)
-  5. Header search bar is centered and wider, with Create button to its right (admin-only)
-  6. AI pipeline prompts and code understand subcategories and can create/place articles into them
-  7. Non-admin users see a clean sidebar with no management controls
-**Plans:** 5 plans
+  2. Admin can create articles manually via a header button and modal with cascading category/subcategory picker
+  3. Sidebar items have hover context menus for inline management (add, rename, delete, move)
+  4. Header search bar is centered and wider, with Create button to its right (admin-only)
+  5. AI pipeline prompts and code understand subcategories and can create/place articles into them
+  6. Non-admin users see a clean sidebar with no management controls
+**Plans:** 4 plans
 
 Plans:
-- [ ] 10-01-PLAN.md -- Install @dnd-kit + shadcn Select, create category-actions.ts and article-actions.ts server actions
-- [ ] 10-02-PLAN.md -- Update AI pipeline for subcategory awareness (schemas, prompts, pipeline, analyze, plan)
-- [ ] 10-03-PLAN.md -- Redesign header layout with centered search, admin Create button, and create article modal
-- [ ] 10-04-PLAN.md -- Add hover-triggered context menus to sidebar items (categories, subcategories, articles)
-- [ ] 10-05-PLAN.md -- Build drag-and-drop sidebar with @dnd-kit flatten-then-reorder pattern and visual verification
+- [x] 10-01-PLAN.md -- Install @dnd-kit + shadcn Select, create category-actions.ts and article-actions.ts server actions
+- [x] 10-02-PLAN.md -- Update AI pipeline for subcategory awareness (schemas, prompts, pipeline, analyze, plan)
+- [x] 10-03-PLAN.md -- Redesign header layout with centered search, admin Create button, and create article modal
+- [x] 10-04-PLAN.md -- Add hover-triggered context menus to sidebar items (categories, subcategories, articles)
+
+### Phase 11: Add Review To Articles Too
+**Goal**: Admins can review merge conflicts and AI annotations directly on article pages via a fifth Review Queue tab, see comment counts on the Comments tab, and scan sidebar badges for articles needing attention
+**Depends on**: Phase 10
+**Requirements**: Post-v1 enhancement -- derived from the existing admin Review Queue (Phase 5, plan 05-05) and AI review annotations (Phase 5, plan 05-04)
+**Success Criteria** (what must be TRUE):
+  1. Admin sees a "Review Queue" tab on article pages (after Comments, before History) showing merge conflicts and active AI annotations for that article
+  2. The Review Queue tab label shows the count of pending items in parentheses when count > 0
+  3. Non-admin users do not see the Review Queue tab
+  4. The Comments tab label shows the count of comments in parentheses when count > 0, visible to all users
+  5. Admin users see subtle review count badges on sidebar articles that have pending review items
+  6. Non-admin users see no review badges in the sidebar
+  7. The admin Review Queue page at /admin/review-queue remains unchanged
+**Plans:** 2 plans
+
+Plans:
+- [ ] 11-01-PLAN.md -- Article-level Review Queue tab (admin-only) and comment count on Comments tab label
+- [ ] 11-02-PLAN.md -- Sidebar review item count badges for admin users (batch query)
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11
 
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
@@ -232,13 +249,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Ask AI & Notifications | 3/3 | ✓ Complete | 2026-02-14 |
 | 8. AI Prompt Refinement & Category Strategy | 4/4 | ✓ Complete | 2026-02-14 |
 | 9. Documentation | 0/1 | ○ Not started | -- |
-| 10. Navigation & Article Creation | 0/5 | ○ Not started | -- |
-
-### Phase 11: Add Review To Articles Too
-
-**Goal:** [To be planned]
-**Depends on:** Phase 10
-**Plans:** 0 plans
-
-Plans:
-- [ ] TBD (run /gsd:plan-phase 11 to break down)
+| 10. Navigation & Article Creation | 4/4 | ✓ Complete | 2026-02-16 |
+| 11. Add Review To Articles Too | 0/2 | ○ Not started | -- |
